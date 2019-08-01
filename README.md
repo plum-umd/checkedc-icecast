@@ -54,7 +54,7 @@ This is the typical procedure if you download the tar file.
 
 If you retrive the code from Git, make sure to clone recursively:
 
-    git clone --recursive https://git.xiph.org/icecast-server.git
+    git clone --recursive https://github.com/plum-umd/checkedc-icecast.git
 
 After that, create the configure script by running: `./autogen.sh`.
 Now you can just follow the steps mentioned above.
