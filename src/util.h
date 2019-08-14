@@ -15,7 +15,7 @@
 #define __UTIL_H__
 
 /* for FILE* */
-#include <stdio.h>
+#include <stdio_checked.h>
 
 #include "common/net/sock.h"
 #include "icecasttypes.h"

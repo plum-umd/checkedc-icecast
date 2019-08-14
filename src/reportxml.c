@@ -14,7 +14,7 @@
 #include <config.h>
 #endif
 
-#include <string.h>
+#include <string_checked.h>
 
 #include "common/thread/thread.h"
 #include "common/avl/avl.h"

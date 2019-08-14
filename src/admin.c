@@ -15,10 +15,10 @@
 #include <config.h>
 #endif
 
-#include <string.h>
-#include <stdlib.h>
+#include <string_checked.h>
+#include <stdlib_checked.h>
 #include <stdarg.h>
-#include <time.h>
+#include <time_checked.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>

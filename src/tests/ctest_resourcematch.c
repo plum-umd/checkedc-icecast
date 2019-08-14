@@ -11,7 +11,7 @@
 #endif
 
 #include <stddef.h> /* for NULL */
-#include <stdio.h> /* for snprintf() */
+#include <stdio_checked.h> /* for snprintf() */
 
 #include "ctest_lib.h"
 

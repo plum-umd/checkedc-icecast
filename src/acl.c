@@ -11,14 +11,14 @@
 #include <config.h>
 #endif
 
-#include <string.h>
-#include <stdlib.h>
+#include <string_checked.h>
+#include <stdlib_checked.h>
 
 #include "acl.h"
 #include "admin.h"
 #include "util.h"
 
-#include <stdio.h>
+#include <stdio_checked.h>
 
 #define MAX_ADMIN_COMMANDS 32
 

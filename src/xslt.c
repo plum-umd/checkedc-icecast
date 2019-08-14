@@ -15,7 +15,7 @@
 #include <config.h>
 #endif
 
-#include <string.h>
+#include <string_checked.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/debugXML.h>
 #include <libxml/HTMLtree.h>
@@ -31,7 +31,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <errno.h>
+#include <errno_checked.h>
 
 #ifdef  HAVE_SYS_TIME_H
 #include <sys/time.h>

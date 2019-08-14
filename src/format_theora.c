@@ -18,7 +18,7 @@
 #include <config.h>
 #endif
 
-#include <stdlib.h>
+#include <stdlib_checked.h>
 #include <ogg/ogg.h>
 #include <theora/theora.h>
 

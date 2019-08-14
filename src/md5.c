@@ -40,8 +40,8 @@
 #include "compat.h"
 #include "md5.h"
 
-#include <stdio.h>
-#include <string.h>
+#include <stdio_checked.h>
+#include <string_checked.h>
 #include <ctype.h>
 
 static void MD5Transform(uint32_t buf[4], uint32_t const in[HASH_LEN]);

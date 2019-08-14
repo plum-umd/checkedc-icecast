@@ -10,7 +10,7 @@
 #include <config.h>
 #endif
 
-#include <string.h>
+#include <string_checked.h>
 
 #include "curl.h"
 #include "event.h"

@@ -11,8 +11,8 @@
 #include <config.h>
 #endif
 
-#include <string.h>
-#include <stdlib.h>
+#include <string_checked.h>
+#include <stdlib_checked.h>
 
 #include "event.h"
 #include "event_log.h"

@@ -19,10 +19,10 @@
 #include <config.h>
 #endif
 
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <stdio.h>
+#include <stdlib_checked.h>
+#include <string_checked.h>
+#include <errno_checked.h>
+#include <stdio_checked.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 

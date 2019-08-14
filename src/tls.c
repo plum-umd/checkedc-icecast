@@ -19,7 +19,7 @@
 #include <openssl/err.h>
 #endif
 
-#include <stdlib.h>
+#include <stdlib_checked.h>
 #include <strings.h>
 
 #include "tls.h"

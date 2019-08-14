@@ -20,7 +20,7 @@
 #include <sys/select.h>
 #endif
 
-#include <string.h>
+#include <string_checked.h>
 
 #include "common/net/sock.h"
 #include "common/thread/thread.h"

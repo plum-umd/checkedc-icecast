@@ -10,9 +10,9 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio_checked.h>
+#include <stdlib_checked.h>
+#include <string_checked.h>
 #include <stdarg.h>
 
 #include "buffer.h"

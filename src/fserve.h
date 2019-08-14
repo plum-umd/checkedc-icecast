@@ -14,7 +14,7 @@
 #ifndef __FSERVE_H__
 #define __FSERVE_H__
 
-#include <stdio.h>
+#include <stdio_checked.h>
 
 #include "icecasttypes.h"
 

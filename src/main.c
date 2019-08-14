@@ -17,9 +17,9 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
-#include <string.h>
-#include <errno.h>
+#include <stdio_checked.h>
+#include <string_checked.h>
+#include <errno_checked.h>
 
 #ifdef HAVE_CURL
 #include "curl.h"
@@ -37,7 +37,7 @@
 #endif
 
 #ifdef HAVE_UNISTD_H
-# include <unistd.h>
+# include <unistd_checked.h>
 #endif
 
 #ifdef HAVE_UNAME

@@ -21,8 +21,8 @@
 #include <config.h>
 #endif
 
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib_checked.h>
+#include <string_checked.h>
 
 #include "refbuf.h"
 

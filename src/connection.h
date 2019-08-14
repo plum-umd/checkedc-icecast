@@ -15,7 +15,7 @@
 #define __CONNECTION_H__
 
 #include <sys/types.h>
-#include <time.h>
+#include <time_checked.h>
 
 #include "tls.h"
 
