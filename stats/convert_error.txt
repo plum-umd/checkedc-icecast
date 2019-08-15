@@ -1,0 +1,66 @@
+nohup: ignoring input
+Enable itype propagation:0
+Merge multiple function declaration:0
+Sound handling of var args functions:0
+file|#constraints|#ptr|#ntarr|#arr|#wild
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/acl.c|60|39|2|10|9
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/admin.c|244|140|27|11|66
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/auth.c|227|117|1|6|103
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/auth_anonymous.c|6|2|0|0|4
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/auth_enforce_auth.c|7|5|0|0|2
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/auth_htpasswd.c|86|40|12|1|33
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/auth_static.c|22|12|0|0|10
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/auth_url.c|110|49|15|13|33
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/buffer.c|69|43|3|9|14
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/cfgfile.c|469|178|2|2|287
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/client.c|156|118|15|10|13
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl/avl.c|213|121|4|4|84
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/httpp/encoding.c|227|154|4|25|44
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/httpp/httpp.c|235|101|12|52|70
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/log/log.c|62|16|8|24|14
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net/resolver.c|18|0|0|0|18
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net/sock.c|40|6|0|6|28
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/thread/thread.c|139|105|6|0|28
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/timing/timing.c|0|0|0|0|0
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/connection.c|239|170|10|13|46
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/curl.c|12|4|0|0|8
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/errors.c|5|2|0|1|2
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/event.c|64|27|7|0|30
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/event_exec.c|49|33|2|0|14
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/event_log.c|14|9|0|0|5
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/event_url.c|38|11|4|1|22
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/fastevent.c|46|28|0|1|17
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format.c|66|49|4|5|8
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format_ebml.c|141|87|0|6|48
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format_flac.c|22|15|0|1|6
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format_kate.c|24|15|0|0|9
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format_midi.c|21|15|0|0|6
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format_mp3.c|127|84|13|7|23
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format_ogg.c|112|83|1|0|28
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format_opus.c|44|31|0|3|10
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format_skeleton.c|20|14|0|0|6
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/format_vorbis.c|144|106|9|1|28
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/fserve.c|90|43|12|5|30
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/global.c|0|0|0|0|0
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/listensocket.c|173|130|4|1|38
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/logging.c|23|8|4|6|5
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/main.c|35|13|4|15|3
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/matchfile.c|35|18|7|1|9
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/md5.c|22|9|0|8|5
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/module.c|94|63|8|3|20
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/playlist.c|38|14|0|0|24
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/refbuf.c|9|9|0|0|0
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/refobject.c|27|10|6|0|11
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/reportxml.c|286|129|13|4|140
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/resourcematch.c|36|14|3|14|5
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/sighandler.c|0|0|0|0|0
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/slave.c|119|65|6|6|42
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/source.c|154|76|2|17|59
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/stats.c|303|122|50|8|123
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/tests/ctest_lib.c|10|6|3|0|1
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/tls.c|42|20|0|0|22
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/util.c|234|76|40|55|63
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/xslt.c|44|15|2|1|26
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/yp.c|164|46|35|1|82
+313.72user 3.86system 5:19.53elapsed 99%CPU (0avgtext+0avgdata 549904maxresident)k
+0inputs+2704outputs (0major+1680163minor)pagefaults 0swaps
