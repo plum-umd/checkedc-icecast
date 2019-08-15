@@ -1,0 +1,3 @@
+JSON and 'convert_all.sh' are equal
+Something is wrong...
+/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/global.c
