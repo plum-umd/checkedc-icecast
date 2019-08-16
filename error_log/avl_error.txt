@@ -1,0 +1,346 @@
+make  all-recursive
+make[1]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+Making all in src
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Making all in common/avl
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+  CC       libiceavl_la-avl.lo
+avl.c:49:20: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    node->parent = parent;
+                   ^~~~~~
+avl.c:75:17: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      t->root = root;
+                ^~~~
+avl.c:120:42: error: passing '_Ptr<avl_node>' (aka '_Ptr<struct avl_node_tag>') to parameter of incompatible type 'avl_node *' (aka 'struct avl_node_tag *')
+    avl_node * node = avl_node_new (key, ob->root);
+                                         ^~~~~~~~
+avl.c:42:45: note: passing argument to parameter 'parent' here
+avl_node *avl_node_new(void *key, avl_node *parent) : itype(_Ptr<avl_node> ) 
+                                            ^
+avl.c:132:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<avl_node>' (aka '_Ptr<struct avl_node_tag>')
+    t = ob->root;
+      ^ ~~~~~~~~
+avl.c:133:11: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    s = p = t->right;
+          ^ ~~~~~~~~
+avl.c:139:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    q = p->left;
+      ^ ~~~~~~~
+avl.c:157:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    q = p->right;
+      ^ ~~~~~~~~
+avl.c:180:13: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      r = p = s->left;
+            ^ ~~~~~~~
+avl.c:182:13: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      r = p = s->right;
+            ^ ~~~~~~~~
+avl.c:187:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    p = p->left;
+      ^ ~~~~~~~
+avl.c:190:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    p = p->right;
+      ^ ~~~~~~~~
+avl.c:235:9: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      p = r->right;
+        ^ ~~~~~~~~
+avl.c:251:9: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      p = r->left;
+        ^ ~~~~~~~
+avl.c:165:20: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        p->right = q;
+                   ^
+avl.c:147:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        p->left = q;
+                  ^
+avl.c:254:28: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        p->right->parent = r;
+                           ^
+avl.c:256:18: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->right = r;
+                 ^
+avl.c:257:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      r->parent = p;
+                  ^
+avl.c:260:27: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        p->left->parent = s;
+                          ^
+avl.c:262:17: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->left = s;
+                ^
+avl.c:263:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      s->parent = p;
+                  ^
+avl.c:238:27: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        p->left->parent = r;
+                          ^
+avl.c:240:17: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->left = r;
+                ^
+avl.c:241:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      r->parent = p;
+                  ^
+avl.c:244:28: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        p->right->parent = s;
+                           ^
+avl.c:246:18: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->right = s;
+                 ^
+avl.c:247:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      s->parent = p;
+                  ^
+avl.c:224:27: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        r->left->parent = s;
+                          ^
+avl.c:226:17: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      r->left = s;
+                ^
+avl.c:227:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      s->parent = r;
+                  ^
+avl.c:216:28: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        r->right->parent = s;
+                           ^
+avl.c:218:18: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      r->right = s;
+                 ^
+avl.c:219:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      s->parent = r;
+                  ^
+avl.c:283:15: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    t->left = p;
+              ^
+avl.c:281:16: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    t->right = p;
+               ^
+avl.c:285:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->parent = t;
+                  ^
+avl.c:124:25: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      ob->root->right = node;
+                        ^~~~
+avl.c:293:14: error: initializing 'avl_node *' (aka 'struct avl_node_tag *') with an expression of incompatible type '_Ptr<struct avl_node_tag>'
+  avl_node * p = tree->root->right;
+             ^   ~~~~~~~~~~~~~~~~~
+avl.c:313:14: error: initializing 'avl_node *' (aka 'struct avl_node_tag *') with an expression of incompatible type '_Ptr<struct avl_node_tag>'
+  avl_node * x = tree->root->right;
+             ^   ~~~~~~~~~~~~~~~~~
+avl.c:343:5: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+  x = tree->root->right;
+    ^ ~~~~~~~~~~~~~~~~~
+avl.c:356:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    x = x->left;
+      ^ ~~~~~~~
+avl.c:366:9: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      x = x->parent;
+        ^ ~~~~~~~~~
+avl.c:373:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    x = x->right;
+      ^ ~~~~~~~~
+avl.c:380:9: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      x = x->parent;
+        ^ ~~~~~~~~~
+avl.c:398:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    y = x->left;
+      ^ ~~~~~~~
+avl.c:400:9: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      y = y->right;
+        ^ ~~~~~~~~
+avl.c:416:13: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    x_child = x->left;
+            ^ ~~~~~~~
+avl.c:419:13: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    x_child = x->right;
+            ^ ~~~~~~~~
+avl.c:441:5: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+  p = x->parent;
+    ^ ~~~~~~~~~
+avl.c:473:11: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      top = p->parent;
+          ^ ~~~~~~~~~
+avl.c:476:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    q = p->left;
+      ^ ~~~~~~~
+avl.c:478:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    q = p->right;
+      ^ ~~~~~~~~
+avl.c:537:9: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      r = q->right;
+        ^ ~~~~~~~~
+avl.c:557:9: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      r = q->left;
+        ^ ~~~~~~~
+avl.c:600:7: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    p = x->parent;
+      ^ ~~~~~~~~~
+avl.c:430:24: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    x->parent->right = x_child;
+                       ^~~~~~~
+avl.c:427:23: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    x->parent->left = x_child;
+                      ^~~~~~~
+avl.c:561:28: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        r->right->parent = q;
+                           ^
+avl.c:563:18: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      r->right = q;
+                 ^
+avl.c:564:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      q->parent = r;
+                  ^
+avl.c:568:27: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        r->left->parent = p;
+                          ^
+avl.c:570:17: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      r->left = p;
+                ^
+avl.c:571:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->parent = r;
+                  ^
+avl.c:541:27: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        r->left->parent = q;
+                          ^
+avl.c:543:17: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      r->left = q;
+                ^
+avl.c:544:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      q->parent = r;
+                  ^
+avl.c:548:28: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        r->right->parent = p;
+                           ^
+avl.c:550:18: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      r->right = p;
+                 ^
+avl.c:551:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->parent = r;
+                  ^
+avl.c:523:28: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        q->right->parent = p;
+                           ^
+avl.c:525:18: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      q->right = p;
+                 ^
+avl.c:526:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->parent = q;
+                  ^
+avl.c:513:27: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        q->left->parent = p;
+                          ^
+avl.c:515:17: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      q->left = p;
+                ^
+avl.c:516:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->parent = q;
+                  ^
+avl.c:497:28: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        q->right->parent = p;
+                           ^
+avl.c:499:18: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      q->right = p;
+                 ^
+avl.c:500:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->parent = q;
+                  ^
+avl.c:487:27: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        q->left->parent = p;
+                          ^
+avl.c:489:17: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      q->left = p;
+                ^
+avl.c:490:19: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+      p->parent = q;
+                  ^
+avl.c:594:18: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    top->right = q;
+                 ^
+avl.c:592:17: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    top->left = q;
+                ^
+avl.c:651:10: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+    node = tree->root->right;
+         ^ ~~~~~~~~~~~~~~~~~
+avl.c:655:14: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+        node = node->left;
+             ^ ~~~~~~~~~~
+avl.c:663:14: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+        node = node->left;
+             ^ ~~~~~~~~~~
+avl.c:665:18: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+            node = node->right;
+                 ^ ~~~~~~~~~~~
+avl.c:672:18: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+            node = node->parent;
+                 ^ ~~~~~~~~~~~~
+avl.c:686:14: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+        node = node->right;
+             ^ ~~~~~~~~~~~
+avl.c:688:18: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+            node = node->left;
+                 ^ ~~~~~~~~~~
+avl.c:695:18: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+            node = node->parent;
+                 ^ ~~~~~~~~~~~~
+avl.c:720:8: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+  node = tree->root->right;
+       ^ ~~~~~~~~~~~~~~~~~
+avl.c:723:12: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      node = node->left;
+           ^ ~~~~~~~~~~
+avl.c:726:12: error: assigning to 'avl_node *' (aka 'struct avl_node_tag *') from incompatible type '_Ptr<struct avl_node_tag>'
+      node = node->right;
+           ^ ~~~~~~~~~~~
+avl.c:749:14: error: initializing 'avl_node *' (aka 'struct avl_node_tag *') with an expression of incompatible type '_Ptr<struct avl_node_tag>'
+  avl_node * x = tree->root->right;
+             ^   ~~~~~~~~~~~~~~~~~
+avl.c:872:14: error: initializing 'avl_node *' (aka 'struct avl_node_tag *') with an expression of incompatible type '_Ptr<struct avl_node_tag>'
+  avl_node * x = tree->root->right;
+             ^   ~~~~~~~~~~~~~~~~~
+avl.c:913:14: error: initializing 'avl_node *' (aka 'struct avl_node_tag *') with an expression of incompatible type '_Ptr<struct avl_node_tag>'
+  avl_node * x = tree->root->right;
+             ^   ~~~~~~~~~~~~~~~~~
+avl.c:975:24: error: passing '_Ptr<struct avl_node_tag>' to parameter of incompatible type 'avl_node *' (aka 'struct avl_node_tag *')
+    avl_verify_parent (node->left, node);
+                       ^~~~~~~~~~
+avl.c:969:41: note: passing argument to parameter 'node' here
+static void avl_verify_parent(avl_node *node, avl_node *parent : itype(_Ptr<avl_node> ) )
+                                        ^
+avl.c:978:24: error: passing '_Ptr<struct avl_node_tag>' to parameter of incompatible type 'avl_node *' (aka 'struct avl_node_tag *')
+    avl_verify_parent (node->right, node);
+                       ^~~~~~~~~~~
+avl.c:969:41: note: passing argument to parameter 'node' here
+static void avl_verify_parent(avl_node *node, avl_node *parent : itype(_Ptr<avl_node> ) )
+                                        ^
+avl.c:1008:25: error: passing '_Ptr<struct avl_node_tag>' to parameter of incompatible type 'avl_node *' (aka 'struct avl_node_tag *')
+    avl_verify_parent  (tree->root->right, tree->root);
+                        ^~~~~~~~~~~~~~~~~
+avl.c:969:41: note: passing argument to parameter 'node' here
+static void avl_verify_parent(avl_node *node, avl_node *parent : itype(_Ptr<avl_node> ) )
+                                        ^
+avl.c:1030:20: error: argument does not meet declared bounds for 1st parameter
+  return snprintf (buffer, AVL_KEY_PRINTER_BUFLEN, "%p", key);
+                   ^~~~~~
+avl.c:1030:20: note: source bounds are an empty range
+avl.c:1030:20: note: destination upper bound is above source upper bound
+avl.c:1030:20: note: (expanded) expected argument bounds are 'bounds((char *)buffer, (char *)buffer + (size_t)(256) == 0 ? 0 : (size_t)(256) - 1)'
+avl.c:1030:20: note: (expanded) inferred bounds are 'bounds(buffer, buffer + 0)'
+  return snprintf (buffer, AVL_KEY_PRINTER_BUFLEN, "%p", key);
+                   ^~~~~~
+avl.c:1105:17: error: passing '_Ptr<int (_Nt_array_ptr<char> : count(0), void *)>' to parameter of incompatible type '_Ptr<int (char *, void *)>': type mismatch at 1st parameter ('_Nt_array_ptr<char>' vs 'char *')
+    print_node (key_printer, tree->root->right, &top);
+                ^~~~~~~~~~~
+avl.c:1066:51: note: passing argument to parameter 'key_printer' here
+static void print_node(_Ptr<int (char* , void* )> key_printer, avl_node *node : itype(_Ptr<avl_node> ) , _Ptr<link_node> link)
+                                                  ^
+102 errors generated.
+Makefile:421: recipe for target 'libiceavl_la-avl.lo' failed
+make[3]: *** [libiceavl_la-avl.lo] Error 1
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+Makefile:1754: recipe for target 'all-recursive' failed
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Makefile:490: recipe for target 'all-recursive' failed
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+Makefile:401: recipe for target 'all' failed
+make: *** [all] Error 2
