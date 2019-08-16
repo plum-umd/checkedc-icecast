@@ -40,40 +40,40 @@ struct listensocket_container_tag {
     listensocket_t **sock;
     int *sockref;
     size_t sock_len;
-    void (*sockcount_cb)(size_t count, void *userdata);
-    void *sockcount_userdata;
+    _Ptr<void (size_t , void* )> sockcount_cb;
+    void* sockcount_userdata;
 };
 struct listensocket_tag {
     refobject_base_t __base;
     size_t sockrefc;
     mutex_t lock;
     rwlock_t listener_rwlock;
-    listener_t *listener;
-    listener_t *listener_update;
+    _Ptr<listener_t> listener;
+    _Ptr<listener_t> listener_update;
     sock_t sock;
 };
 
-static listensocket_t * listensocket_container_get_by_id(listensocket_container_t *self, const char *id);
-static int listensocket_container_configure__unlocked(listensocket_container_t *self, const ice_config_t *config);
-static int listensocket_container_setup__unlocked(listensocket_container_t *self);
-static ssize_t listensocket_container_sockcount__unlocked(listensocket_container_t *self);
-static listensocket_t * listensocket_new(const listener_t *listener);
-static int              listensocket_apply_config(listensocket_t *self);
-static int              listensocket_apply_config__unlocked(listensocket_t *self);
-static int              listensocket_set_update(listensocket_t *self, const listener_t *listener);
+static listensocket_t * listensocket_container_get_by_id(_Ptr<listensocket_container_t> self, _Nt_array_ptr<const char> id);
+static int listensocket_container_configure__unlocked(listensocket_container_t *self, _Ptr<const ice_config_t> config);
+static int listensocket_container_setup__unlocked(_Ptr<listensocket_container_t> self);
+static ssize_t listensocket_container_sockcount__unlocked(_Ptr<listensocket_container_t> self);
+static listensocket_t * listensocket_new(_Ptr<const listener_t> listener);
+static int listensocket_apply_config(listensocket_t *self : itype(_Ptr<listensocket_t> ) );
+static int listensocket_apply_config__unlocked(_Ptr<listensocket_t> self);
+static int listensocket_set_update(listensocket_t *self : itype(_Ptr<listensocket_t> ) , _Ptr<const listener_t> listener);
 #ifdef HAVE_POLL
-static inline int listensocket__poll_fill(listensocket_t *self, struct pollfd *p);
+static int listensocket__poll_fill(listensocket_t *self : itype(_Ptr<listensocket_t> ) , _Ptr<struct pollfd> p);
 #else
 static inline int listensocket__select_set(listensocket_t *self, fd_set *set, int *max);
 static inline int listensocket__select_isset(listensocket_t *self, fd_set *set);
 #endif
 
-static inline const char * __string_default(const char *str, const char *def)
+static _Ptr<const char> __string_default(_Ptr<const char> str, _Ptr<const char> def)
 {
     return str != NULL ? str : def;
 }
 
-static inline int __socket_listen(sock_t serversock, const listener_t *listener)
+static int __socket_listen(int serversock, _Ptr<const listener_t> listener)
 {
     int listen_backlog = listener->listen_backlog;
 
@@ -87,7 +87,7 @@ static inline int __socket_listen(sock_t serversock, const listener_t *listener)
     return sock_listen(serversock, listen_backlog);
 }
 
-static inline int __listener_cmp(const listener_t *a, const listener_t *b)
+static int __listener_cmp(_Ptr<const listener_t> a, _Ptr<const listener_t> b)
 {
     if (a == b)
         return 1;
@@ -106,7 +106,7 @@ static inline int __listener_cmp(const listener_t *a, const listener_t *b)
     return 1;
 }
 
-static inline void __call_sockcount_cb(listensocket_container_t *self)
+static void __call_sockcount_cb(_Ptr<listensocket_container_t> self)
 {
     if (self->sockcount_cb == NULL)
         return;
@@ -114,7 +114,7 @@ static inline void __call_sockcount_cb(listensocket_container_t *self)
     self->sockcount_cb(listensocket_container_sockcount__unlocked(self), self->sockcount_userdata);
 }
 
-static void __listensocket_container_clear_sockets(listensocket_container_t *self)
+static void __listensocket_container_clear_sockets(listensocket_container_t *self : itype(_Ptr<listensocket_container_t> ) )
 {
     size_t i;
 
@@ -141,7 +141,7 @@ static void __listensocket_container_clear_sockets(listensocket_container_t *sel
 }
 
 
-static void __listensocket_container_free(refobject_t self, void **userdata)
+static void __listensocket_container_free(refobject_t self, void** userdata)
 {
     listensocket_container_t *container = REFOBJECT_TO_TYPE(self, listensocket_container_t *);
     thread_mutex_lock(&container->lock);
@@ -150,7 +150,7 @@ static void __listensocket_container_free(refobject_t self, void **userdata)
     thread_mutex_destroy(&container->lock);
 }
 
-int __listensocket_container_new(refobject_t self, const refobject_type_t *type, va_list ap)
+int __listensocket_container_new(refobject_t self, _Ptr<const refobject_type_t> type, va_list ap)
 {
     listensocket_container_t *ret = REFOBJECT_TO_TYPE(self, listensocket_container_t*);
 
@@ -169,9 +169,9 @@ REFOBJECT_DEFINE_TYPE(listensocket_container_t,
         REFOBJECT_DEFINE_TYPE_NEW(__listensocket_container_new)
         );
 
-static inline void __find_matching_entry(listensocket_container_t *self, const listener_t *listener, listensocket_t ***found, int **ref)
+static void __find_matching_entry(listensocket_container_t *self : itype(_Ptr<listensocket_container_t> ) , _Ptr<const listener_t> listener, listensocket_t ***found : itype(_Ptr<listensocket_t**> ) , _Ptr<_Ptr<int>> ref)
 {
-    const listener_t *b;
+    _Ptr<const listener_t> b = NULL;
     int test;
     size_t i;
 
@@ -194,7 +194,7 @@ static inline void __find_matching_entry(listensocket_container_t *self, const l
     *ref = NULL;
 }
 
-int                         listensocket_container_configure(listensocket_container_t *self, const ice_config_t *config)
+int listensocket_container_configure(_Ptr<listensocket_container_t> self, _Ptr<const ice_config_t> config)
 {
     int ret;
 
@@ -208,13 +208,13 @@ int                         listensocket_container_configure(listensocket_contai
     return ret;
 }
 
-static int listensocket_container_configure__unlocked(listensocket_container_t *self, const ice_config_t *config)
+static int listensocket_container_configure__unlocked(listensocket_container_t *self, _Ptr<const ice_config_t> config)
 {
     listensocket_t **n;
     listensocket_t **match;
-    listener_t *cur;
+    _Ptr<listener_t> cur = NULL;
     int *r;
-    int *m;
+    _Ptr<int> m = NULL;
     size_t i;
 
     if (!self || !config)
@@ -268,9 +268,9 @@ static int listensocket_container_configure__unlocked(listensocket_container_t *
     return 0;
 }
 
-int                         listensocket_container_configure_and_setup(listensocket_container_t *self, const ice_config_t *config)
+int listensocket_container_configure_and_setup(_Ptr<listensocket_container_t> self, _Ptr<const ice_config_t> config)
 {
-    void (*cb)(size_t count, void *userdata);
+    _Ptr<void (size_t , void* )> cb = NULL;
     int ret;
 
     if (!self)
@@ -293,7 +293,7 @@ int                         listensocket_container_configure_and_setup(listensoc
     return ret;
 }
 
-int                         listensocket_container_setup(listensocket_container_t *self)
+int listensocket_container_setup(_Ptr<listensocket_container_t> self)
 {
     int ret;
 
@@ -306,7 +306,7 @@ int                         listensocket_container_setup(listensocket_container_
 
     return ret;
 }
-static int listensocket_container_setup__unlocked(listensocket_container_t *self)
+static int listensocket_container_setup__unlocked(_Ptr<listensocket_container_t> self)
 {
     listener_type_t type;
     size_t i;
@@ -335,7 +335,7 @@ static int listensocket_container_setup__unlocked(listensocket_container_t *self
     return ret;
 }
 
-static listensocket_t *       listensocket_container_accept__inner(listensocket_container_t *self, int timeout)
+static listensocket_t * listensocket_container_accept__inner(_Ptr<listensocket_container_t> self, int timeout)
 {
 #ifdef HAVE_POLL
     struct pollfd ufds[self->sock_len];
@@ -424,10 +424,10 @@ static listensocket_t *       listensocket_container_accept__inner(listensocket_
     return NULL;
 #endif
 }
-connection_t *              listensocket_container_accept(listensocket_container_t *self, int timeout)
+_Ptr<connection_t> listensocket_container_accept(_Ptr<listensocket_container_t> self, int timeout)
 {
     listensocket_t *ls;
-    connection_t *ret;
+    _Ptr<connection_t> ret = NULL;
 
     if (!self)
         return NULL;
@@ -443,7 +443,7 @@ connection_t *              listensocket_container_accept(listensocket_container
     return ret;
 }
 
-int                         listensocket_container_set_sockcount_cb(listensocket_container_t *self, void (*cb)(size_t count, void *userdata), void *userdata)
+int listensocket_container_set_sockcount_cb(_Ptr<listensocket_container_t> self, _Ptr<void (size_t , void* )> cb, void* userdata)
 {
     if (!self)
         return -1;
@@ -456,7 +456,7 @@ int                         listensocket_container_set_sockcount_cb(listensocket
     return 0;
 }
 
-ssize_t                     listensocket_container_sockcount(listensocket_container_t *self)
+ssize_t listensocket_container_sockcount(_Ptr<listensocket_container_t> self)
 {
     ssize_t ret;
 
@@ -470,7 +470,7 @@ ssize_t                     listensocket_container_sockcount(listensocket_contai
     return ret;
 }
 
-static ssize_t listensocket_container_sockcount__unlocked(listensocket_container_t *self)
+static ssize_t listensocket_container_sockcount__unlocked(_Ptr<listensocket_container_t> self)
 {
     ssize_t count = 0;
     size_t i;
@@ -484,10 +484,10 @@ static ssize_t listensocket_container_sockcount__unlocked(listensocket_container
     return count;
 }
 
-static listensocket_t * listensocket_container_get_by_id(listensocket_container_t *self, const char *id)
+static listensocket_t * listensocket_container_get_by_id(_Ptr<listensocket_container_t> self, _Nt_array_ptr<const char> id)
 {
     size_t i;
-    const listener_t *listener;
+    _Ptr<const listener_t> listener = NULL;
 
     for (i = 0; i < self->sock_len; i++) {
         if (self->sock[i] != NULL) {
@@ -509,7 +509,7 @@ static listensocket_t * listensocket_container_get_by_id(listensocket_container_
 
 /* ---------------------------------------------------------------------------- */
 
-static void __listensocket_free(refobject_t self, void **userdata)
+static void __listensocket_free(refobject_t self, void** userdata)
 {
     listensocket_t *listensocket = REFOBJECT_TO_TYPE(self, listensocket_t *);
 
@@ -534,7 +534,7 @@ REFOBJECT_DEFINE_TYPE(listensocket_t,
         REFOBJECT_DEFINE_TYPE_FREE(__listensocket_free)
         );
 
-static listensocket_t * listensocket_new(const listener_t *listener) {
+static listensocket_t * listensocket_new(_Ptr<const listener_t> listener) {
     listensocket_t *self;
 
     if (listener == NULL)
@@ -558,7 +558,7 @@ static listensocket_t * listensocket_new(const listener_t *listener) {
     return self;
 }
 
-static int              listensocket_apply_config(listensocket_t *self)
+static int listensocket_apply_config(listensocket_t *self : itype(_Ptr<listensocket_t> ) )
 {
     int ret;
 
@@ -572,9 +572,9 @@ static int              listensocket_apply_config(listensocket_t *self)
     return ret;
 }
 
-static int              listensocket_apply_config__unlocked(listensocket_t *self)
+static int listensocket_apply_config__unlocked(_Ptr<listensocket_t> self)
 {
-    const listener_t *listener;
+    _Ptr<const listener_t> listener = NULL;
 
     if (!self)
         return -1;
@@ -617,9 +617,9 @@ static int              listensocket_apply_config__unlocked(listensocket_t *self
     return 0;
 }
 
-static int              listensocket_set_update(listensocket_t *self, const listener_t *listener)
+static int listensocket_set_update(listensocket_t *self : itype(_Ptr<listensocket_t> ) , _Ptr<const listener_t> listener)
 {
-    listener_t *n;
+    _Ptr<listener_t> n = NULL;
 
     if (!self || !listener)
         return -1;
@@ -635,7 +635,7 @@ static int              listensocket_set_update(listensocket_t *self, const list
     return 0;
 }
 
-int                         listensocket_refsock(listensocket_t *self)
+int listensocket_refsock(listensocket_t *self : itype(_Ptr<listensocket_t> ) )
 {
     if (!self)
         return -1;
@@ -676,7 +676,7 @@ int                         listensocket_refsock(listensocket_t *self)
     return 0;
 }
 
-int                         listensocket_unrefsock(listensocket_t *self)
+int listensocket_unrefsock(listensocket_t *self : itype(_Ptr<listensocket_t> ) )
 {
     if (!self)
         return -1;
@@ -700,9 +700,9 @@ int                         listensocket_unrefsock(listensocket_t *self)
     return 0;
 }
 
-connection_t *              listensocket_accept(listensocket_t *self, listensocket_container_t *container)
+_Ptr<connection_t> listensocket_accept(listensocket_t *self, _Ptr<listensocket_container_t> container)
 {
-    connection_t *con;
+    _Ptr<connection_t> con = NULL;
     listensocket_t *effective = NULL;
     sock_t sock;
     char *ip;
@@ -754,9 +754,9 @@ connection_t *              listensocket_accept(listensocket_t *self, listensock
     return con;
 }
 
-const listener_t *          listensocket_get_listener(listensocket_t *self)
+_Ptr<const listener_t> listensocket_get_listener(listensocket_t *self : itype(_Ptr<listensocket_t> ) )
 {
-    const listener_t *ret;
+    _Ptr<const listener_t> ret = NULL;
 
     if (!self)
         return NULL;
@@ -769,7 +769,7 @@ const listener_t *          listensocket_get_listener(listensocket_t *self)
     return ret;
 }
 
-int                         listensocket_release_listener(listensocket_t *self)
+int listensocket_release_listener(listensocket_t *self : itype(_Ptr<listensocket_t> ) )
 {
     if (!self)
         return -1;
@@ -786,7 +786,7 @@ int                         listensocket_release_listener(listensocket_t *self)
     return 0;
 }
 
-listener_type_t             listensocket_get_type(listensocket_t *self)
+listener_type_t listensocket_get_type(listensocket_t *self : itype(_Ptr<listensocket_t> ) )
 {
     listener_type_t ret;
 
@@ -801,7 +801,7 @@ listener_type_t             listensocket_get_type(listensocket_t *self)
 }
 
 #ifdef HAVE_POLL
-static inline int listensocket__poll_fill(listensocket_t *self, struct pollfd *p)
+static int listensocket__poll_fill(listensocket_t *self : itype(_Ptr<listensocket_t> ) , _Ptr<struct pollfd> p)
 {
     if (!self)
         return -1;

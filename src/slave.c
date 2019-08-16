@@ -59,15 +59,15 @@
 
 struct relay_tag {
     relay_config_t *config;
-    source_t *source;
+    _Ptr<source_t> source;
     int running;
     int cleanup;
     time_t start;
-    thread_type *thread;
+    _Ptr<thread_type> thread;
     relay_t *next;
 };
 
-static void *_slave_thread(void *arg);
+static void* _slave_thread(void *arg);
 static thread_type *_slave_thread_id;
 static int slave_running = 0;
 static volatile int update_settings = 0;
@@ -75,7 +75,7 @@ static volatile int update_all_mounts = 0;
 static volatile unsigned int max_interval = 0;
 static mutex_t _slave_mutex; // protects slave_running, update_settings, update_all_mounts, max_interval
 
-static inline void relay_config_upstream_free (relay_config_upstream_t *upstream)
+static void relay_config_upstream_free(_Ptr<relay_config_upstream_t> upstream)
 {
     if (upstream->server)
         xmlFree(upstream->server);
@@ -87,7 +87,7 @@ static inline void relay_config_upstream_free (relay_config_upstream_t *upstream
         xmlFree(upstream->password);
 }
 
-void relay_config_free (relay_config_t *relay)
+void relay_config_free(relay_config_t *relay : itype(_Ptr<relay_config_t> ) )
 {
     size_t i;
 
@@ -104,7 +104,7 @@ void relay_config_free (relay_config_t *relay)
     free(relay);
 }
 
-relay_t *relay_free (relay_t *relay)
+relay_t * relay_free(_Ptr<relay_t> relay)
 {
     relay_t *next = relay->next;
 
@@ -120,7 +120,7 @@ relay_t *relay_free (relay_t *relay)
 }
 
 
-static inline void relay_config_upstream_copy(relay_config_upstream_t *dst, const relay_config_upstream_t *src)
+static void relay_config_upstream_copy(_Ptr<relay_config_upstream_t> dst, _Ptr<const relay_config_upstream_t> src)
 {
     dst->server = (char *)xmlCharStrdup(src->server);
     dst->mount = (char *)xmlCharStrdup(src->mount);
@@ -135,7 +135,7 @@ static inline void relay_config_upstream_copy(relay_config_upstream_t *dst, cons
     dst->mp3metadata = src->mp3metadata;
 }
 
-static inline relay_config_t *relay_config_copy (relay_config_t *r)
+static relay_config_t * relay_config_copy(_Ptr<relay_config_t> r)
 {
     relay_config_t *copy = calloc (1, sizeof (relay_config_t));
     relay_config_upstream_t *u = NULL;
@@ -169,7 +169,7 @@ static inline relay_config_t *relay_config_copy (relay_config_t *r)
     return copy;
 }
 
-static inline relay_t *relay_new(relay_config_t *config)
+static relay_t * relay_new(_Ptr<relay_config_t> config)
 {
     relay_t *r = calloc(1, sizeof(*r));
 
@@ -240,15 +240,15 @@ void slave_shutdown(void)
  * responses within here.
  */
 #define _GET_UPSTREAM_SETTING(n) ((upstream && upstream->n) ? upstream->n : relay->config->upstream_default.n)
-static client_t *open_relay_connection (relay_t *relay, relay_config_upstream_t *upstream)
+static _Ptr<client_t> open_relay_connection(_Ptr<relay_t> relay, _Nt_array_ptr<relay_config_upstream_t> upstream)
 {
     int redirects = 0;
-    char *server_id = NULL;
-    ice_config_t *config;
-    http_parser_t *parser = NULL;
-    connection_t *con=NULL;
+    _Nt_array_ptr<char> server_id =  NULL;
+    _Ptr<ice_config_t> config = NULL;
+    _Ptr<http_parser_t> parser =  NULL;
+    _Ptr<connection_t> con = NULL;
     char *server = strdup (_GET_UPSTREAM_SETTING(server));
-    char *mount = strdup (_GET_UPSTREAM_SETTING(mount));
+    _Nt_array_ptr<char> mount =  strdup (_GET_UPSTREAM_SETTING(mount));
     int port = _GET_UPSTREAM_SETTING(port);
     char *auth_header;
     char header[4096];
@@ -352,7 +352,7 @@ static client_t *open_relay_connection (relay_t *relay, relay_config_upstream_t 
         }
         else
         {
-            client_t *client = NULL;
+            _Ptr<client_t> client =  NULL;
 
             if (httpp_getvar (parser, HTTPP_VAR_ERROR_MESSAGE))
             {
@@ -399,11 +399,11 @@ static client_t *open_relay_connection (relay_t *relay, relay_config_upstream_t 
 /* This does the actual connection for a relay. A thread is
  * started off if a connection can be acquired
  */
-static void *start_relay_stream (void *arg)
+static void* start_relay_stream(void* arg)
 {
-    relay_t *relay = arg;
-    source_t *src = relay->source;
-    client_t *client;
+    _Ptr<relay_t> relay =  arg;
+    _Ptr<source_t> src =  relay->source;
+    _Ptr<client_t> client = NULL;
 
     ICECAST_LOG_INFO("Starting relayed source at mountpoint \"%s\"", relay->config->localmount);
     do
@@ -460,7 +460,7 @@ static void *start_relay_stream (void *arg)
 
     if (relay->source->fallback_mount)
     {
-        source_t *fallback_source;
+        _Ptr<source_t> fallback_source = NULL;
 
         ICECAST_LOG_DEBUG("failed relay, fallback to %s", relay->source->fallback_mount);
         avl_tree_rlock(global.source_tree);
@@ -488,7 +488,7 @@ static void *start_relay_stream (void *arg)
 
 
 /* wrapper for starting the provided relay stream */
-static void check_relay_stream (relay_t *relay)
+static void check_relay_stream(relay_t *relay : itype(_Ptr<relay_t> ) )
 {
     if (relay->source == NULL)
     {
@@ -505,8 +505,8 @@ static void check_relay_stream (relay_t *relay)
             ICECAST_LOG_DEBUG("Adding relay source at mountpoint \"%s\"", relay->config->localmount);
             if (relay->config->on_demand)
             {
-                ice_config_t *config = config_get_config ();
-                mount_proxy *mountinfo = config_find_mount (config, relay->config->localmount, MOUNT_TYPE_NORMAL);
+                _Ptr<ice_config_t> config =  config_get_config ();
+                _Ptr<mount_proxy> mountinfo =  config_find_mount (config, relay->config->localmount, MOUNT_TYPE_NORMAL);
                 relay->source->on_demand = relay->config->on_demand;
                 if (mountinfo == NULL)
                     source_update_settings (config, relay->source, mountinfo);
@@ -527,7 +527,7 @@ static void check_relay_stream (relay_t *relay)
     }
     do
     {
-        source_t *source = relay->source;
+        _Ptr<source_t> source =  relay->source;
         /* skip relay if active, not configured or just not time yet */
         if (relay->source == NULL || relay->running || relay->start > time(NULL))
             break;
@@ -538,7 +538,7 @@ static void check_relay_stream (relay_t *relay)
 
             if (source->fallback_mount && source->fallback_override)
             {
-                source_t *fallback;
+                _Ptr<source_t> fallback = NULL;
                 avl_tree_rlock (global.source_tree);
                 fallback = source_find_mount (source->fallback_mount);
                 if (fallback && fallback->running && fallback->listeners)
@@ -573,8 +573,8 @@ static void check_relay_stream (relay_t *relay)
 
         if (relay->config->on_demand && relay->source)
         {
-            ice_config_t *config = config_get_config ();
-            mount_proxy *mountinfo = config_find_mount (config, relay->config->localmount, MOUNT_TYPE_NORMAL);
+            _Ptr<ice_config_t> config =  config_get_config ();
+            _Ptr<mount_proxy> mountinfo =  config_find_mount (config, relay->config->localmount, MOUNT_TYPE_NORMAL);
             source_update_settings (config, relay->source, mountinfo);
             config_release_config ();
             stats_event (relay->config->localmount, "listeners", "0");
@@ -588,7 +588,7 @@ static void check_relay_stream (relay_t *relay)
  */
 #define _EQ_STR(a,b) (((a) == (b)) || ((a) != NULL && (b) != NULL && strcmp((a), (b)) == 0))
 #define _EQ_ATTR(x) (_EQ_STR((new->x), (old->x)))
-static int relay_has_changed_upstream(const relay_config_upstream_t *new, const relay_config_upstream_t *old)
+static int relay_has_changed_upstream(_Ptr<const relay_config_upstream_t> new, _Ptr<const relay_config_upstream_t> old)
 {
     if (new->mp3metadata != old->mp3metadata)
         return 1;
@@ -610,7 +610,7 @@ static int relay_has_changed_upstream(const relay_config_upstream_t *new, const 
     return 0;
 }
 
-static int relay_has_changed (const relay_config_t *new, relay_config_t *old)
+static int relay_has_changed(_Ptr<const relay_config_t> new, relay_config_t *old : itype(_Ptr<relay_config_t> ) )
 {
     size_t i;
 
@@ -639,10 +639,9 @@ static int relay_has_changed (const relay_config_t *new, relay_config_t *old)
  * returned list contains relays that should be kept running, current contains
  * the list of relays to shutdown
  */
-static relay_t *
-update_relay_set(relay_t **current, relay_config_t **updated, size_t updated_length)
+static relay_t * update_relay_set(relay_t **current, relay_config_t*_Ptr<relay_config_t> updated, size_t updated_length)
 {
-    relay_config_t *relay;
+    _Ptr<relay_config_t> relay = NULL;
     relay_t *existing_relay, **existing_p;
     relay_t *new_list = NULL;
     size_t i;
@@ -686,8 +685,7 @@ update_relay_set(relay_t **current, relay_config_t **updated, size_t updated_len
  * are added to the list, and any not listed in the provided new_relay_list
  * are separated and returned in a separate list
  */
-static relay_t *
-update_relays (relay_t **relay_list, relay_config_t **new_relay_list, size_t new_relay_list_length)
+static relay_t * update_relays(relay_t **relay_list : itype(_Ptr<relay_t*> ) , relay_config_t **new_relay_list : itype(_Ptr<_Ptr<relay_config_t>> ) , size_t new_relay_list_length)
 {
     relay_t *active_relays, *cleanup_relays;
 
@@ -701,8 +699,7 @@ update_relays (relay_t **relay_list, relay_config_t **new_relay_list, size_t new
 }
 
 
-static void relay_check_streams (relay_t *to_start,
-        relay_t *to_free, int skip_timer)
+static void relay_check_streams(relay_t *to_start, relay_t *to_free : itype(_Ptr<relay_t> ) , int skip_timer)
 {
     relay_t *relay;
 
@@ -735,9 +732,12 @@ static void relay_check_streams (relay_t *to_start,
 }
 
 
-static int update_from_master(ice_config_t *config)
+static int update_from_master(_Ptr<ice_config_t> config)
 {
-    char *master = NULL, *password = NULL, *username= NULL;
+   char *master = ((void *)0);
+_Nt_array_ptr<char> password = ((void *)0);
+_Nt_array_ptr<char> username = ((void *)0);
+ 
     int port;
     sock_t mastersock;
     int ret = 0;
@@ -870,9 +870,9 @@ static int update_from_master(ice_config_t *config)
 }
 
 
-static void *_slave_thread(void *arg)
+static void* _slave_thread(void *arg)
 {
-    ice_config_t *config;
+    _Ptr<ice_config_t> config = NULL;
     unsigned int interval = 0;
 
     (void)arg;

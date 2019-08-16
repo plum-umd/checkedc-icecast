@@ -37,25 +37,25 @@ struct event_tag {
     /* refernece counter */
     size_t refcount;
     /* reference to next element in chain */
-    event_t *next;
+    _Ptr<event_t> next;
 
     /* event_registration lists.
      * They are referenced here to avoid the need to access
      * config and global client list each time an event is emitted.
      */
-    event_registration_t *reglist[MAX_REGLISTS_PER_EVENT];
+    _Ptr<_Ptr<event_registration_t>> reglist;
 
     /* trigger name */
-    char *trigger;
+    _Ptr<char> trigger;
 
     /* from client */
-    char *uri; /* from context */
+    _Ptr<char> uri; /* from context */
     unsigned long connection_id; /* from client->con->id */
-    char *connection_ip; /* from client->con->ip */
+    _Ptr<char> connection_ip; /* from client->con->ip */
     time_t connection_time; /* from client->con->con_time */
-    char *client_role; /* from client->role */
-    char *client_username; /* from client->username */
-    char *client_useragent; /* from httpp_getvar(client->parser, "user-agent") */
+    _Ptr<char> client_role; /* from client->role */
+    _Ptr<char> client_username; /* from client->username */
+    _Ptr<char> client_useragent; /* from httpp_getvar(client->parser, "user-agent") */
     admin_command_id_t client_admin_command; /* from client->admin_command */
 };
 
@@ -63,25 +63,25 @@ struct event_registration_tag {
     /* refernece counter */
     size_t refcount;
     /* reference to next element in chain */
-    event_registration_t *next;
+    _Ptr<event_registration_t> next;
 
     /* protection */
     mutex_t lock;
 
     /* type of event */
-    char *type;
+    _Ptr<char> type;
 
     /* trigger name */
-    char *trigger;
+    _Ptr<char> trigger;
 
     /* backend state */
     void *state;
 
     /* emit events */
-    int (*emit)(void *state, event_t *event);
+    _Ptr<int (void* , _Ptr<event_t> )> emit;
 
     /* free backend state */
-    void (*free)(void *state);
+    _Ptr<void (void* )> free;
 };
 
 /* subsystem functions */
@@ -92,12 +92,12 @@ void event_shutdown(void);
 /* basic functions to work with event registrations */
 event_registration_t * event_new_from_xml_node(xmlNodePtr node);
 
-void event_registration_addref(event_registration_t *er);
-void event_registration_release(event_registration_t *er);
-void event_registration_push(event_registration_t **er, event_registration_t *tail);
+void event_registration_addref(event_registration_t *er : itype(_Ptr<event_registration_t> ) );
+void event_registration_release(event_registration_t *er : itype(_Ptr<event_registration_t> ) );
+void event_registration_push(_Ptr<event_registration_t*> er, event_registration_t *tail);
 
 /* event signaling */
-void event_emit_clientevent(const char *trigger, client_t *client, const char *uri);
+void event_emit_clientevent(_Nt_array_ptr<const char> trigger, _Ptr<client_t> client, _Nt_array_ptr<const char> uri);
 #define event_emit_global(x) event_emit_clientevent((x), NULL, NULL)
 
 #endif

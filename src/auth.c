@@ -47,7 +47,7 @@ struct auth_stack_tag {
 };
 
 /* code */
-static void __handle_auth_client(auth_t *auth, auth_client *auth_user);
+static void __handle_auth_client(auth_t *auth : itype(_Ptr<auth_t> ) , auth_client *auth_user : itype(_Ptr<auth_client> ) );
 
 static mutex_t _auth_lock; /* protects _current_id */
 static volatile unsigned long _current_id = 0;
@@ -77,7 +77,7 @@ static const struct {
     {.result = AUTH_USERDELETED,    .string = "user deleted"}
 };
 
-static const char *auth_result2str(auth_result res)
+static const char * auth_result2str(auth_result res)
 {
     size_t i;
 
@@ -101,7 +101,7 @@ auth_result auth_str2result(const char *str)
     return AUTH_FAILED;
 }
 
-static auth_client *auth_client_setup (client_t *client)
+static auth_client * auth_client_setup(_Ptr<client_t> client)
 {
     /* This will look something like "Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" */
     auth_client *auth_user;
@@ -151,7 +151,7 @@ static auth_client *auth_client_setup (client_t *client)
 }
 
 
-static void queue_auth_client (auth_client *auth_user)
+static void queue_auth_client(auth_client *auth_user)
 {
     auth_t *auth;
 
@@ -181,7 +181,7 @@ static void queue_auth_client (auth_client *auth_user)
 /* release the auth. It is referred to by multiple structures so this is
  * refcounted and only actual freed after the last use
  */
-void auth_release (auth_t *authenticator) {
+void auth_release(auth_t *authenticator : itype(_Ptr<auth_t> ) ) {
     size_t i;
 
     if (authenticator == NULL)
@@ -229,7 +229,7 @@ void auth_release (auth_t *authenticator) {
 
 /* increment refcount on the auth.
  */
-void    auth_addref (auth_t *authenticator) {
+void auth_addref(auth_t *authenticator : itype(_Ptr<auth_t> ) ) {
     if (authenticator == NULL)
         return;
 
@@ -239,7 +239,7 @@ void    auth_addref (auth_t *authenticator) {
     thread_mutex_unlock (&authenticator->lock);
 }
 
-static void auth_client_free (auth_client *auth_user)
+static void auth_client_free(_Ptr<auth_client> auth_user)
 {
     if (!auth_user)
         return;
@@ -250,7 +250,7 @@ static void auth_client_free (auth_client *auth_user)
 
 
 /* verify that the client is still connected. */
-static int is_client_connected (client_t *client) {
+static int is_client_connected(_Ptr<client_t> client) {
 /* As long as sock_active() is broken we need to disable this:
 
     int ret = 1;
@@ -262,8 +262,8 @@ static int is_client_connected (client_t *client) {
     return 1;
 }
 
-static auth_result auth_new_client (auth_t *auth, auth_client *auth_user) {
-    client_t *client = auth_user->client;
+static auth_result auth_new_client(_Ptr<auth_t> auth, _Ptr<auth_client> auth_user) {
+    _Ptr<client_t> client =  auth_user->client;
     auth_result ret = AUTH_FAILED;
 
     /* make sure there is still a client at this point, a slow backend request
@@ -291,9 +291,9 @@ static auth_result auth_new_client (auth_t *auth, auth_client *auth_user) {
 
 /* wrapper function for auth thread to drop client connections
  */
-static auth_result auth_remove_client(auth_t *auth, auth_client *auth_user)
+static auth_result auth_remove_client(auth_t *auth, _Ptr<auth_client> auth_user)
 {
-    client_t *client = auth_user->client;
+    _Ptr<client_t> client =  auth_user->client;
     auth_result ret = AUTH_RELEASED;
 
     (void)auth;
@@ -311,14 +311,14 @@ static auth_result auth_remove_client(auth_t *auth, auth_client *auth_user)
     return ret;
 }
 
-static inline int __handle_auth_client_alter(auth_t *auth, auth_client *auth_user)
+static int __handle_auth_client_alter(_Ptr<auth_t> auth, _Ptr<auth_client> auth_user)
 {
-    client_t *client = auth_user->client;
-    const char *uuid = NULL;
-    const char *location = NULL;
+    _Ptr<client_t> client =  auth_user->client;
+    _Nt_array_ptr<const char> uuid =  NULL;
+    _Ptr<const char> location =  NULL;
     int http_status = 0;
 
-    void client_send_redirect(client_t *client, const char *uuid, int status, const char *location);
+    void client_send_redirect(_Ptr<client_t> client, _Ptr<const char> uuid, int status, _Ptr<const char> location);
 
     switch (auth_user->alter_client_action) {
         case AUTH_ALTER_NOOP:
@@ -360,7 +360,7 @@ static inline int __handle_auth_client_alter(auth_t *auth, auth_client *auth_use
 
     return -1;
 }
-static void __handle_auth_client (auth_t *auth, auth_client *auth_user) {
+static void __handle_auth_client(auth_t *auth : itype(_Ptr<auth_t> ) , auth_client *auth_user : itype(_Ptr<auth_client> ) ) {
     auth_result result;
 
     if (auth_user->process) {
@@ -395,7 +395,7 @@ static void __handle_auth_client (auth_t *auth, auth_client *auth_user) {
 }
 
 /* The auth thread main loop. */
-static void *auth_run_thread (void *arg)
+static void* auth_run_thread(void *arg)
 {
     auth_t *auth = arg;
 
@@ -441,7 +441,7 @@ static void *auth_run_thread (void *arg)
 
 /* Add a client.
  */
-static void auth_add_client(auth_t *auth, client_t *client, void (*on_no_match)(client_t *client, void (*on_result)(client_t *client, void *userdata, auth_result result), void *userdata), void (*on_result)(client_t *client, void *userdata, auth_result result), void *userdata) {
+static void auth_add_client(auth_t *auth, _Ptr<client_t> client, _Ptr<void (_Ptr<client_t> , _Ptr<void (_Ptr<client_t> , void* , auth_result )> , void* )> on_no_match, _Ptr<void (_Ptr<client_t> , void* , auth_result )> on_result, void* userdata) {
     auth_client *auth_user;
     auth_matchtype_t matchtype;
     const char *origin;
@@ -529,7 +529,7 @@ static void auth_add_client(auth_t *auth, client_t *client, void (*on_no_match)(
     queue_auth_client(auth_user);
 }
 
-static void __auth_on_result_destroy_client(client_t *client, void *userdata, auth_result result)
+static void __auth_on_result_destroy_client(_Ptr<client_t> client, void *userdata, auth_result result)
 {
     (void)userdata, (void)result;
 
@@ -539,7 +539,7 @@ static void __auth_on_result_destroy_client(client_t *client, void *userdata, au
 /* determine whether we need to process this client further. This
  * involves any auth exit, typically for external auth servers.
  */
-int auth_release_client (client_t *client) {
+int auth_release_client(_Ptr<client_t> client) {
     if (!client->acl)
         return 0;
 
@@ -560,7 +560,7 @@ int auth_release_client (client_t *client) {
 }
 
 
-static int get_authenticator (auth_t *auth, config_options_t *options)
+static int get_authenticator(auth_t *auth : itype(_Ptr<auth_t> ) , config_options_t *options : itype(_Ptr<config_options_t> ) )
 {
     if (auth->type == NULL)
     {
@@ -610,7 +610,7 @@ static int get_authenticator (auth_t *auth, config_options_t *options)
 }
 
 
-static inline void auth_get_authenticator__filter_admin(auth_t *auth, xmlNodePtr node, size_t *filter_admin_index, const char *name, auth_matchtype_t matchtype)
+static void auth_get_authenticator__filter_admin(auth_t *auth : itype(_Ptr<auth_t> ) , xmlNodePtr node, _Ptr<size_t> filter_admin_index, const char *name, auth_matchtype_t matchtype)
 {
     char * tmp = (char*)xmlGetProp(node, XMLSTR(name));
 
@@ -651,7 +651,7 @@ static inline void auth_get_authenticator__filter_admin(auth_t *auth, xmlNodePtr
     }
 }
 
-static inline void auth_get_authenticator__filter_origin(auth_t *auth, xmlNodePtr node, const char *name, auth_matchtype_t matchtype)
+static void auth_get_authenticator__filter_origin(auth_t *auth : itype(_Ptr<auth_t> ) , xmlNodePtr node, const char *name, auth_matchtype_t matchtype)
 {
     char * tmp = (char*)xmlGetProp(node, XMLSTR(name));
 
@@ -694,7 +694,7 @@ static inline void auth_get_authenticator__filter_origin(auth_t *auth, xmlNodePt
     }
 }
 
-static inline void auth_get_authenticator__init_method(auth_t *auth, int *method_inited, auth_matchtype_t init_with)
+static void auth_get_authenticator__init_method(auth_t *auth : itype(_Ptr<auth_t> ) , _Ptr<int> method_inited, auth_matchtype_t init_with)
 {
     size_t i;
 
@@ -707,7 +707,7 @@ static inline void auth_get_authenticator__init_method(auth_t *auth, int *method
     *method_inited = 1;
 }
 
-static inline int auth_get_authenticator__filter_method(auth_t *auth, xmlNodePtr node, const char *name, auth_matchtype_t matchtype, int *method_inited, auth_matchtype_t init_with)
+static int auth_get_authenticator__filter_method(auth_t *auth, xmlNodePtr node, const char *name, auth_matchtype_t matchtype, _Ptr<int> method_inited, auth_matchtype_t init_with)
 {
     char * tmp = (char*)xmlGetProp(node, XMLSTR(name));
 
@@ -749,7 +749,7 @@ static inline int auth_get_authenticator__filter_method(auth_t *auth, xmlNodePtr
     return 0;
 }
 
-static inline int auth_get_authenticator__permission_alter(auth_t *auth, xmlNodePtr node, const char *name, auth_matchtype_t matchtype)
+static int auth_get_authenticator__permission_alter(auth_t *auth : itype(_Ptr<auth_t> ) , xmlNodePtr node, const char *name, auth_matchtype_t matchtype)
 {
     char * tmp = (char*)xmlGetProp(node, XMLSTR(name));
 
@@ -795,7 +795,7 @@ static inline int auth_get_authenticator__permission_alter(auth_t *auth, xmlNode
 
     return 0;
 }
-auth_t *auth_get_authenticator(xmlNodePtr node)
+auth_t * auth_get_authenticator(xmlNodePtr node)
 {
     auth_t *auth = calloc(1, sizeof(auth_t));
     config_options_t *options = NULL, **next_option = &options;
@@ -978,7 +978,7 @@ auth_t *auth_get_authenticator(xmlNodePtr node)
     return auth;
 }
 
-int auth_alter_client(auth_t *auth, auth_client *auth_user, auth_alter_t action, const char *arg)
+int auth_alter_client(_Ptr<auth_t> auth, _Ptr<auth_client> auth_user, auth_alter_t action, _Ptr<const char> arg)
 {
     if (!auth || !auth_user || !arg)
         return -1;
@@ -1036,7 +1036,7 @@ void auth_shutdown (void)
 
 /* authstack functions */
 
-static void __move_client_forward_in_auth_stack(client_t *client, void (*on_result)(client_t *client, void *userdata, auth_result result), void *userdata) {
+static void __move_client_forward_in_auth_stack(_Ptr<client_t> client, _Ptr<void (_Ptr<client_t> , void* , auth_result )> on_result, void* userdata) {
     auth_stack_next(&client->authstack);
     if (client->authstack) {
         auth_stack_add_client(client->authstack, client, on_result, userdata);
@@ -1046,7 +1046,7 @@ static void __move_client_forward_in_auth_stack(client_t *client, void (*on_resu
     }
 }
 
-void          auth_stack_add_client(auth_stack_t *stack, client_t *client, void (*on_result)(client_t *client, void *userdata, auth_result result), void *userdata) {
+void auth_stack_add_client(auth_stack_t *stack, _Ptr<client_t> client, _Ptr<void (_Ptr<client_t> , void* , auth_result )> on_result, void* userdata) {
     auth_t *auth;
 
     if (!stack || !client || (client->authstack && client->authstack != stack))
@@ -1060,7 +1060,7 @@ void          auth_stack_add_client(auth_stack_t *stack, client_t *client, void 
     auth_release(auth);
 }
 
-void          auth_stack_release(auth_stack_t *stack) {
+void auth_stack_release(auth_stack_t *stack : itype(_Ptr<auth_stack_t> ) ) {
     if (!stack)
         return;
 
@@ -1077,7 +1077,7 @@ void          auth_stack_release(auth_stack_t *stack) {
     free(stack);
 }
 
-void          auth_stack_addref(auth_stack_t *stack) {
+void auth_stack_addref(auth_stack_t *stack : itype(_Ptr<auth_stack_t> ) ) {
     if (!stack)
         return;
     thread_mutex_lock(&stack->lock);
@@ -1085,7 +1085,7 @@ void          auth_stack_addref(auth_stack_t *stack) {
     thread_mutex_unlock(&stack->lock);
 }
 
-int           auth_stack_next(auth_stack_t **stack) {
+int auth_stack_next(auth_stack_t **stack : itype(_Ptr<auth_stack_t*> ) ) {
     auth_stack_t *next;
     if (!stack || !*stack)
         return -1;
@@ -1100,7 +1100,7 @@ int           auth_stack_next(auth_stack_t **stack) {
     return 0;
 }
 
-int           auth_stack_push(auth_stack_t **stack, auth_t *auth) {
+int auth_stack_push(_Ptr<auth_stack_t*> stack, auth_t *auth) {
     auth_stack_t *next;
 
     if (!stack || !auth)
@@ -1125,7 +1125,7 @@ int           auth_stack_push(auth_stack_t **stack, auth_t *auth) {
     }
 }
 
-int           auth_stack_append(auth_stack_t *stack, auth_stack_t *tail) {
+int auth_stack_append(auth_stack_t *stack, auth_stack_t *tail) {
     auth_stack_t *next, *cur;
 
     if (!stack)
@@ -1152,7 +1152,7 @@ int           auth_stack_append(auth_stack_t *stack, auth_stack_t *tail) {
     return 0;
 }
 
-auth_t       *auth_stack_get(auth_stack_t *stack) {
+auth_t * auth_stack_get(auth_stack_t *stack : itype(_Ptr<auth_stack_t> ) ) {
     auth_t *auth;
 
     if (!stack)
@@ -1164,7 +1164,7 @@ auth_t       *auth_stack_get(auth_stack_t *stack) {
     return auth;
 }
 
-auth_t       *auth_stack_getbyid(auth_stack_t *stack, unsigned long id) {
+auth_t * auth_stack_getbyid(auth_stack_t *stack, unsigned long id) {
     auth_t *ret = NULL;
 
     if (!stack)
@@ -1189,8 +1189,8 @@ auth_t       *auth_stack_getbyid(auth_stack_t *stack, unsigned long id) {
 
 }
 
-acl_t        *auth_stack_get_anonymous_acl(auth_stack_t *stack, httpp_request_type_e method) {
-    acl_t *ret = NULL;
+_Ptr<acl_t> auth_stack_get_anonymous_acl(auth_stack_t *stack, httpp_request_type_e method) {
+    _Ptr<acl_t> ret =  NULL;
 
     if (!stack || method < 0 || method > httpp_req_unknown)
         return NULL;

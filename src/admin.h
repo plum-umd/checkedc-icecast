@@ -37,25 +37,20 @@ typedef void (*admin_request_function_ptr)(client_t * client, source_t * source,
 typedef void (*admin_request_function_with_parameters_ptr)(client_t * client, source_t * source, admin_format_t format, resourcematch_extract_t *parameters);
 
 typedef struct admin_command_handler {
-    const char                         *route;
+    _Ptr<const char> route;
     const int                           type;
     const int                           format;
-    const admin_request_function_ptr    function;
-    const admin_request_function_with_parameters_ptr function_with_parameters;
+    const _Ptr<void (_Ptr<client_t> , _Ptr<source_t> , admin_format_t )> function;
+    const _Ptr<void (_Ptr<client_t> , _Ptr<source_t> , admin_format_t , _Ptr<resourcematch_extract_t> )> function_with_parameters;
 } admin_command_handler_t;
 
-void admin_handle_request(client_t *client, const char *uri);
+void admin_handle_request(_Ptr<client_t> client, _Nt_array_ptr<const char> uri);
 
-void admin_send_response(xmlDocPtr       doc,
-                         client_t       *client,
-                         admin_format_t  response,
-                         const char     *xslt_template);
+void admin_send_response(xmlDocPtr doc, _Ptr<client_t> client, admin_format_t response, _Nt_array_ptr<const char> xslt_template);
 
-void admin_add_listeners_to_mount(source_t       *source,
-                                  xmlNodePtr      parent,
-                                  operation_mode  mode);
+void admin_add_listeners_to_mount(_Ptr<source_t> source, xmlNodePtr parent : itype(_Ptr<xmlNode> ) , operation_mode mode);
 
-xmlNodePtr admin_add_role_to_authentication(auth_t *auth, xmlNodePtr parent);
+xmlNodePtr admin_add_role_to_authentication(_Ptr<auth_t> auth, xmlNodePtr parent);
 
 admin_command_id_t admin_get_command(const char *command);
 int admin_get_command_type(admin_command_id_t command);
@@ -63,7 +58,7 @@ int admin_get_command_type(admin_command_id_t command);
 /* Register and unregister admin commands below /admin/$prefix/.
  * All parameters must be kept in memory as long as the registration is valid as there will be no copy made.
  */
-int admin_command_table_register(const char *prefix, size_t handlers_length, const admin_command_handler_t *handlers);
-int admin_command_table_unregister(const char *prefix);
+int admin_command_table_register(_Nt_array_ptr<const char> prefix, size_t handlers_length, const admin_command_handler_t *handlers);
+int admin_command_table_unregister(_Nt_array_ptr<const char> prefix);
 
 #endif  /* __ADMIN_H__ */

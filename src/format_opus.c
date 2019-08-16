@@ -29,7 +29,7 @@
 #define CATMODULE "format-opus"
 #include "logging.h"
 
-static void opus_codec_free (ogg_state_t *ogg_info, ogg_codec_t *codec)
+static void opus_codec_free(_Ptr<ogg_state_t> ogg_info, _Ptr<ogg_codec_t> codec)
 {
     stats_event(ogg_info->mount, "audio_channels", NULL);
     stats_event(ogg_info->mount, "audio_samplerate", NULL);
@@ -50,7 +50,7 @@ static uint32_t __read_header_u32be_unaligned(const unsigned char *in)
     return ret;
 }
 
-static void __handle_header_opushead(ogg_state_t *ogg_info, ogg_packet *packet)
+static void __handle_header_opushead(_Ptr<ogg_state_t> ogg_info, _Ptr<ogg_packet> packet)
 {
     if (packet->bytes < 19) {
         ICECAST_LOG_WARN("Bad Opus header: header too small, expected at least 19 byte, got %li", (long int)packet->bytes);
@@ -66,7 +66,7 @@ static void __handle_header_opushead(ogg_state_t *ogg_info, ogg_packet *packet)
     stats_event_args(ogg_info->mount, "audio_samplerate", "%ld", (long int)__read_header_u32be_unaligned(packet->packet+12));
 }
 
-static void __handle_header_opustags(ogg_state_t *ogg_info, ogg_packet *packet, format_plugin_t *plugin) 
+static void __handle_header_opustags(_Ptr<ogg_state_t> ogg_info, _Ptr<ogg_packet> packet, _Ptr<format_plugin_t> plugin) 
 {
     size_t comments;
     size_t next;
@@ -159,8 +159,7 @@ static void __handle_header_opustags(ogg_state_t *ogg_info, ogg_packet *packet, 
     ogg_info->log_metadata = 1;
 }
 
-static void __handle_header(ogg_state_t *ogg_info,
-        ogg_codec_t *codec, ogg_packet *packet, format_plugin_t *plugin)
+static void __handle_header(_Ptr<ogg_state_t> ogg_info, ogg_codec_t *codec : itype(_Ptr<ogg_codec_t> ) , _Ptr<ogg_packet> packet, _Ptr<format_plugin_t> plugin)
 {
     ICECAST_LOG_DEBUG("Got Opus header");
     if (packet->bytes < 8) {
@@ -180,10 +179,9 @@ static void __handle_header(ogg_state_t *ogg_info,
     }
 }
 
-static refbuf_t *process_opus_page (ogg_state_t *ogg_info,
-        ogg_codec_t *codec, ogg_page *page, format_plugin_t *plugin)
+static _Ptr<refbuf_t> process_opus_page(_Ptr<ogg_state_t> ogg_info, ogg_codec_t *codec, ogg_page *page, _Ptr<format_plugin_t> plugin)
 {
-    refbuf_t *refbuf;
+    _Ptr<refbuf_t> refbuf = NULL;
 
     if (codec->headers < 2)
     {
@@ -205,9 +203,9 @@ static refbuf_t *process_opus_page (ogg_state_t *ogg_info,
 }
 
 
-ogg_codec_t *initial_opus_page (format_plugin_t *plugin, ogg_page *page)
+ogg_codec_t * initial_opus_page(_Ptr<format_plugin_t> plugin, ogg_page *page)
 {
-    ogg_state_t *ogg_info = plugin->_state;
+    _Ptr<ogg_state_t> ogg_info =  plugin->_state;
     ogg_codec_t *codec = calloc(1, sizeof (ogg_codec_t));
     ogg_packet packet;
 

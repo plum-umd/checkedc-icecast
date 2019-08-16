@@ -27,7 +27,7 @@
 
 typedef struct ice_global_tag
 {
-    listensocket_container_t *listensockets;
+    _Ptr<listensocket_container_t> listensockets;
 
     int running;
 
@@ -35,13 +35,13 @@ typedef struct ice_global_tag
     int clients;
     int schedule_config_reread;
 
-    avl_tree *source_tree;
+    _Ptr<avl_tree> source_tree;
     /* for locally defined relays */
-    relay_t *relays;
+    _Ptr<relay_t> relays;
     /* relays retrieved from master */
-    relay_t *master_relays;
+    _Ptr<relay_t> master_relays;
 
-    module_container_t *modulecontainer;
+    _Ptr<module_container_t> modulecontainer;
 
     cond_t shutdown_cond;
 } ice_global_t;

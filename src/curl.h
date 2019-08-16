@@ -20,7 +20,7 @@ int   icecast_curl_initialize(void);
 int   icecast_curl_shutdown(void);
 
 /* creator and destructor function for CURL* object. */
-CURL *icecast_curl_new(const char *url, char * errors);
-int   icecast_curl_free(CURL *curl);
+CURL * icecast_curl_new(_Ptr<const char> url, _Ptr<char> errors);
+int icecast_curl_free(CURL *curl);
 
 #endif

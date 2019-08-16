@@ -16,20 +16,20 @@
 REFOBJECT_FORWARD_TYPE(listensocket_container_t);
 
 listensocket_container_t *  listensocket_container_new(void);
-int                         listensocket_container_configure(listensocket_container_t *self, const ice_config_t *config);
-int                         listensocket_container_configure_and_setup(listensocket_container_t *self, const ice_config_t *config);
-int                         listensocket_container_setup(listensocket_container_t *self);
-connection_t *              listensocket_container_accept(listensocket_container_t *self, int timeout);
-int                         listensocket_container_set_sockcount_cb(listensocket_container_t *self, void (*cb)(size_t count, void *userdata), void *userdata);
-ssize_t                     listensocket_container_sockcount(listensocket_container_t *self);
+int listensocket_container_configure(_Ptr<listensocket_container_t> self, _Ptr<const ice_config_t> config);
+int listensocket_container_configure_and_setup(_Ptr<listensocket_container_t> self, _Ptr<const ice_config_t> config);
+int listensocket_container_setup(_Ptr<listensocket_container_t> self);
+_Ptr<connection_t> listensocket_container_accept(_Ptr<listensocket_container_t> self, int timeout);
+int listensocket_container_set_sockcount_cb(_Ptr<listensocket_container_t> self, _Ptr<void (size_t , void* )> cb, void* userdata);
+ssize_t listensocket_container_sockcount(_Ptr<listensocket_container_t> self);
 
 REFOBJECT_FORWARD_TYPE(listensocket_t);
 
-int                         listensocket_refsock(listensocket_t *self);
-int                         listensocket_unrefsock(listensocket_t *self);
-connection_t *              listensocket_accept(listensocket_t *self, listensocket_container_t *container);
-const listener_t *          listensocket_get_listener(listensocket_t *self);
-int                         listensocket_release_listener(listensocket_t *self);
-listener_type_t             listensocket_get_type(listensocket_t *self);
+int listensocket_refsock(listensocket_t *self : itype(_Ptr<listensocket_t> ) );
+int listensocket_unrefsock(listensocket_t *self : itype(_Ptr<listensocket_t> ) );
+_Ptr<connection_t> listensocket_accept(listensocket_t *self, _Ptr<listensocket_container_t> container);
+_Ptr<const listener_t> listensocket_get_listener(listensocket_t *self : itype(_Ptr<listensocket_t> ) );
+int listensocket_release_listener(listensocket_t *self : itype(_Ptr<listensocket_t> ) );
+listener_type_t listensocket_get_type(listensocket_t *self : itype(_Ptr<listensocket_t> ) );
 
 #endif

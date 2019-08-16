@@ -61,7 +61,7 @@ struct reportxml_database_tag {
     /* the lock used to ensure the database object is thread safe. */
     mutex_t lock;
     /* The tree of definitions */
-    avl_tree *definitions;
+    _Ptr<avl_tree> definitions;
 };
 
 /* The nodeattr structure is used to store definition of node attributes */
@@ -70,15 +70,15 @@ struct nodeattr {
     /* name of the attribute */
     const char *name;
     /* the type of the attribute. This is based on the DTD */
-    const char *type;
+    _Ptr<const char> type;
     /* the default value for the attribute if any */
     const char *def;
     /* whether the attribute is required or not */
     int required;
     /* a function that can be used to check the content of the attribute if any */
-    int (*checker)(const struct nodeattr *attr, const char *str);
+    _Ptr<int (_Ptr<const struct nodeattr> , const char* )> checker;
     /* NULL terminated list of possible values (if enum) */
-    const char *values[32];
+    _Nt_array_ptr<const char> values[32];
 };
 
 /* The type of the content an node has */
@@ -102,14 +102,14 @@ struct nodedef {
     /* The type of the content the node may have */
     enum nodecontent content;
     /* __attr__eol terminated list of attributes the node may have */
-    const struct nodeattr *attr[12];
+    _Ptr<const struct nodeattr> attr[12];
     /* REPORTXML_NODE_TYPE__ERROR terminated list of child node types the node may have */
     const reportxml_node_type_t childs[12];
 };
 
 /* Prototypes */
-static int __attach_copy_of_node_or_definition(reportxml_node_t *parent, reportxml_node_t *node, reportxml_database_t *db, ssize_t depth);
-static reportxml_node_t *      __reportxml_database_build_node_ext(reportxml_database_t *db, const char *id, ssize_t depth, reportxml_node_type_t *acst_type_ret);
+static int __attach_copy_of_node_or_definition(reportxml_node_t *parent, reportxml_node_t *node, _Ptr<reportxml_database_t> db, ssize_t depth);
+static reportxml_node_t * __reportxml_database_build_node_ext(_Ptr<reportxml_database_t> db, const char *id, ssize_t depth, _Ptr<reportxml_node_type_t> acst_type_ret);
 
 /* definition of known attributes */
 static const struct nodeattr __attr__eol[1]             = {{NULL,           NULL,           NULL,     0,  NULL, {NULL}}};
@@ -181,7 +181,7 @@ static const struct nodedef __nodedef[] = {
         {REPORTXML_NODE_TYPE__ERROR}}
 };
 
-static const struct nodedef * __get_nodedef(reportxml_node_type_t type)
+static _Ptr<const struct nodedef> __get_nodedef(reportxml_node_type_t type)
 {
     size_t i;
 
@@ -194,7 +194,7 @@ static const struct nodedef * __get_nodedef(reportxml_node_type_t type)
     return NULL;
 }
 
-static const struct nodedef * __get_nodedef_by_name(const char *name)
+static _Ptr<const struct nodedef> __get_nodedef_by_name(const char *name : itype(_Nt_array_ptr<const char> ) )
 {
     size_t i;
 
@@ -207,7 +207,7 @@ static const struct nodedef * __get_nodedef_by_name(const char *name)
     return NULL;
 }
 
-static const struct nodeattr * __get_nodeattr(const struct nodedef * nodedef, const char *key)
+static _Ptr<const struct nodeattr> __get_nodeattr(_Ptr<const struct nodedef> nodedef, const char *key : itype(_Nt_array_ptr<const char> ) )
 {
     size_t i;
 
@@ -229,14 +229,14 @@ static const struct nodeattr * __get_nodeattr(const struct nodedef * nodedef, co
 }
 
 
-static void __report_free(refobject_t self, void **userdata)
+static void __report_free(refobject_t self, void** userdata)
 {
     reportxml_t *report = REFOBJECT_TO_TYPE(self, reportxml_t *);
 
     refobject_unref(report->root);
 }
 
-static int __report_new(refobject_t self, const refobject_type_t *type, va_list ap)
+static int __report_new(refobject_t self, _Ptr<const refobject_type_t> type, va_list ap)
 {
     reportxml_t *ret = REFOBJECT_TO_TYPE(self, reportxml_t*);
     reportxml_node_t *root = reportxml_node_new(REPORTXML_NODE_TYPE_REPORT, NULL, NULL, NULL);
@@ -254,7 +254,7 @@ REFOBJECT_DEFINE_TYPE(reportxml_t,
         REFOBJECT_DEFINE_TYPE_NEW(__report_new)
         );
 
-static reportxml_t *    reportxml_new_with_root(reportxml_node_t *root)
+static reportxml_t * reportxml_new_with_root(reportxml_node_t *root)
 {
     reportxml_t *ret;
 
@@ -267,12 +267,12 @@ static reportxml_t *    reportxml_new_with_root(reportxml_node_t *root)
     return ret;
 }
 
-reportxml_t *           reportxml_new(void)
+_Ptr<reportxml_t> reportxml_new(void)
 {
     return refobject_new(reportxml_t);
 }
 
-reportxml_node_t *      reportxml_get_root_node(reportxml_t *report)
+reportxml_node_t * reportxml_get_root_node(reportxml_t *report : itype(_Ptr<reportxml_t> ) )
 {
     if (!report)
         return NULL;
@@ -283,7 +283,7 @@ reportxml_node_t *      reportxml_get_root_node(reportxml_t *report)
     return report->root;
 }
 
-reportxml_node_t *      reportxml_get_node_by_attribute(reportxml_t *report, const char *key, const char *value, int include_definitions)
+_Ptr<reportxml_node_t> reportxml_get_node_by_attribute(_Ptr<reportxml_t> report, const char *key, _Nt_array_ptr<const char> value, int include_definitions)
 {
     if (!report || !key || !value)
         return NULL;
@@ -291,7 +291,7 @@ reportxml_node_t *      reportxml_get_node_by_attribute(reportxml_t *report, con
     return reportxml_node_get_child_by_attribute(report->root, key, value, include_definitions);
 }
 
-reportxml_node_t *      reportxml_get_node_by_type(reportxml_t *report, reportxml_node_type_t type, int include_definitions)
+_Ptr<reportxml_node_t> reportxml_get_node_by_type(_Ptr<reportxml_t> report, reportxml_node_type_t type, int include_definitions)
 {
     if (!report)
         return NULL;
@@ -299,7 +299,7 @@ reportxml_node_t *      reportxml_get_node_by_type(reportxml_t *report, reportxm
     return reportxml_node_get_child_by_type(report->root, type, include_definitions);
 }
 
-reportxml_t *           reportxml_parse_xmldoc(xmlDocPtr doc)
+reportxml_t * reportxml_parse_xmldoc(xmlDocPtr doc)
 {
     reportxml_node_t *root;
     reportxml_t *ret;
@@ -330,7 +330,7 @@ reportxml_t *           reportxml_parse_xmldoc(xmlDocPtr doc)
     return ret;
 }
 
-xmlDocPtr               reportxml_render_xmldoc(reportxml_t *report)
+xmlDocPtr reportxml_render_xmldoc(_Ptr<reportxml_t> report)
 {
     xmlDocPtr ret;
     xmlNodePtr node;
@@ -353,7 +353,7 @@ xmlDocPtr               reportxml_render_xmldoc(reportxml_t *report)
     return ret;
 }
 
-static void __report_node_free(refobject_t self, void **userdata)
+static void __report_node_free(refobject_t self, void** userdata)
 {
     size_t i;
 
@@ -377,10 +377,10 @@ REFOBJECT_DEFINE_TYPE(reportxml_node_t,
         REFOBJECT_DEFINE_TYPE_FREE(__report_node_free)
         );
 
-reportxml_node_t *      reportxml_node_new(reportxml_node_type_t type, const char *id, const char *definition, const char *akindof)
+reportxml_node_t * reportxml_node_new(reportxml_node_type_t type, const char *id, const char *definition, const char *akindof)
 {
     reportxml_node_t *ret;
-    const struct nodedef *nodedef = __get_nodedef(type);
+    _Ptr<const struct nodedef> nodedef =  __get_nodedef(type);
     size_t i;
 
     if (!nodedef)
@@ -401,7 +401,7 @@ reportxml_node_t *      reportxml_node_new(reportxml_node_type_t type, const cha
     }
 
     for (i = 0; i < (sizeof(nodedef->attr)/sizeof(*nodedef->attr)); i++) {
-        const struct nodeattr *nodeattr = nodedef->attr[i];
+        _Ptr<const struct nodeattr> nodeattr =  nodedef->attr[i];
         if (nodeattr->name == NULL)
             break;
 
@@ -428,11 +428,11 @@ reportxml_node_t *      reportxml_node_new(reportxml_node_type_t type, const cha
     return ret;
 }
 
-reportxml_node_t *      reportxml_node_parse_xmlnode(xmlNodePtr xmlnode)
+reportxml_node_t * reportxml_node_parse_xmlnode(xmlNodePtr xmlnode : itype(_Ptr<xmlNode> ) )
 {
     reportxml_node_t *node;
 
-    const struct nodedef *nodedef;
+    _Ptr<const struct nodedef> nodedef = NULL;
 
     if (!xmlnode)
         return NULL;
@@ -448,7 +448,7 @@ reportxml_node_t *      reportxml_node_parse_xmlnode(xmlNodePtr xmlnode)
         return NULL;
 
     if (xmlnode->properties) {
-        xmlAttrPtr cur = xmlnode->properties;
+        _Ptr<xmlAttr> cur =  xmlnode->properties;
 
         do {
             xmlChar *value = xmlNodeListGetString(xmlnode->doc, cur->children, 1);
@@ -521,7 +521,7 @@ reportxml_node_t *      reportxml_node_parse_xmlnode(xmlNodePtr xmlnode)
     return node;
 }
 
-static reportxml_node_t *      __reportxml_node_copy_with_db(reportxml_node_t *node, reportxml_database_t *db, ssize_t depth)
+static reportxml_node_t * __reportxml_node_copy_with_db(reportxml_node_t *node, _Ptr<reportxml_database_t> db, ssize_t depth)
 {
     reportxml_node_t *ret;
     ssize_t child_count;
@@ -593,12 +593,12 @@ static reportxml_node_t *      __reportxml_node_copy_with_db(reportxml_node_t *n
     return ret;
 }
 
-reportxml_node_t *      reportxml_node_copy(reportxml_node_t *node)
+reportxml_node_t * reportxml_node_copy(reportxml_node_t *node)
 {
     return __reportxml_node_copy_with_db(node, NULL, -1);
 }
 
-xmlNodePtr              reportxml_node_render_xmlnode(reportxml_node_t *node)
+xmlNodePtr reportxml_node_render_xmlnode(reportxml_node_t *node)
 {
     xmlNodePtr ret;
     ssize_t child_count;
@@ -673,7 +673,7 @@ xmlNodePtr              reportxml_node_render_xmlnode(reportxml_node_t *node)
     return ret;
 }
 
-reportxml_node_type_t   reportxml_node_get_type(reportxml_node_t *node)
+reportxml_node_type_t reportxml_node_get_type(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) )
 {
     if (!node)
         return REPORTXML_NODE_TYPE__ERROR;
@@ -681,10 +681,10 @@ reportxml_node_type_t   reportxml_node_get_type(reportxml_node_t *node)
     return node->type;
 }
 
-int                     reportxml_node_set_attribute(reportxml_node_t *node, const char *key, const char *value)
+int reportxml_node_set_attribute(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) , const char *key, const char *value)
 {
-    const struct nodedef *nodedef;
-    const struct nodeattr *nodeattr;
+    _Ptr<const struct nodedef> nodedef = NULL;
+    _Ptr<const struct nodeattr> nodeattr = NULL;
     size_t i;
 
     if (!node || !key || !value)
@@ -722,10 +722,10 @@ int                     reportxml_node_set_attribute(reportxml_node_t *node, con
     return 0;
 }
 
-char *                  reportxml_node_get_attribute(reportxml_node_t *node, const char *key)
+char *reportxml_node_get_attribute(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) , const char *key) : itype(_Nt_array_ptr<char> ) 
 {
     xmlChar *k;
-    char *n;
+    _Nt_array_ptr<char> n = NULL;
 
     if (!node || !key)
         return NULL;
@@ -741,9 +741,9 @@ char *                  reportxml_node_get_attribute(reportxml_node_t *node, con
     return n;
 }
 
-int                     reportxml_node_add_child(reportxml_node_t *node, reportxml_node_t *child)
+int reportxml_node_add_child(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) , reportxml_node_t *child)
 {
-    const struct nodedef *nodedef;
+    _Ptr<const struct nodedef> nodedef = NULL;
     reportxml_node_t **n;
     size_t i;
     int found;
@@ -783,7 +783,7 @@ int                     reportxml_node_add_child(reportxml_node_t *node, reportx
     return 0;
 }
 
-ssize_t                 reportxml_node_count_child(reportxml_node_t *node)
+ssize_t reportxml_node_count_child(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) )
 {
     if (!node)
         return -1;
@@ -791,7 +791,7 @@ ssize_t                 reportxml_node_count_child(reportxml_node_t *node)
     return node->childs_len;
 }
 
-reportxml_node_t *      reportxml_node_get_child(reportxml_node_t *node, size_t idx)
+reportxml_node_t * reportxml_node_get_child(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) , size_t idx)
 {
     if (!node)
         return NULL;
@@ -805,9 +805,9 @@ reportxml_node_t *      reportxml_node_get_child(reportxml_node_t *node, size_t 
     return node->childs[idx];
 }
 
-reportxml_node_t *      reportxml_node_get_child_by_attribute(reportxml_node_t *node, const char *key, const char *value, int include_definitions)
+_Ptr<reportxml_node_t> reportxml_node_get_child_by_attribute(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) , const char *key, _Nt_array_ptr<const char> value, int include_definitions)
 {
-    reportxml_node_t *ret;
+    _Ptr<reportxml_node_t> ret = NULL;
     xmlChar *k;
     size_t i;
 
@@ -839,7 +839,7 @@ reportxml_node_t *      reportxml_node_get_child_by_attribute(reportxml_node_t *
     return NULL;
 }
 
-reportxml_node_t *      reportxml_node_get_child_by_type(reportxml_node_t *node, reportxml_node_type_t type, int include_definitions)
+_Ptr<reportxml_node_t> reportxml_node_get_child_by_type(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) , reportxml_node_type_t type, int include_definitions)
 {
     size_t i;
 
@@ -856,7 +856,7 @@ reportxml_node_t *      reportxml_node_get_child_by_type(reportxml_node_t *node,
         return NULL;
 
     for (i = 0; i < node->childs_len; i++) {
-        reportxml_node_t *ret;
+        _Ptr<reportxml_node_t> ret = NULL;
 
         ret = reportxml_node_get_child_by_type(node->childs[i], type, include_definitions);
         if (ret != NULL)
@@ -866,9 +866,9 @@ reportxml_node_t *      reportxml_node_get_child_by_type(reportxml_node_t *node,
     return NULL;
 }
 
-int                     reportxml_node_set_content(reportxml_node_t *node, const char *value)
+int reportxml_node_set_content(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) , const char *value : itype(_Nt_array_ptr<const char> ) )
 {
-    const struct nodedef *nodedef;
+    _Ptr<const struct nodedef> nodedef = NULL;
     char *n = NULL;
 
     if (!node)
@@ -891,7 +891,7 @@ int                     reportxml_node_set_content(reportxml_node_t *node, const
     return 0;
 }
 
-char *              reportxml_node_get_content(reportxml_node_t *node)
+char * reportxml_node_get_content(_Ptr<reportxml_node_t> node)
 {
     if (!node)
         return NULL;
@@ -903,9 +903,9 @@ char *              reportxml_node_get_content(reportxml_node_t *node)
     }
 }
 
-int                     reportxml_node_add_xml_child(reportxml_node_t *node, xmlNodePtr child)
+int reportxml_node_add_xml_child(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) , xmlNodePtr child)
 {
-    const struct nodedef *nodedef;
+    _Ptr<const struct nodedef> nodedef = NULL;
     xmlNodePtr *n;
 
     if (!node || !child)
@@ -931,7 +931,7 @@ int                     reportxml_node_add_xml_child(reportxml_node_t *node, xml
     return 0;
 }
 
-ssize_t                 reportxml_node_count_xml_child(reportxml_node_t *node)
+ssize_t reportxml_node_count_xml_child(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) )
 {
     if (!node)
         return -1;
@@ -939,7 +939,7 @@ ssize_t                 reportxml_node_count_xml_child(reportxml_node_t *node)
     return node->xml_childs_len;
 }
 
-xmlNodePtr              reportxml_node_get_xml_child(reportxml_node_t *node, size_t idx)
+xmlNodePtr reportxml_node_get_xml_child(reportxml_node_t *node : itype(_Ptr<reportxml_node_t> ) , size_t idx)
 {
     xmlNodePtr ret;
 
@@ -954,7 +954,7 @@ xmlNodePtr              reportxml_node_get_xml_child(reportxml_node_t *node, siz
     return ret;
 }
 
-static void __database_free(refobject_t self, void **userdata)
+static void __database_free(refobject_t self, void** userdata)
 {
     reportxml_database_t *db = REFOBJECT_TO_TYPE(self, reportxml_database_t *);
 
@@ -964,7 +964,7 @@ static void __database_free(refobject_t self, void **userdata)
     thread_mutex_destroy(&(db->lock));
 }
 
-static int __compare_definitions(void *arg, void *a, void *b)
+static int __compare_definitions(void* arg, void *a, void *b)
 {
     char *id_a, *id_b;
     int ret = 0;
@@ -984,7 +984,7 @@ static int __compare_definitions(void *arg, void *a, void *b)
     return ret;
 }
 
-static int __database_new(refobject_t self, const refobject_type_t *type, va_list ap)
+static int __database_new(refobject_t self, _Ptr<const refobject_type_t> type, va_list ap)
 {
     reportxml_database_t *ret = REFOBJECT_TO_TYPE(self, reportxml_database_t*);
 
@@ -1002,12 +1002,12 @@ REFOBJECT_DEFINE_TYPE(reportxml_database_t,
         REFOBJECT_DEFINE_TYPE_NEW(__database_new)
         );
 
-reportxml_database_t *  reportxml_database_new(void)
+_Ptr<reportxml_database_t> reportxml_database_new(void)
 {
     return refobject_new(reportxml_database_t);
 }
 
-int                     reportxml_database_add_report(reportxml_database_t *db, reportxml_t *report)
+int reportxml_database_add_report(_Ptr<reportxml_database_t> db, reportxml_t *report)
 {
     reportxml_node_t *root;
     ssize_t count;
@@ -1051,7 +1051,7 @@ int                     reportxml_database_add_report(reportxml_database_t *db, 
     return 0;
 }
 
-static int __attach_copy_of_node_or_definition(reportxml_node_t *parent, reportxml_node_t *node, reportxml_database_t *db, ssize_t depth)
+static int __attach_copy_of_node_or_definition(reportxml_node_t *parent, reportxml_node_t *node, _Ptr<reportxml_database_t> db, ssize_t depth)
 {
     reportxml_node_t *copy;
     reportxml_node_t *def = NULL;
@@ -1122,7 +1122,7 @@ static int __attach_copy_of_node_or_definition(reportxml_node_t *parent, reportx
     }
 }
 
-static reportxml_node_t *      __reportxml_database_build_node_ext(reportxml_database_t *db, const char *id, ssize_t depth, reportxml_node_type_t *acst_type_ret)
+static reportxml_node_t * __reportxml_database_build_node_ext(_Ptr<reportxml_database_t> db, const char *id, ssize_t depth, _Ptr<reportxml_node_type_t> acst_type_ret)
 {
     reportxml_node_t *search;
     reportxml_node_t *found;
@@ -1270,13 +1270,13 @@ static reportxml_node_t *      __reportxml_database_build_node_ext(reportxml_dat
     return ret;
 }
 
-reportxml_node_t *      reportxml_database_build_node(reportxml_database_t *db, const char *id, ssize_t depth)
+reportxml_node_t * reportxml_database_build_node(_Ptr<reportxml_database_t> db, const char *id, ssize_t depth)
 {
     return __reportxml_database_build_node_ext(db, id, depth, NULL);
 }
 
 /* We try to build a a report from the definition. Exat structure depends on what is defined. */
-reportxml_t *           reportxml_database_build_report(reportxml_database_t *db, const char *id, ssize_t depth)
+reportxml_t * reportxml_database_build_report(_Ptr<reportxml_database_t> db, const char *id, ssize_t depth)
 {
     reportxml_node_t *definition;
     reportxml_node_t *child;

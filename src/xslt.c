@@ -220,17 +220,13 @@ static xsltStylesheetPtr xslt_get_stylesheet(const char *fn) {
 }
 
 /* Custom xslt loader */
-static xmlDocPtr custom_loader(const        xmlChar *URI,
-                               xmlDictPtr   dict,
-                               int          options,
-                               void        *ctxt,
-                               xsltLoadType type)
+static xmlDocPtrcustom_loader(const xmlChar *URI, xmlDictPtr dict : itype(_Ptr<xmlDict> ) , int options, void *ctxt, xsltLoadType type) : itype(_Ptr<xmlDoc> ) 
 {
-    xmlDocPtr ret;
+    _Ptr<xmlDoc> ret = NULL;
     xmlChar *rel_URI, *fn, *final_URI = NULL;
     char *path_URI = NULL;
     xsltStylesheet *c;
-    ice_config_t *config;
+    _Ptr<ice_config_t> config = NULL;
 
     switch (type) {
         /* In case an include is loaded */
@@ -311,7 +307,7 @@ static xmlDocPtr custom_loader(const        xmlChar *URI,
     return ret;
 }
 
-static inline void _send_error(client_t *client, icecast_error_id_t id, int old_status) {
+static void _send_error(_Ptr<client_t> client, icecast_error_id_t id, int old_status) {
     if (old_status >= 400) {
         client_send_error_by_id(client, ICECAST_ERROR_RECURSIVE_ERROR);
         return;
@@ -320,7 +316,7 @@ static inline void _send_error(client_t *client, icecast_error_id_t id, int old_
     client_send_error_by_id(client, id);
 }
 
-void xslt_transform(xmlDocPtr doc, const char *xslfilename, client_t *client, int status, const char *location)
+void xslt_transform(xmlDocPtr doc, _Ptr<const char> xslfilename, _Ptr<client_t> client, int status, _Nt_array_ptr<const char> location)
 {
     xmlDocPtr res;
     xsltStylesheetPtr cur;
@@ -373,7 +369,7 @@ void xslt_transform(xmlDocPtr doc, const char *xslfilename, client_t *client, in
     {
         ssize_t ret;
         int failed = 0;
-        refbuf_t *refbuf;
+        _Ptr<refbuf_t> refbuf = NULL;
         size_t location_length = 0;
         ssize_t full_len = strlen(mediatype) + (ssize_t)len + (ssize_t)1024;
 

@@ -88,9 +88,9 @@
 static int background;
 static char *pidfile = NULL;
 
-static void pidfile_update(ice_config_t *config, int always_try);
+static void pidfile_update(_Ptr<ice_config_t> config, int always_try);
 
-static void _fatal_error(const char *perr)
+static void _fatal_error(_Ptr<const char> perr)
 {
 #ifdef WIN32_SERVICE
     MessageBox(NULL, perr, "Error", MB_SERVICE_NOTIFICATION);
@@ -194,13 +194,13 @@ static void shutdown_subsystems(void)
     xslt_shutdown();
 }
 
-void main_config_reload(ice_config_t *config)
+void main_config_reload(_Ptr<ice_config_t> config)
 {
     ICECAST_LOG_DEBUG("Reloading configuration.");
     pidfile_update(config, 0);
 }
 
-static int _parse_config_opts(int argc, char **argv, char *filename, size_t size)
+static int _parse_config_opts(int argc, char*_Nt_array_ptr<char> argv, char *filename, size_t size)
 {
     int i = 1;
     int config_ok = 0;
@@ -276,7 +276,7 @@ static int _start_logging(void)
     char buf[1024];
     int log_to_stderr;
 
-    ice_config_t *config = config_get_config_unlocked();
+    _Ptr<ice_config_t> config =  config_get_config_unlocked();
 
     if(strcmp(config->error_log, "-") == 0) {
         /* this is already in place because of _start_logging_stdout() */
@@ -348,12 +348,12 @@ static int _start_logging(void)
     return 0;
 }
 
-static void pidfile_update(ice_config_t *config, int always_try)
+static void pidfile_update(_Ptr<ice_config_t> config, int always_try)
 {
-    char *newpidfile = NULL;
+    _Nt_array_ptr<char> newpidfile =  NULL;
 
     if (config->pidfile) {
-        FILE *f;
+        _Ptr<FILE> f = NULL;
 
         /* check if the file actually changed */
         if (pidfile && strcmp(pidfile, config->pidfile) == 0)
@@ -403,7 +403,7 @@ static void pidfile_update(ice_config_t *config, int always_try)
 /* bind the socket and start listening */
 static int _server_proc_init(void)
 {
-    ice_config_t *config = config_get_config_unlocked();
+    _Ptr<ice_config_t> config =  config_get_config_unlocked();
 
     connection_setup_sockets(config);
 
@@ -436,7 +436,7 @@ static void _server_proc(void)
 #if defined(HAVE_SETUID) || defined(HAVE_CHROOT) || defined(HAVE_SETUID)
 static void _ch_root_uid_setup(void)
 {
-   ice_config_t *conf = config_get_config_unlocked();
+   _Ptr<ice_config_t> conf =  config_get_config_unlocked();
 #ifdef HAVE_SETUID
    struct passwd *user;
    struct group *group;
@@ -526,7 +526,7 @@ static inline void __log_system_name(void) {
 #ifdef HAVE_UNAME
     struct utsname utsname;
 #endif
-    ice_config_t *config;
+    _Ptr<ice_config_t> config = NULL;
 
 #ifdef HAVE_GETHOSTNAME
     if (gethostname(hostname, sizeof(hostname)) != 0) {

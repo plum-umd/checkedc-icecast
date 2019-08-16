@@ -29,16 +29,16 @@
 
 #define MAX_LINE_LEN 512
 
-int util_timed_wait_for_fd(sock_t fd, int timeout);
-int util_read_header(sock_t sock, char *buff, unsigned long len, int entire);
-int util_check_valid_extension(const char *uri);
-char *util_get_extension(const char *path);
-char *util_get_path_from_uri(char *uri);
-char *util_get_path_from_normalised_uri(const char *uri);
-char *util_normalise_uri(const char *uri);
-char *util_base64_encode(const char *data, size_t len);
-char *util_base64_decode(const char *input);
-char *util_bin_to_hex(unsigned char *data, int len);
+int util_timed_wait_for_fd(int fd, int timeout);
+int util_read_header(int sock, char *buff, unsigned long len, int entire);
+int util_check_valid_extension(_Nt_array_ptr<const char> uri);
+char * util_get_extension(_Nt_array_ptr<const char> path);
+_Ptr<char> util_get_path_from_uri(_Ptr<char> uri);
+char * util_get_path_from_normalised_uri(_Nt_array_ptr<const char> uri);
+char * util_normalise_uri(const char *uri);
+char * util_base64_encode(const char *data, size_t len);
+char * util_base64_decode(const char *data);
+char * util_bin_to_hex(unsigned char *data, int len);
 
 typedef enum _util_hostcheck_tag {
     HOSTCHECK_ERROR = -1,
@@ -54,11 +54,11 @@ util_hostcheck_type util_hostcheck(const char *hostname);
 
 int util_str_to_bool(const char *str);
 int util_str_to_loglevel(const char *str);
-int util_str_to_int(const char *str, const int default_value);
-unsigned int util_str_to_unsigned_int(const char *str, const unsigned int default_value);
+int util_str_to_int(_Nt_array_ptr<const char> str, const int default_value);
+unsigned int util_str_to_unsigned_int(_Nt_array_ptr<const char> str, const unsigned int default_value);
 
-char *util_url_unescape(const char *src);
-char *util_url_escape(const char *src);
+char * util_url_unescape(const char *src);
+char * util_url_escape(const char *src);
 
 /* Function to build up a HTTP header.
  * out is the pointer to storage.
@@ -81,54 +81,48 @@ char *util_url_escape(const char *src);
  * If datablock is NULL no end-of-header nor any data is appended.
  * Returns the number of bytes written or -1 on error.
  */
-ssize_t util_http_build_header(char * out, size_t len, ssize_t offset,
-        int cache,
-        int status, const char * statusmsg,
-        const char * contenttype, const char * charset,
-        const char * datablock,
-        source_t * source,
-        client_t * client);
+ssize_t util_http_build_header(char *out, size_t len, ssize_t offset, int cache, int status, _Nt_array_ptr<const char> statusmsg, _Ptr<const char> contenttype, _Ptr<const char> charset, _Ptr<const char> datablock, _Ptr<source_t> source, _Ptr<client_t> client);
 
-const char *util_http_select_best(const char *input, const char *first, ...);
+const char * util_http_select_best(_Ptr<const char> input, const char *first, ...);
 
 typedef struct icecast_kv_tag {
-    char *key;
-    char *value;
+    _Ptr<char> key;
+    _Ptr<char> value;
 } icecast_kv_t;
 
 typedef struct icecast_kva_tag {
-    void   *_tofree[3];
+    void** _tofree;
     size_t kvlen;
     size_t indexlen;
-    size_t *index;
-    icecast_kv_t *kv;
+    _Ptr<size_t> index;
+    _Ptr<icecast_kv_t> kv;
 } icecast_kva_t;
 
-icecast_kva_t * util_parse_http_cn(const char *cnstr);
-void util_kva_free(icecast_kva_t *kva);
+icecast_kva_t * util_parse_http_cn(_Nt_array_ptr<const char> cnstr);
+void util_kva_free(icecast_kva_t *kva : itype(_Ptr<icecast_kva_t> ) );
 
 /* String dictionary type, without support for NULL keys, or multiple
  * instances of the same key */
 typedef struct _util_dict {
-    char *key;
-    char *val;
-    struct _util_dict *next;
+    _Ptr<char> key;
+    _Ptr<char> val;
+    _Ptr<struct _util_dict> next;
 } util_dict;
 
-util_dict *util_dict_new(void);
-void util_dict_free(util_dict *dict);
+_Ptr<util_dict> util_dict_new(void);
+void util_dict_free(_Ptr<util_dict> dict);
 /* dict, key must not be NULL. */
-int util_dict_set(util_dict *dict, const char *key, const char *val);
-const char *util_dict_get(util_dict *dict, const char *key);
-char *util_dict_urlencode(util_dict *dict, char delim);
+int util_dict_set(_Ptr<util_dict> dict, _Nt_array_ptr<const char> key, _Nt_array_ptr<const char> val);
+_Ptr<const char> util_dict_get(_Ptr<util_dict> dict, _Nt_array_ptr<const char> key);
+char * util_dict_urlencode(_Ptr<util_dict> dict, char delim);
 
 #ifndef HAVE_LOCALTIME_R
 struct tm *localtime_r(const time_t *timep, struct tm *result);
 #endif
-char *util_conv_string (const char *string, const char *in_charset, const char *out_charset);
+_Ptr<char> util_conv_string(const char *string, const char *in_charset, const char *out_charset);
 
-int get_line(FILE *file, char *buf, size_t siz);
+int get_line(_Ptr<FILE> file, char *buf, size_t siz);
 
-int util_replace_string(char **dst, const char *src);
+int util_replace_string(_Ptr<_Nt_array_ptr<char>> dst, _Nt_array_ptr<const char> src);
 int util_strtolower(char *str);
 #endif  /* __UTIL_H__ */

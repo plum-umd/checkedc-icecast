@@ -17,7 +17,7 @@
 
 #include "icecasttypes.h"
 
-void xslt_transform(xmlDocPtr doc, const char *xslfilename, client_t *client, int status, const char *location);
+void xslt_transform(xmlDocPtr doc, _Ptr<const char> xslfilename, _Ptr<client_t> client, int status, _Nt_array_ptr<const char> location);
 void xslt_initialize(void);
 void xslt_shutdown(void);
 void xslt_clear_cache(void);

@@ -31,8 +31,8 @@ typedef struct {
     char *inline_url;
     int update_metadata;
 
-    refbuf_t *metadata;
-    refbuf_t *read_data;
+    _Ptr<refbuf_t> metadata;
+    _Ptr<refbuf_t> read_data;
     int read_count;
     mutex_t url_lock;
 
@@ -41,6 +41,6 @@ typedef struct {
     char build_metadata[4081];
 } mp3_state;
 
-int format_mp3_get_plugin(struct source_tag *src);
+int format_mp3_get_plugin(_Ptr<struct source_tag> source);
 
 #endif  /* __FORMAT_MP3_H__ */

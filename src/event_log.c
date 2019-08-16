@@ -24,8 +24,8 @@ typedef struct event_log {
     int level;
 } event_log_t;
 
-static int event_log_emit(void *state, event_t *event) {
-    event_log_t *self = state;
+static int event_log_emit(void* state, _Ptr<event_t> event) {
+    _Ptr<event_log_t> self =  state;
 
     ICECAST_LOG(self->level, ICECAST_LOGFLAG_NONE,
                              "%s%strigger=\"%s\" uri=\"%s\" "
@@ -45,7 +45,7 @@ static void event_log_free(void *state) {
     free(self);
 }
 
-int event_get_log(event_registration_t *er, config_options_t *options) {
+int event_get_log(_Ptr<event_registration_t> er, _Ptr<config_options_t> options) {
     event_log_t *self = calloc(1, sizeof(event_log_t));
 
     if (!self)

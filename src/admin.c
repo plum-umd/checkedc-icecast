@@ -94,24 +94,24 @@
 #define BUILDM3U_RAW_REQUEST                "buildm3u"
 
 typedef struct {
-    const char *prefix;
+    _Nt_array_ptr<const char> prefix;
     size_t length;
     const admin_command_handler_t *handlers;
 } admin_command_table_t;
 
-static void command_fallback            (client_t *client, source_t *source, admin_format_t response);
-static void command_metadata            (client_t *client, source_t *source, admin_format_t response);
-static void command_shoutcast_metadata  (client_t *client, source_t *source, admin_format_t response);
-static void command_show_listeners      (client_t *client, source_t *source, admin_format_t response);
-static void command_stats               (client_t *client, source_t *source, admin_format_t response);
-static void command_queue_reload        (client_t *client, source_t *source, admin_format_t response);
-static void command_list_mounts         (client_t *client, source_t *source, admin_format_t response);
-static void command_move_clients        (client_t *client, source_t *source, admin_format_t response);
-static void command_kill_client         (client_t *client, source_t *source, admin_format_t response);
-static void command_kill_source         (client_t *client, source_t *source, admin_format_t response);
-static void command_manageauth          (client_t *client, source_t *source, admin_format_t response);
-static void command_updatemetadata      (client_t *client, source_t *source, admin_format_t response);
-static void command_buildm3u            (client_t *client, source_t *source, admin_format_t response);
+static void command_fallback(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_metadata(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_shoutcast_metadata(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t format);
+static void command_show_listeners(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_stats(_Ptr<client_t> client, source_t *source, admin_format_t response);
+static void command_queue_reload(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_list_mounts(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_move_clients(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_kill_client(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_kill_source(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_manageauth(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_updatemetadata(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response);
+static void command_buildm3u(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t format);
 
 static const admin_command_handler_t handlers[] = {
     { "*",                                  ADMINTYPE_GENERAL,      ADMIN_FORMAT_HTML,          NULL, NULL}, /* for ACL framework */
@@ -151,7 +151,7 @@ static admin_command_table_t command_tables[ADMIN_MAX_COMMAND_TABLES] = {
     {.prefix = NULL, .length = (sizeof(handlers)/sizeof(*handlers)), .handlers = handlers},
 };
 
-static inline int __is_command_table_valid(const admin_command_table_t * table)
+static int __is_command_table_valid(_Ptr<const admin_command_table_t> table)
 {
     if (table == NULL)
         return 0;
@@ -162,7 +162,7 @@ static inline int __is_command_table_valid(const admin_command_table_t * table)
     return 1;
 }
 
-static inline const admin_command_table_t * admin_get_table(admin_command_id_t command)
+static _Ptr<const admin_command_table_t> admin_get_table(admin_command_id_t command)
 {
     size_t t = (command & 0x00FF0000) >> 16;
 
@@ -175,7 +175,7 @@ static inline const admin_command_table_t * admin_get_table(admin_command_id_t c
     return &(command_tables[t]);
 }
 
-static inline const admin_command_table_t * admin_get_table_by_prefix(const char *command)
+static const admin_command_table_t * admin_get_table_by_prefix(const char *command)
 {
     const char *end;
     size_t i;
@@ -205,7 +205,7 @@ static inline const admin_command_table_t * admin_get_table_by_prefix(const char
     return NULL;
 }
 
-static inline admin_command_id_t admin_get_command_by_table_and_index(const admin_command_table_t *table, size_t index)
+static admin_command_id_t admin_get_command_by_table_and_index(const admin_command_table_t *table, size_t index)
 {
     size_t t = table - command_tables;
 
@@ -221,7 +221,7 @@ static inline admin_command_id_t admin_get_command_by_table_and_index(const admi
     return (t << 16) | index;
 }
 
-static inline size_t admin_get_index_by_command(admin_command_id_t command)
+static size_t admin_get_index_by_command(admin_command_id_t command)
 {
     return command & 0x0FFFF;
 }
@@ -251,9 +251,9 @@ admin_command_id_t admin_get_command(const char *command)
 
 /* Get the command handler for command or NULL
  */
-const admin_command_handler_t* admin_get_handler(admin_command_id_t command)
+_Ptr<const admin_command_handler_t> admin_get_handler(admin_command_id_t command)
 {
-    const admin_command_table_t *table = admin_get_table(command);
+    _Ptr<const admin_command_table_t> table =  admin_get_table(command);
     size_t index = admin_get_index_by_command(command);
 
     if (table == NULL)
@@ -270,7 +270,7 @@ const admin_command_handler_t* admin_get_handler(admin_command_id_t command)
  */
 int admin_get_command_type(admin_command_id_t command)
 {
-    const admin_command_handler_t* handler = admin_get_handler(command);
+    _Ptr<const admin_command_handler_t> handler =  admin_get_handler(command);
 
     if (handler != NULL)
         return handler->type;
@@ -278,7 +278,7 @@ int admin_get_command_type(admin_command_id_t command)
     return ADMINTYPE_ERROR;
 }
 
-int admin_command_table_register(const char *prefix, size_t handlers_length, const admin_command_handler_t *handlers)
+int admin_command_table_register(_Nt_array_ptr<const char> prefix, size_t handlers_length, const admin_command_handler_t *handlers)
 {
     size_t i;
 
@@ -299,7 +299,7 @@ int admin_command_table_register(const char *prefix, size_t handlers_length, con
     return -1;
 }
 
-int admin_command_table_unregister(const char *prefix)
+int admin_command_table_unregister(_Nt_array_ptr<const char> prefix)
 {
     size_t i;
 
@@ -329,7 +329,7 @@ xmlNodePtr admin_build_rootnode(xmlDocPtr doc, const char *name)
  * doc even if the source is running */
 xmlDocPtr admin_build_sourcelist(const char *mount)
 {
-    avl_node *node;
+    _Ptr<avl_node> node = NULL;
     source_t *source;
     xmlNodePtr xmlnode, srcnode;
     xmlDocPtr doc;
@@ -355,9 +355,9 @@ xmlDocPtr admin_build_sourcelist(const char *mount)
 
         if (source->running || source->on_demand)
         {
-            ice_config_t *config;
-            mount_proxy *mountinfo;
-            acl_t *acl = NULL;
+            _Ptr<ice_config_t> config = NULL;
+            _Ptr<mount_proxy> mountinfo = NULL;
+            _Ptr<acl_t> acl =  NULL;
 
             srcnode = xmlNewChild(xmlnode, NULL, XMLSTR("source"), NULL);
             xmlSetProp(srcnode, XMLSTR("mount"), XMLSTR(source->mount));
@@ -395,10 +395,7 @@ xmlDocPtr admin_build_sourcelist(const char *mount)
     return(doc);
 }
 
-void admin_send_response(xmlDocPtr       doc,
-                         client_t       *client,
-                         admin_format_t  response,
-                         const char     *xslt_template)
+void admin_send_response(xmlDocPtr doc, _Ptr<client_t> client, admin_format_t response, _Nt_array_ptr<const char> xslt_template)
 {
     if (response == ADMIN_FORMAT_RAW) {
         xmlChar *buff = NULL;
@@ -459,9 +456,9 @@ void admin_send_response(xmlDocPtr       doc,
         fserve_add_client (client, NULL);
     }
     if (response == ADMIN_FORMAT_HTML) {
-        char *fullpath_xslt_template;
+        _Nt_array_ptr<char> fullpath_xslt_template = NULL;
         size_t fullpath_xslt_template_len;
-        ice_config_t *config = config_get_config();
+        _Ptr<ice_config_t> config =  config_get_config();
 
         fullpath_xslt_template_len = strlen(config->adminroot_dir) + strlen(xslt_template) + strlen(PATH_SEPARATOR) + 1;
         fullpath_xslt_template = malloc(fullpath_xslt_template_len);
@@ -475,11 +472,11 @@ void admin_send_response(xmlDocPtr       doc,
     }
 }
 
-void admin_handle_request(client_t *client, const char *uri)
+void admin_handle_request(_Ptr<client_t> client, _Nt_array_ptr<const char> uri)
 {
-    const char *mount;
-    const admin_command_handler_t* handler;
-    source_t *source = NULL;
+    _Nt_array_ptr<const char> mount = NULL;
+    _Ptr<const admin_command_handler_t> handler = NULL;
+    _Ptr<source_t> source =  NULL;
     admin_format_t format;
 
     ICECAST_LOG_DEBUG("Got admin request '%s'", uri);
@@ -555,7 +552,7 @@ void admin_handle_request(client_t *client, const char *uri)
             if (handler->function) {
                 handler->function(client, source, format);
             } else {
-                resourcematch_extract_t *extract = NULL;
+                _Ptr<resourcematch_extract_t> extract =  NULL;
                 const char *suffix = strchr(uri, '/');
 
                 if (!suffix) {
@@ -587,7 +584,7 @@ void admin_handle_request(client_t *client, const char *uri)
     return;
 }
 
-static void html_success(client_t *client, char *message)
+static void html_success(_Ptr<client_t> client, _Ptr<char> message)
 {
     ssize_t ret;
 
@@ -612,12 +609,10 @@ static void html_success(client_t *client, char *message)
 }
 
 
-static void command_move_clients(client_t   *client,
-                                 source_t   *source,
-                                 admin_format_t response)
+static void command_move_clients(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
-    const char *dest_source;
-    source_t *dest;
+    _Nt_array_ptr<const char> dest_source = NULL;
+    _Ptr<source_t> dest = NULL;
     xmlDocPtr doc;
     xmlNodePtr node;
     char buf[255];
@@ -670,10 +665,7 @@ static void command_move_clients(client_t   *client,
     xmlFreeDoc(doc);
 }
 
-static inline xmlNodePtr __add_listener(client_t        *client,
-                                        xmlNodePtr      parent,
-                                        time_t          now,
-                                        operation_mode  mode)
+static xmlNodePtr __add_listener(client_t *client : itype(_Ptr<client_t> ) , xmlNodePtr parent, time_t now, operation_mode mode)
 {
     const char *tmp;
     xmlNodePtr node;
@@ -730,12 +722,10 @@ static inline xmlNodePtr __add_listener(client_t        *client,
     return node;
 }
 
-void admin_add_listeners_to_mount(source_t          *source,
-                                  xmlNodePtr        parent,
-                                  operation_mode    mode)
+void admin_add_listeners_to_mount(_Ptr<source_t> source, xmlNodePtr parent : itype(_Ptr<xmlNode> ) , operation_mode mode)
 {
     time_t now = time(NULL);
-    avl_node *client_node;
+    _Ptr<avl_node> client_node = NULL;
 
     avl_tree_rlock(source->client_tree);
     client_node = avl_get_first(source->client_tree);
@@ -746,9 +736,7 @@ void admin_add_listeners_to_mount(source_t          *source,
     avl_tree_unlock(source->client_tree);
 }
 
-static void command_show_listeners(client_t *client,
-                                   source_t *source,
-                                   admin_format_t response)
+static void command_show_listeners(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
     xmlDocPtr doc;
     xmlNodePtr node, srcnode;
@@ -772,11 +760,11 @@ static void command_show_listeners(client_t *client,
     xmlFreeDoc(doc);
 }
 
-static void command_buildm3u(client_t *client, source_t *source, admin_format_t format)
+static void command_buildm3u(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t format)
 {
     const char *mount = source->mount;
-    const char *username = NULL;
-    const char *password = NULL;
+    _Nt_array_ptr<const char> username =  NULL;
+    _Nt_array_ptr<const char> password =  NULL;
     ssize_t ret;
 
     COMMAND_REQUIRE(client, "username", username);
@@ -802,7 +790,7 @@ static void command_buildm3u(client_t *client, source_t *source, admin_format_t 
     fserve_add_client (client, NULL);
 }
 
-xmlNodePtr admin_add_role_to_authentication(auth_t *auth, xmlNodePtr parent)
+xmlNodePtr admin_add_role_to_authentication(_Ptr<auth_t> auth, xmlNodePtr parent)
 {
     xmlNodePtr rolenode = xmlNewChild(parent, NULL, XMLSTR("role"), NULL);
     char idbuf[32];
@@ -824,19 +812,19 @@ xmlNodePtr admin_add_role_to_authentication(auth_t *auth, xmlNodePtr parent)
     return rolenode;
 }
 
-static void command_manageauth(client_t *client, source_t *source, admin_format_t response)
+static void command_manageauth(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
     xmlDocPtr doc;
     xmlNodePtr node, rolenode, usersnode, msgnode;
-    const char *action = NULL;
-    const char *username = NULL;
-    const char *idstring = NULL;
+    _Nt_array_ptr<const char> action =  NULL;
+    _Nt_array_ptr<const char> username =  NULL;
+    _Nt_array_ptr<const char> idstring =  NULL;
     char *message = NULL;
     int ret = AUTH_OK;
     int error_id = ICECAST_ERROR_ADMIN_missing_parameter;
     long unsigned int id;
-    ice_config_t *config = config_get_config();
-    auth_t *auth;
+    _Ptr<ice_config_t> config =  config_get_config();
+    _Ptr<auth_t> auth = NULL;
 
     do {
         /* get id */
@@ -848,7 +836,7 @@ static void command_manageauth(client_t *client, source_t *source, admin_format_
         auth = auth_stack_getbyid(config->authstack, id);
         /* now mounts */
         if (!auth) {
-            mount_proxy *mount = config->mounts;
+            _Ptr<mount_proxy> mount =  config->mounts;
             while (mount) {
                 auth = auth_stack_getbyid(mount->authstack, id);
                 if (auth)
@@ -871,7 +859,7 @@ static void command_manageauth(client_t *client, source_t *source, admin_format_
             action = "list";
 
         if (!strcmp(action, "add")) {
-            const char *password = NULL;
+            _Nt_array_ptr<const char> password =  NULL;
             COMMAND_OPTIONAL(client, "password", password);
 
             if (username == NULL || password == NULL) {
@@ -944,9 +932,7 @@ static void command_manageauth(client_t *client, source_t *source, admin_format_
     client_send_error_by_id(client, error_id);
 }
 
-static void command_kill_source(client_t *client,
-                                source_t *source,
-                                admin_format_t response)
+static void command_kill_source(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
     xmlDocPtr doc;
     xmlNodePtr node;
@@ -964,13 +950,11 @@ static void command_kill_source(client_t *client,
     xmlFreeDoc(doc);
 }
 
-static void command_kill_client(client_t *client,
-                                source_t *source,
-                                admin_format_t response)
+static void command_kill_client(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
-    const char *idtext;
+    _Nt_array_ptr<const char> idtext = NULL;
     int id;
-    client_t *listener;
+    _Ptr<client_t> listener = NULL;
     xmlDocPtr doc;
     xmlNodePtr node;
     char buf[50] = "";
@@ -1009,11 +993,9 @@ static void command_kill_client(client_t *client,
     xmlFreeDoc(doc);
 }
 
-static void command_fallback(client_t *client,
-                             source_t *source,
-                             admin_format_t response)
+static void command_fallback(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
-    const char *fallback;
+    _Nt_array_ptr<const char> fallback = NULL;
     char *old;
 
     ICECAST_LOG_DEBUG("Got fallback request");
@@ -1027,13 +1009,15 @@ static void command_fallback(client_t *client,
     html_success(client, "Fallback configured");
 }
 
-static void command_metadata(client_t *client,
-                             source_t *source,
-                             admin_format_t response)
+static void command_metadata(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
-    const char *action;
-    const char *song, *title, *artist, *charset;
-    format_plugin_t *plugin;
+    _Nt_array_ptr<const char> action = NULL;
+   _Nt_array_ptr<const char> song = NULL;
+_Nt_array_ptr<const char> title = NULL;
+_Nt_array_ptr<const char> artist = NULL;
+_Nt_array_ptr<const char> charset = NULL;
+ 
+    _Ptr<format_plugin_t> plugin = NULL;
     xmlDocPtr doc;
     xmlNodePtr node;
     int same_ip = 1;
@@ -1101,12 +1085,10 @@ static void command_metadata(client_t *client,
     xmlFreeDoc(doc);
 }
 
-static void command_shoutcast_metadata(client_t *client,
-                                       source_t *source,
-                                       admin_format_t format)
+static void command_shoutcast_metadata(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t format)
 {
-    const char *action;
-    const char *value;
+    _Nt_array_ptr<const char> action = NULL;
+    _Nt_array_ptr<const char> value = NULL;
     int same_ip = 1;
 
     ICECAST_LOG_DEBUG("Got shoutcast metadata update request");
@@ -1149,7 +1131,7 @@ static void command_shoutcast_metadata(client_t *client,
     }
 }
 
-static void command_stats(client_t *client, source_t *source, admin_format_t response)
+static void command_stats(_Ptr<client_t> client, source_t *source, admin_format_t response)
 {
     const char *mount = (source) ? source->mount : NULL;
     xmlDocPtr doc;
@@ -1162,7 +1144,7 @@ static void command_stats(client_t *client, source_t *source, admin_format_t res
     return;
 }
 
-static void command_queue_reload(client_t *client, source_t *source, admin_format_t response)
+static void command_queue_reload(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
     xmlDocPtr doc;
     xmlNodePtr node;
@@ -1182,7 +1164,7 @@ static void command_queue_reload(client_t *client, source_t *source, admin_forma
 }
 
 
-static void command_list_mounts(client_t *client, source_t *source, admin_format_t response)
+static void command_list_mounts(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
     ICECAST_LOG_DEBUG("List mounts request");
 
@@ -1216,9 +1198,7 @@ static void command_list_mounts(client_t *client, source_t *source, admin_format
     }
 }
 
-static void command_updatemetadata(client_t *client,
-                                   source_t *source,
-                                   admin_format_t response)
+static void command_updatemetadata(_Ptr<client_t> client, _Ptr<source_t> source, admin_format_t response)
 {
     xmlDocPtr doc;
     xmlNodePtr node, srcnode;

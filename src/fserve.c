@@ -86,17 +86,17 @@ static sock_t fd_max = SOCK_ERROR;
 #endif
 
 typedef struct {
-    char *ext;
-    char *type;
+    _Nt_array_ptr<char> ext;
+    _Nt_array_ptr<char> type;
 } mime_type;
 
-static void fserve_client_destroy(fserve_t *fclient);
-static int _delete_mapping(void *mapping);
-static void *fserv_thread_function(void *arg);
+static void fserve_client_destroy(fserve_t *fclient : itype(_Ptr<fserve_t> ) );
+static int _delete_mapping(void* mapping);
+static void* fserv_thread_function(void *arg);
 
 void fserve_initialize(void)
 {
-    ice_config_t *config = config_get_config();
+    _Ptr<ice_config_t> config =  config_get_config();
 
     mimetypes = NULL;
     active_list = NULL;
@@ -270,7 +270,7 @@ static int wait_for_fds(void)
     return -1;
 }
 
-static void *fserv_thread_function(void *arg)
+static void* fserv_thread_function(void *arg)
 {
     fserve_t *fclient, **trail;
     size_t bytes;
@@ -290,8 +290,8 @@ static void *fserv_thread_function(void *arg)
             /* process this client, if it is ready */
             if (fclient->ready)
             {
-                client_t *client = fclient->client;
-                refbuf_t *refbuf = client->refbuf;
+                _Ptr<client_t> client =  fclient->client;
+                _Ptr<refbuf_t> refbuf =  client->refbuf;
                 fclient->ready = 0;
                 if (client->pos == refbuf->len)
                 {
@@ -345,17 +345,17 @@ static void *fserv_thread_function(void *arg)
 }
 
 /* string returned needs to be free'd */
-char *fserve_content_type(const char *path)
+_Nt_array_ptr<char> fserve_content_type(const char *path)
 {
-    char *ext = util_get_extension(path);
+    _Nt_array_ptr<char> ext =  util_get_extension(path);
     mime_type exttype = {ext, NULL};
-    void *result;
-    char *type;
+    void* result = NULL;
+    _Nt_array_ptr<char> type = NULL;
 
     thread_spin_lock (&pending_lock);
     if (mimetypes && !avl_get_by_key (mimetypes, &exttype, &result))
     {
-        mime_type *mime = result;
+        _Ptr<mime_type> mime =  result;
         type = strdup (mime->type);
     }
     else {
@@ -385,7 +385,7 @@ char *fserve_content_type(const char *path)
     return type;
 }
 
-static void fserve_client_destroy(fserve_t *fclient)
+static void fserve_client_destroy(fserve_t *fclient : itype(_Ptr<fserve_t> ) )
 {
     if (fclient)
     {
@@ -405,7 +405,7 @@ static void fserve_client_destroy(fserve_t *fclient)
 /* client has requested a file, so check for it and send the file.  Do not
  * refer to the client_t afterwards.  return 0 for success, -1 on error.
  */
-int fserve_client_create (client_t *httpclient)
+int fserve_client_create(_Ptr<client_t> httpclient)
 {
     int bytes;
     struct stat file_buf;
@@ -416,9 +416,9 @@ int fserve_client_create (client_t *httpclient)
     int ret = 0;
     char *fullpath;
     int m3u_requested = 0, m3u_file_available = 1;
-    const char * xslt_playlist_requested = NULL;
+    _Nt_array_ptr<const char> xslt_playlist_requested =  NULL;
     int xslt_playlist_file_available = 1;
-    ice_config_t *config;
+    _Ptr<ice_config_t> config = NULL;
     FILE *file;
 
     fullpath = util_get_path_from_normalised_uri(httpclient->uri);
@@ -452,8 +452,8 @@ int fserve_client_create (client_t *httpclient)
 
     if (m3u_requested && m3u_file_available == 0)
     {
-        char *sourceuri = strdup(httpclient->uri);
-        char *dot = strrchr(sourceuri, '.');
+        _Nt_array_ptr<char> sourceuri =  strdup(httpclient->uri);
+        _Nt_array_ptr<char> dot =  strrchr(sourceuri, '.');
 
         *dot = 0;
         httpclient->respcode = 200;
@@ -476,8 +476,8 @@ int fserve_client_create (client_t *httpclient)
     if (xslt_playlist_requested && xslt_playlist_file_available == 0)
     {
         xmlDocPtr doc;
-        char *reference = strdup(httpclient->uri);
-        char *eol = strrchr (reference, '.');
+        _Nt_array_ptr<char> reference =  strdup(httpclient->uri);
+        _Nt_array_ptr<char> eol =  strrchr (reference, '.');
         if (eol)
             *eol = '\0';
         doc = stats_get_xml (0, reference, httpclient);
@@ -548,7 +548,7 @@ int fserve_client_create (client_t *httpclient)
             }
             if (!rangeproblem) {
                 off_t endpos = rangenumber+new_content_len-1;
-                char *type;
+                _Nt_array_ptr<char> type = NULL;
 
                 if (endpos < 0) {
                     endpos = 0;
@@ -584,7 +584,7 @@ int fserve_client_create (client_t *httpclient)
         }
     }
     else {
-        char *type = fserve_content_type(httpclient->uri);
+        _Nt_array_ptr<char> type =  fserve_content_type(httpclient->uri);
         httpclient->respcode = 200;
         bytes = util_http_build_header (httpclient->refbuf->data, BUFSIZE, 0,
                                         0, 200, NULL,
@@ -620,7 +620,7 @@ fail:
 /* Routine to actually add pre-configured client structure to pending list and
  * then to start off the file serving thread if it is not already running
  */
-static void fserve_add_pending (fserve_t *fclient)
+static void fserve_add_pending(fserve_t *fclient)
 {
     thread_spin_lock (&pending_lock);
     fclient->next = (fserve_t *)pending_list;
@@ -638,7 +638,7 @@ static void fserve_add_pending (fserve_t *fclient)
 /* Add client to fserve thread, client needs to have refbuf set and filled
  * but may provide a NULL file if no data needs to be read
  */
-int fserve_add_client (client_t *client, FILE *file)
+int fserve_add_client(_Ptr<client_t> client, FILE *file : itype(_Ptr<FILE> ) )
 {
     fserve_t *fclient = calloc (1, sizeof(fserve_t));
 
@@ -660,7 +660,7 @@ int fserve_add_client (client_t *client, FILE *file)
 /* add client to file serving engine, but just write out the buffer contents,
  * then pass the client to the callback with the provided arg
  */
-void fserve_add_client_callback (client_t *client, fserve_callback_t callback, void *arg)
+void fserve_add_client_callback(_Ptr<client_t> client, _Ptr<void (_Ptr<client_t> , void* )> callback, void* arg)
 {
     fserve_t *fclient = calloc (1, sizeof(fserve_t));
 
@@ -680,8 +680,8 @@ void fserve_add_client_callback (client_t *client, fserve_callback_t callback, v
 }
 
 
-static int _delete_mapping(void *mapping) {
-    mime_type *map = mapping;
+static int _delete_mapping(void* mapping) {
+    _Ptr<mime_type> map =  mapping;
     free(map->ext);
     free(map->type);
     free(map);
@@ -689,7 +689,7 @@ static int _delete_mapping(void *mapping) {
     return 1;
 }
 
-static int _compare_mappings(void *arg, void *a, void *b)
+static int _compare_mappings(void *arg, void* a, void* b)
 {
     (void)arg;
     return strcmp(
@@ -697,13 +697,13 @@ static int _compare_mappings(void *arg, void *a, void *b)
             ((mime_type *)b)->ext);
 }
 
-void fserve_recheck_mime_types(ice_config_t *config)
+void fserve_recheck_mime_types(_Ptr<ice_config_t> config)
 {
-    FILE *mimefile;
+    _Ptr<FILE> mimefile = NULL;
     char line[4096];
     char *type, *ext, *cur;
     mime_type *mapping;
-    avl_tree *new_mimetypes;
+    _Ptr<avl_tree> new_mimetypes = NULL;
 
     if (config->mimetypes_fn == NULL)
         return;
@@ -746,7 +746,7 @@ void fserve_recheck_mime_types(ice_config_t *config)
             *cur++ = 0;
             if(*ext)
             {
-                void *tmp;
+                void* tmp = NULL;
                 /* Add a new extension->type mapping */
                 mapping = malloc(sizeof(mime_type));
                 mapping->ext = strdup(ext);

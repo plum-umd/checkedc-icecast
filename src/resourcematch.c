@@ -55,7 +55,7 @@ static resourcematch_extract_t * allocate_extract(const char *pattern)
     return ret;
 }
 
-static void strip_common_prefix(const char **pattern, const char **string)
+static void strip_common_prefix(_Ptr<const char*> pattern, _Ptr<const char*> string)
 {
     const char *p = *pattern;
     const char *s = *string;
@@ -66,7 +66,7 @@ static void strip_common_prefix(const char **pattern, const char **string)
     *string = s;
 }
 
-static inline void setup_group(resourcematch_extract_t *extract, size_t idx, char type)
+static void setup_group(resourcematch_extract_t *extract : itype(_Ptr<resourcematch_extract_t> ) , size_t idx, char type)
 {
     if (!extract)
         return;
@@ -75,10 +75,10 @@ static inline void setup_group(resourcematch_extract_t *extract, size_t idx, cha
     extract->group[idx].raw = NULL;
 }
 
-static inline resourcematch_result_t match_lli(const char **string, resourcematch_extract_t *extract, size_t idx, int base)
+static resourcematch_result_t match_lli(_Ptr<_Nt_array_ptr<const char>> string, resourcematch_extract_t *extract : itype(_Ptr<resourcematch_extract_t> ) , size_t idx, int base)
 {
     long long int ret;
-    char *endptr;
+    _Nt_array_ptr<char> endptr = NULL;
 
     errno = 0;
     ret = strtoll(*string, &endptr, base);
@@ -96,7 +96,7 @@ static inline resourcematch_result_t match_lli(const char **string, resourcematc
     return RESOURCEMATCH_MATCH;
 }
 
-resourcematch_result_t resourcematch_match(const char *pattern, const char *string, resourcematch_extract_t **extract)
+resourcematch_result_t resourcematch_match(const char *pattern, const char *string, _Ptr<resourcematch_extract_t*> extract)
 {
     resourcematch_result_t ret;
     resourcematch_extract_t *matches = NULL;
@@ -177,7 +177,7 @@ resourcematch_result_t resourcematch_match(const char *pattern, const char *stri
     }
 }
 
-void resourcematch_extract_free(resourcematch_extract_t *extract)
+void resourcematch_extract_free(resourcematch_extract_t *extract : itype(_Ptr<resourcematch_extract_t> ) )
 {
     size_t i;
 

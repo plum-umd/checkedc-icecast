@@ -140,7 +140,7 @@ static const icecast_error_t __errors[] = {
      .message = "Recursive error"}
 };
 
-const icecast_error_t * error_get_by_id(icecast_error_id_t id) {
+_Ptr<const icecast_error_t> error_get_by_id(icecast_error_id_t id) {
     size_t i;
 
     for (i = 0; i < (sizeof(__errors)/sizeof(*__errors)); i++) {
@@ -152,7 +152,7 @@ const icecast_error_t * error_get_by_id(icecast_error_id_t id) {
     return NULL;
 }
 
-const icecast_error_t * error_get_by_uuid(const char *uuid)
+_Ptr<const icecast_error_t> error_get_by_uuid(const char *uuid)
 {
     size_t i;
 

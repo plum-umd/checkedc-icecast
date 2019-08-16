@@ -71,14 +71,14 @@ mutex_t move_clients_mutex;
 /* avl tree helper */
 static int _compare_clients(void *compare_arg, void *a, void *b);
 static int _free_client(void *key);
-static void _parse_audio_info (source_t *source, const char *s);
-static void source_shutdown (source_t *source);
+static void _parse_audio_info(source_t *source : itype(_Ptr<source_t> ) , const char *s);
+static void source_shutdown(source_t *source);
 
 /* Allocate a new source with the stated mountpoint, if one already
  * exists with that mountpoint in the global source tree then return
  * NULL.
  */
-source_t *source_reserve (const char *mount)
+source_t * source_reserve(const char *mount)
 {
     source_t *src = NULL;
 
@@ -121,10 +121,10 @@ source_t *source_reserve (const char *mount)
 /* Find a mount with this raw name - ignoring fallbacks. You should have the
  * global source tree locked to call this.
  */
-source_t *source_find_mount_raw(const char *mount)
+source_t * source_find_mount_raw(_Nt_array_ptr<const char> mount)
 {
     source_t *source;
-    avl_node *node;
+    _Ptr<avl_node> node = NULL;
     int cmp;
 
     if (!mount) {
@@ -153,11 +153,11 @@ source_t *source_find_mount_raw(const char *mount)
  * check the fallback, and so on.  Must have a global source lock to call
  * this function.
  */
-source_t *source_find_mount(const char *mount)
+source_t * source_find_mount(const char *mount)
 {
     source_t *source = NULL;
-    ice_config_t *config;
-    mount_proxy *mountinfo;
+    _Ptr<ice_config_t> config = NULL;
+    _Ptr<mount_proxy> mountinfo = NULL;
     int depth = 0;
 
     config = config_get_config();
@@ -199,7 +199,7 @@ int source_compare_sources(void *arg, void *a, void *b)
 }
 
 
-void source_clear_source (source_t *source)
+void source_clear_source(source_t *source : itype(_Ptr<source_t> ) )
 {
     int c;
 
@@ -227,7 +227,7 @@ void source_clear_source (source_t *source)
     c=0;
     while (1)
     {
-        avl_node *node = avl_get_first (source->client_tree);
+        _Ptr<avl_node> node =  avl_get_first (source->client_tree);
         if (node)
         {
             client_t *client = node->key;
@@ -258,7 +258,7 @@ void source_clear_source (source_t *source)
     /* Lets clear out the source queue too */
     while (source->stream_data)
     {
-        refbuf_t *p = source->stream_data;
+        _Ptr<refbuf_t> p =  source->stream_data;
         source->stream_data = p->next;
         p->next = NULL;
         /* can be referenced by burst handler as well */
@@ -303,7 +303,7 @@ void source_clear_source (source_t *source)
 
 
 /* Remove the provided source from the global tree and free it */
-void source_free_source (source_t *source)
+void source_free_source(source_t *source)
 {
     ICECAST_LOG_DEBUG("freeing source \"%s\"", source->mount);
     avl_tree_wlock (global.source_tree);
@@ -323,11 +323,11 @@ void source_free_source (source_t *source)
 }
 
 
-client_t *source_find_client(source_t *source, int id)
+_Ptr<client_t> source_find_client(_Ptr<source_t> source, int id)
 {
-    client_t fakeclient;
-    void *result;
-    connection_t fakecon;
+    client_t fakeclient = {};
+    void* result = NULL;
+    connection_t fakecon = {};
 
     fakeclient.con = &fakecon;
     fakeclient.con->id = id;
@@ -349,7 +349,7 @@ client_t *source_find_client(source_t *source, int id)
  * The only lock that should be held when this is called is the
  * source tree lock
  */
-void source_move_clients(source_t *source, source_t *dest)
+void source_move_clients(source_t *source : itype(_Ptr<source_t> ) , source_t *dest : itype(_Ptr<source_t> ) )
 {
     unsigned long count = 0;
     if (strcmp (source->mount, dest->mount) == 0)
@@ -396,7 +396,7 @@ void source_move_clients(source_t *source, source_t *dest)
 
         while (1)
         {
-            avl_node *node = avl_get_first (source->pending_tree);
+            _Ptr<avl_node> node =  avl_get_first (source->pending_tree);
             if (node == NULL)
                 break;
             client = (client_t *)(node->key);
@@ -420,7 +420,7 @@ void source_move_clients(source_t *source, source_t *dest)
 
         while (1)
         {
-            avl_node *node = avl_get_first (source->client_tree);
+            _Ptr<avl_node> node =  avl_get_first (source->client_tree);
             if (node == NULL)
                 break;
 
@@ -464,9 +464,9 @@ void source_move_clients(source_t *source, source_t *dest)
  * and sent back, however NULL is also valid as in the case of a short
  * timeout and there's no data pending.
  */
-static refbuf_t *get_next_buffer (source_t *source)
+static _Ptr<refbuf_t> get_next_buffer(_Ptr<source_t> source)
 {
-    refbuf_t *refbuf = NULL;
+    _Ptr<refbuf_t> refbuf =  NULL;
     int delay = 250;
 
     if (source->short_delay)
@@ -534,7 +534,7 @@ static refbuf_t *get_next_buffer (source_t *source)
  * referring to it after writing then drop the client as it's fallen too far
  * behind
  */
-static void send_to_listener (source_t *source, client_t *client, int deletion_expected)
+static void send_to_listener(_Ptr<source_t> source, client_t *client : itype(_Ptr<client_t> ) , int deletion_expected)
 {
     int bytes;
     int loop = 10;   /* max number of iterations in one go */
@@ -591,12 +591,12 @@ static void send_to_listener (source_t *source, client_t *client, int deletion_e
 /* Open the file for stream dumping.
  * This function should do all processing of the filename.
  */
-static FILE * source_open_dumpfile(const char * filename) {
+static _Ptr<FILE> source_open_dumpfile(const char *filename) {
 #ifndef _WIN32
     /* some of the below functions seems not to be standard winapi functions */
     char buffer[PATH_MAX];
     time_t curtime;
-    struct tm *loctime;
+    _Ptr<struct tm> loctime = NULL;
 
     /* Get the current time. */
     curtime = time (NULL);
@@ -614,7 +614,7 @@ static FILE * source_open_dumpfile(const char * filename) {
 /* Perform any initialisation just before the stream data is processed, the header
  * info is processed by now and the format details are setup
  */
-static void source_init (source_t *source)
+static void source_init(source_t *source)
 {
     char listenurl[512];
     const char *str;
@@ -681,11 +681,11 @@ static void source_init (source_t *source)
 }
 
 
-void source_main (source_t *source)
+void source_main(source_t *source : itype(_Ptr<source_t> ) )
 {
-    refbuf_t *refbuf;
+    _Ptr<refbuf_t> refbuf = NULL;
     client_t *client;
-    avl_node *client_node;
+    _Ptr<avl_node> client_node = NULL;
 
     source_init (source);
 
@@ -716,7 +716,7 @@ void source_main (source_t *source)
             source->burst_offset += refbuf->len;
             while (source->burst_offset > source->burst_size)
             {
-                refbuf_t *to_release = source->burst_point;
+                _Ptr<refbuf_t> to_release =  source->burst_point;
 
                 if (to_release->next)
                 {
@@ -828,7 +828,7 @@ void source_main (source_t *source)
              * increase refcount */
             while (source->stream_data->_count == 1)
             {
-                refbuf_t *to_go = source->stream_data;
+                _Ptr<refbuf_t> to_go =  source->stream_data;
 
                 if (to_go->next == NULL || source->burst_point == to_go)
                 {
@@ -851,7 +851,7 @@ void source_main (source_t *source)
 }
 
 
-static void source_shutdown (source_t *source)
+static void source_shutdown(source_t *source)
 {
     source->running = 0;
     if (source->con && source->con->ip) {
@@ -927,8 +927,8 @@ static int _compare_clients(void *compare_arg, void *a, void *b)
 
     (void)compare_arg;
 
-    connection_t *cona = clienta->con;
-    connection_t *conb = clientb->con;
+    _Ptr<connection_t> cona =  clienta->con;
+    _Ptr<connection_t> conb =  clientb->con;
 
     if (cona->id < conb->id) return -1;
     if (cona->id > conb->id) return 1;
@@ -936,7 +936,7 @@ static int _compare_clients(void *compare_arg, void *a, void *b)
     return 0;
 }
 
-int source_remove_client(void *key)
+int source_remove_client(void* key)
 {
     return 1;
 }
@@ -960,7 +960,7 @@ static int _free_client(void *key)
     return 1;
 }
 
-static void _parse_audio_info (source_t *source, const char *s)
+static void _parse_audio_info(source_t *source : itype(_Ptr<source_t> ) , const char *s)
 {
     const char *start = s;
     unsigned int len;
@@ -994,12 +994,12 @@ static void _parse_audio_info (source_t *source, const char *s)
 
 
 /* Apply the mountinfo details to the source */
-static void source_apply_mount (ice_config_t *config, source_t *source, mount_proxy *mountinfo)
+static void source_apply_mount(_Ptr<ice_config_t> config, _Ptr<source_t> source, _Ptr<mount_proxy> mountinfo)
 {
     const char *str;
     int val;
-    http_parser_t *parser = NULL;
-    acl_t *acl = NULL;
+    _Ptr<http_parser_t> parser =  NULL;
+    _Ptr<acl_t> acl =  NULL;
 
     ICECAST_LOG_DEBUG("Applying mount information for \"%s\"", source->mount);
     avl_tree_rlock (source->client_tree);
@@ -1183,13 +1183,13 @@ static void source_apply_mount (ice_config_t *config, source_t *source, mount_pr
     }
     if (mountinfo && mountinfo->intro_filename)
     {
-        ice_config_t *config = config_get_config_unlocked ();
+        _Ptr<ice_config_t> config =  config_get_config_unlocked ();
         unsigned int len  = strlen (config->webroot_dir) +
             strlen (mountinfo->intro_filename) + 2;
         char *path = malloc (len);
         if (path)
         {
-            FILE *f;
+            _Ptr<FILE> f = NULL;
             snprintf (path, len, "%s" PATH_SEPARATOR "%s", config->webroot_dir,
                     mountinfo->intro_filename);
 
@@ -1225,7 +1225,7 @@ static void source_apply_mount (ice_config_t *config, source_t *source, mount_pr
  * mountinfo can be NULL in which case default settings should be taken
  * This function is called by the Slave thread
  */
-void source_update_settings (ice_config_t *config, source_t *source, mount_proxy *mountinfo)
+void source_update_settings(_Ptr<ice_config_t> config, source_t *source : itype(_Ptr<source_t> ) , _Ptr<mount_proxy> mountinfo)
 {
     thread_mutex_lock(&source->lock);
     /*  skip if source is a fallback to file */
@@ -1286,7 +1286,7 @@ void source_update_settings (ice_config_t *config, source_t *source, mount_proxy
 }
 
 
-void *source_client_thread (void *arg)
+void* source_client_thread(void *arg)
 {
     source_t *source = arg;
 
@@ -1302,7 +1302,7 @@ void *source_client_thread (void *arg)
 }
 
 
-void source_client_callback (client_t *client, void *arg)
+void source_client_callback(_Ptr<client_t> client, void *arg)
 {
     const char *agent;
     source_t *source = arg;
@@ -1328,16 +1328,16 @@ void source_client_callback (client_t *client, void *arg)
             source, THREAD_DETACHED);
 }
 
-static void *source_fallback_file (void *arg)
+static void* source_fallback_file(void *arg)
 {
     char *mount = arg;
-    char *type;
+    _Ptr<char> type = NULL;
     char *path;
     unsigned int len;
-    FILE *file = NULL;
+    _Ptr<FILE> file =  NULL;
     source_t *source = NULL;
-    ice_config_t *config;
-    http_parser_t *parser;
+    _Ptr<ice_config_t> config = NULL;
+    _Ptr<http_parser_t> parser = NULL;
 
     do
     {
@@ -1395,10 +1395,10 @@ static void *source_fallback_file (void *arg)
 /* rescan the mount list, so that xsl files are updated to show
  * unconnected but active fallback mountpoints
  */
-void source_recheck_mounts (int update_all)
+void source_recheck_mounts(int update_all)
 {
-    ice_config_t *config;
-    mount_proxy *mount;
+    _Ptr<ice_config_t> config = NULL;
+    _Ptr<mount_proxy> mount = NULL;
 
     avl_tree_rlock (global.source_tree);
     config = config_get_config();
@@ -1419,7 +1419,7 @@ void source_recheck_mounts (int update_all)
             source = source_find_mount_raw (mount->mountname);
             if (source)
             {
-                mount_proxy *mountinfo = config_find_mount (config, source->mount, MOUNT_TYPE_NORMAL);
+                _Ptr<mount_proxy> mountinfo =  config_find_mount (config, source->mount, MOUNT_TYPE_NORMAL);
                 source_update_settings (config, source, mountinfo);
             }
             else if (update_all)

@@ -32,10 +32,10 @@ typedef struct auth_static {
     char *arg;
 } auth_static_t;
 
-static auth_result static_auth(auth_client *auth_user)
+static auth_result static_auth(_Ptr<auth_client> auth_user)
 {
-    client_t        *client     = auth_user->client;
-    auth_t          *auth       = client->auth;
+    _Ptr<client_t> client =  auth_user->client;
+    _Ptr<auth_t> auth =  client->auth;
     auth_static_t   *auth_info  = auth->state;
 
     if (auth_info->username) {
@@ -61,7 +61,7 @@ static auth_result static_auth(auth_client *auth_user)
     return AUTH_OK;
 }
 
-static void clear_auth (auth_t *auth)
+static void clear_auth(_Ptr<auth_t> auth)
 {
     auth_static_t *auth_info = auth->state;
     if (!auth_info)
@@ -74,7 +74,7 @@ static void clear_auth (auth_t *auth)
     auth->state = NULL;
 }
 
-static auth_result static_userlist(auth_t *auth, xmlNodePtr srcnode)
+static auth_result static_userlist(_Ptr<auth_t> auth, xmlNodePtr srcnode)
 {
     auth_static_t *auth_info = auth->state;
     xmlNodePtr    newnode;
@@ -85,7 +85,7 @@ static auth_result static_userlist(auth_t *auth, xmlNodePtr srcnode)
     return AUTH_OK;
 }
 
-int  auth_get_static_auth (auth_t *authenticator, config_options_t *options)
+int auth_get_static_auth(_Ptr<auth_t> authenticator, _Ptr<config_options_t> options)
 {
     auth_static_t *auth_info;
     int           need_user;

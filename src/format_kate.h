@@ -17,6 +17,6 @@
 
 #include "format_ogg.h"
 
-ogg_codec_t *initial_kate_page(format_plugin_t *plugin, ogg_page *page);
+ogg_codec_t * initial_kate_page(_Ptr<format_plugin_t> plugin, ogg_page *page);
 
 #endif /* __FORMAT_KATE_H */

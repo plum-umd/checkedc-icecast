@@ -80,10 +80,10 @@
 */
 
 typedef struct client_queue_tag {
-    client_t *client;
+    _Ptr<client_t> client;
     int offset;
     int shoutcast;
-    char *shoutcast_mount;
+    _Nt_array_ptr<char> shoutcast_mount;
     char *bodybuffer;
     size_t bodybufferlen;
     int tried_body;
@@ -105,9 +105,9 @@ static matchfile_t *banned_ip, *allowed_ip;
 
 rwlock_t _source_shutdown_rwlock;
 
-static int  _update_admin_command(client_t *client);
+static int _update_admin_command(_Ptr<client_t> client);
 static void _handle_connection(void);
-static void get_tls_certificate(ice_config_t *config);
+static void get_tls_certificate(_Ptr<ice_config_t> config);
 
 void connection_initialize(void)
 {
@@ -145,7 +145,7 @@ void connection_shutdown(void)
     _initialized = 0;
 }
 
-void connection_reread_config(ice_config_t *config)
+void connection_reread_config(_Ptr<ice_config_t> config)
 {
     get_tls_certificate(config);
     listensocket_container_configure_and_setup(global.listensockets, config);
@@ -164,9 +164,9 @@ static connection_id_t _next_connection_id(void)
 
 
 #ifdef ICECAST_CAP_TLS
-static void get_tls_certificate(ice_config_t *config)
+static void get_tls_certificate(_Ptr<ice_config_t> config)
 {
-    const char *keyfile;
+    _Ptr<const char> keyfile = NULL;
 
     config->tls_ok = tls_ok = 0;
 
@@ -188,7 +188,7 @@ static void get_tls_certificate(ice_config_t *config)
 /* handlers for reading and writing a connection_t when there is TLS
  * configured on the listening port
  */
-static int connection_read_tls(connection_t *con, void *buf, size_t len)
+static int connection_read_tls(_Ptr<connection_t> con, void* buf, size_t len)
 {
     ssize_t bytes = tls_read(con->tls, buf, len);
 
@@ -200,7 +200,7 @@ static int connection_read_tls(connection_t *con, void *buf, size_t len)
     return bytes;
 }
 
-static int connection_send_tls(connection_t *con, const void *buf, size_t len)
+static int connection_send_tls(_Ptr<connection_t> con, _Ptr<const void> buf, size_t len)
 {
     ssize_t bytes = tls_write(con->tls, buf, len);
 
@@ -229,7 +229,7 @@ static void get_tls_certificate(ice_config_t *config)
 /* handlers (default) for reading and writing a connection_t, no encrpytion
  * used just straight access to the socket
  */
-static int connection_read(connection_t *con, void *buf, size_t len)
+static int connection_read(_Ptr<connection_t> con, void* buf, size_t len)
 {
     int bytes = sock_read_bytes(con->sock, buf, len);
     if (bytes == 0)
@@ -239,7 +239,7 @@ static int connection_read(connection_t *con, void *buf, size_t len)
     return bytes;
 }
 
-static int connection_send(connection_t *con, const void *buf, size_t len)
+static int connection_send(_Ptr<connection_t> con, _Ptr<const void> buf, size_t len)
 {
     int bytes = sock_write_bytes(con->sock, buf, len);
     if (bytes < 0) {
@@ -252,9 +252,9 @@ static int connection_send(connection_t *con, const void *buf, size_t len)
     return bytes;
 }
 
-connection_t *connection_create(sock_t sock, listensocket_t *listensocket_real, listensocket_t* listensocket_effective, char *ip)
+_Ptr<connection_t> connection_create(int sock, _Ptr<listensocket_t> listensocket_real, _Ptr<listensocket_t> listensocket_effective, _Ptr<char> ip)
 {
-    connection_t *con;
+    _Ptr<connection_t> con = NULL;
 
     if (!matchfile_match_allow_deny(allowed_ip, banned_ip, ip))
         return NULL;
@@ -282,7 +282,7 @@ connection_t *connection_create(sock_t sock, listensocket_t *listensocket_real, 
 
 /* prepare connection for interacting over a TLS connection
  */
-void connection_uses_tls(connection_t *con)
+void connection_uses_tls(_Ptr<connection_t> con)
 {
 #ifdef ICECAST_CAP_TLS
     if (con->tls)
@@ -303,7 +303,7 @@ void connection_uses_tls(connection_t *con)
 #endif
 }
 
-ssize_t connection_send_bytes(connection_t *con, const void *buf, size_t len)
+ssize_t connection_send_bytes(_Ptr<connection_t> con, _Ptr<const void> buf, size_t len)
 {
     ssize_t ret = con->send(con, buf, len);
 
@@ -312,7 +312,7 @@ ssize_t connection_send_bytes(connection_t *con, const void *buf, size_t len)
     return ret;
 }
 
-static inline ssize_t connection_read_bytes_real(connection_t *con, void *buf, size_t len)
+static ssize_t connection_read_bytes_real(_Ptr<connection_t> con, void *buf, size_t len)
 {
     ssize_t done = 0;
     ssize_t ret;
@@ -354,7 +354,7 @@ static inline ssize_t connection_read_bytes_real(connection_t *con, void *buf, s
     return done + ret;
 }
 
-ssize_t connection_read_bytes(connection_t *con, void *buf, size_t len)
+ssize_t connection_read_bytes(_Ptr<connection_t> con, void *buf, size_t len)
 {
     ssize_t ret = connection_read_bytes_real(con, buf, len);
 
@@ -363,7 +363,7 @@ ssize_t connection_read_bytes(connection_t *con, void *buf, size_t len)
     return ret;
 }
 
-int connection_read_put_back(connection_t *con, const void *buf, size_t len)
+int connection_read_put_back(_Ptr<connection_t> con, _Ptr<const void> buf, size_t len)
 {
     void *n;
 
@@ -432,7 +432,7 @@ static client_queue_t *_get_connection(void)
 static void process_request_queue (void)
 {
     client_queue_t **node_ref = (client_queue_t **)&_req_queue;
-    ice_config_t *config;
+    _Ptr<ice_config_t> config = NULL;
     int timeout;
     char peak;
 
@@ -442,7 +442,7 @@ static void process_request_queue (void)
 
     while (*node_ref) {
         client_queue_t *node = *node_ref;
-        client_t *client = node->client;
+        _Ptr<client_t> client =  node->client;
         int len = PER_CLIENT_REFBUF_SIZE - 1 - node->offset;
         char *buf = client->refbuf->data + node->offset;
 
@@ -540,9 +540,9 @@ static void _add_body_client(client_queue_t *node)
     thread_spin_unlock(&_connection_lock);
 }
 
-static client_slurp_result_t process_request_body_queue_one(client_queue_t *node, time_t timeout, size_t body_size_limit)
+static client_slurp_result_t process_request_body_queue_one(client_queue_t *node : itype(_Ptr<client_queue_t> ) , time_t timeout, size_t body_size_limit)
 {
-        client_t *client = node->client;
+        _Ptr<client_t> client =  node->client;
         client_slurp_result_t res;
 
         if (client->parser->req_type == httpp_req_post) {
@@ -581,7 +581,7 @@ static client_slurp_result_t process_request_body_queue_one(client_queue_t *node
 static void process_request_body_queue (void)
 {
     client_queue_t **node_ref = (client_queue_t **)&_body_queue;
-    ice_config_t *config;
+    _Ptr<ice_config_t> config = NULL;
     time_t timeout;
     size_t body_size_limit;
 
@@ -596,7 +596,7 @@ static void process_request_body_queue (void)
 
     while (*node_ref) {
         client_queue_t *node = *node_ref;
-        client_t *client = node->client;
+        _Ptr<client_t> client =  node->client;
         client_slurp_result_t res;
 
         node->tried_body = 1;
@@ -628,10 +628,10 @@ static void _add_request_queue(client_queue_t *node)
     _req_queue_tail = (volatile client_queue_t **)&node->next;
 }
 
-static client_queue_t *create_client_node(client_t *client)
+static client_queue_t * create_client_node(_Ptr<client_t> client)
 {
     client_queue_t *node = calloc (1, sizeof (client_queue_t));
-    const listener_t *listener;
+    _Ptr<const listener_t> listener = NULL;
 
     if (!node)
         return NULL;
@@ -655,10 +655,10 @@ static client_queue_t *create_client_node(client_t *client)
     return node;
 }
 
-void connection_queue(connection_t *con)
+void connection_queue(_Ptr<connection_t> con)
 {
     client_queue_t *node;
-    client_t *client = NULL;
+    _Ptr<client_t> client =  NULL;
 
     global_lock();
     if (client_create(&client, con, NULL) < 0) {
@@ -692,8 +692,8 @@ void connection_queue(connection_t *con)
 
 void connection_accept_loop(void)
 {
-    connection_t *con;
-    ice_config_t *config;
+    _Ptr<connection_t> con = NULL;
+    _Ptr<ice_config_t> config = NULL;
     int duration = 300;
 
     config = config_get_config();
@@ -726,9 +726,9 @@ void connection_accept_loop(void)
 /* Called when activating a source. Verifies that the source count is not
  * exceeded and applies any initial parameters.
  */
-int connection_complete_source(source_t *source, int response)
+int connection_complete_source(_Ptr<source_t> source, int response)
 {
-    ice_config_t *config;
+    _Ptr<ice_config_t> config = NULL;
 
     global_lock();
     ICECAST_LOG_DEBUG("sources count is %d", global.sources);
@@ -736,7 +736,7 @@ int connection_complete_source(source_t *source, int response)
     config = config_get_config();
     if (global.sources < config->source_limit) {
         const char *contenttype;
-        mount_proxy *mountinfo;
+        _Ptr<mount_proxy> mountinfo = NULL;
         format_type_t format_type;
 
         /* setup format handler */
@@ -810,9 +810,9 @@ int connection_complete_source(source_t *source, int response)
     return -1;
 }
 
-static inline void source_startup(client_t *client)
+static void source_startup(_Ptr<client_t> client)
 {
-    source_t *source;
+    _Ptr<source_t> source = NULL;
     source = source_reserve(client->uri);
 
     if (source) {
@@ -833,7 +833,7 @@ static inline void source_startup(client_t *client)
             source->shoutcast_compat = 1;
             source_client_callback(client, source);
         } else {
-            refbuf_t *ok = refbuf_new(PER_CLIENT_REFBUF_SIZE);
+            _Ptr<refbuf_t> ok =  refbuf_new(PER_CLIENT_REFBUF_SIZE);
             const char *expectcontinue;
             const char *transfer_encoding;
             int status_to_send = 0;
@@ -886,7 +886,7 @@ static inline void source_startup(client_t *client)
 }
 
 /* only called for native icecast source clients */
-static void _handle_source_request(client_t *client)
+static void _handle_source_request(_Ptr<client_t> client)
 {
     const char *method = httpp_getvar(client->parser, HTTPP_VAR_REQ_TYPE);
 
@@ -909,7 +909,7 @@ static void _handle_source_request(client_t *client)
 }
 
 
-static void _handle_stats_request(client_t *client)
+static void _handle_stats_request(_Ptr<client_t> client)
 {
     stats_event_inc(NULL, "stats_connections");
 
@@ -923,7 +923,7 @@ static void _handle_stats_request(client_t *client)
 /* if 0 is returned then the client should not be touched, however if -1
  * is returned then the caller is responsible for handling the client
  */
-static int __add_listener_to_source(source_t *source, client_t *client)
+static int __add_listener_to_source(_Ptr<source_t> source, _Ptr<client_t> client)
 {
     size_t loop = 10;
 
@@ -936,7 +936,7 @@ static int __add_listener_to_source(source_t *source, client_t *client)
             break;
 
         if (loop && source->fallback_when_full && source->fallback_mount) {
-            source_t *next = source_find_mount (source->fallback_mount);
+            _Ptr<source_t> next =  source_find_mount (source->fallback_mount);
             if (!next) {
                 ICECAST_LOG_ERROR("Fallback '%s' for full source '%s' not found",
                     source->mount, source->fallback_mount);
@@ -971,9 +971,9 @@ static int __add_listener_to_source(source_t *source, client_t *client)
 }
 
 /* count the number of clients on a mount with same username and same role as the given one */
-static inline ssize_t __count_user_role_on_mount (source_t *source, client_t *client) {
+static ssize_t __count_user_role_on_mount(_Ptr<source_t> source, _Ptr<client_t> client) {
     ssize_t ret = 0;
-    avl_node *node;
+    _Ptr<avl_node> node = NULL;
 
     avl_tree_rlock(source->client_tree);
     node = avl_get_first(source->client_tree);
@@ -1005,8 +1005,8 @@ static inline ssize_t __count_user_role_on_mount (source_t *source, client_t *cl
     return ret;
 }
 
-static void _handle_get_request(client_t *client) {
-    source_t *source = NULL;
+static void _handle_get_request(_Ptr<client_t> client) {
+    _Ptr<source_t> source =  NULL;
 
     ICECAST_LOG_DEBUG("Got client %p with URI %H", client, client->uri);
 
@@ -1061,8 +1061,8 @@ static void _handle_get_request(client_t *client) {
         if (!in_error && client->con->discon_time == 0) {
             time_t connection_duration = acl_get_max_connection_duration(client->acl);
             if (connection_duration == -1) {
-                ice_config_t *config = config_get_config();
-                mount_proxy *mount = config_find_mount(config, source->mount, MOUNT_TYPE_NORMAL);
+                _Ptr<ice_config_t> config =  config_get_config();
+                _Ptr<mount_proxy> mount =  config_find_mount(config, source->mount, MOUNT_TYPE_NORMAL);
                 if (mount && mount->max_listener_duration)
                     connection_duration = mount->max_listener_duration;
                 config_release_config();
@@ -1082,8 +1082,8 @@ static void _handle_get_request(client_t *client) {
     }
 }
 
-static void _handle_delete_request(client_t *client) {
-    source_t *source;
+static void _handle_delete_request(_Ptr<client_t> client) {
+    _Ptr<source_t> source = NULL;
 
     avl_tree_wlock(global.source_tree);
     source = source_find_mount_raw(client->uri);
@@ -1101,10 +1101,10 @@ static void _handle_shoutcast_compatible(client_queue_t *node)
 {
     char *http_compliant;
     int http_compliant_len = 0;
-    http_parser_t *parser;
-    const char *shoutcast_mount;
-    client_t *client = node->client;
-    ice_config_t *config;
+    _Ptr<http_parser_t> parser = NULL;
+    _Nt_array_ptr<const char> shoutcast_mount = NULL;
+    _Ptr<client_t> client =  node->client;
+    _Ptr<ice_config_t> config = NULL;
 
     if (node->shoutcast == 1)
     {
@@ -1181,17 +1181,17 @@ static void _handle_shoutcast_compatible(client_queue_t *node)
 /* Handle <resource> lookups here.
  */
 
-static int _handle_resources(client_t *client, char **uri)
+static int _handle_resources(_Ptr<client_t> client, _Ptr<char*> uri)
 {
     const char *http_host = httpp_getvar(client->parser, "host");
-    char *serverhost = NULL;
+    _Nt_array_ptr<char> serverhost =  NULL;
     int   serverport = 0;
-    char *vhost = NULL;
-    char *vhost_colon;
+    _Nt_array_ptr<char> vhost =  NULL;
+    _Nt_array_ptr<char> vhost_colon = NULL;
     char *new_uri = NULL;
-    ice_config_t *config;
-    const listener_t *listen_sock;
-    resource_t *resource;
+    _Ptr<ice_config_t> config = NULL;
+    _Ptr<const listener_t> listen_sock = NULL;
+    _Ptr<resource_t> resource = NULL;
 
     if (http_host) {
         vhost = strdup(http_host);
@@ -1255,7 +1255,7 @@ static int _handle_resources(client_t *client, char **uri)
             client->mode = resource->omode;
 
         if (resource->module) {
-            module_t *module = module_container_get_module(global.modulecontainer, resource->module);
+            _Ptr<module_t> module =  module_container_get_module(global.modulecontainer, resource->module);
 
             if (module != NULL) {
                 refobject_unref(client->handler_module);
@@ -1266,7 +1266,7 @@ static int _handle_resources(client_t *client, char **uri)
         }
 
         if (resource->handler) {
-            char *func = strdup(resource->handler);
+            _Nt_array_ptr<char> func =  strdup(resource->handler);
             if (func) {
                 free(client->handler_function);
                 client->handler_function = func;
@@ -1293,7 +1293,7 @@ static int _handle_resources(client_t *client, char **uri)
     return 0;
 }
 
-static void _handle_admin_request(client_t *client, char *adminuri)
+static void _handle_admin_request(_Ptr<client_t> client, _Ptr<char> adminuri)
 {
     ICECAST_LOG_DEBUG("Client %p requesting admin interface.", client);
 
@@ -1304,7 +1304,7 @@ static void _handle_admin_request(client_t *client, char *adminuri)
 
 /* Handle any client that passed the authing process.
  */
-static void _handle_authed_client(client_t *client, void *userdata, auth_result result)
+static void _handle_authed_client(_Ptr<client_t> client, void* userdata, auth_result result)
 {
     auth_stack_release(client->authstack);
     client->authstack = NULL;
@@ -1337,7 +1337,7 @@ static void _handle_authed_client(client_t *client, void *userdata, auth_result 
     }
 
     if (client->handler_module && client->handler_function) {
-        const module_client_handler_t *handler = module_get_client_handler(client->handler_module, client->handler_function);
+        _Ptr<const module_client_handler_t> handler =  module_get_client_handler(client->handler_module, client->handler_function);
         if (handler) {
             handler->cb(client->handler_module, client);
             return;
@@ -1372,10 +1372,10 @@ static void _handle_authed_client(client_t *client, void *userdata, auth_result 
 /* Handle clients that still need to authenticate.
  */
 
-static void _handle_authentication_global(client_t *client, void *userdata, auth_result result)
+static void _handle_authentication_global(_Ptr<client_t> client, void* userdata, auth_result result)
 {
-    ice_config_t *config;
-    auth_stack_t *authstack;
+    _Ptr<ice_config_t> config = NULL;
+    _Ptr<auth_stack_t> authstack = NULL;
 
     auth_stack_release(client->authstack);
     client->authstack = NULL;
@@ -1396,7 +1396,7 @@ static void _handle_authentication_global(client_t *client, void *userdata, auth
     auth_stack_release(authstack);
 }
 
-static inline mount_proxy * __find_non_admin_mount(ice_config_t *config, const char *name, mount_type type)
+static _Ptr<mount_proxy> __find_non_admin_mount(_Ptr<ice_config_t> config, _Nt_array_ptr<const char> name, mount_type type)
 {
     if (strcmp(name, "/admin.cgi") == 0 || strncmp(name, "/admin/", 7) == 0)
         return NULL;
@@ -1404,11 +1404,11 @@ static inline mount_proxy * __find_non_admin_mount(ice_config_t *config, const c
     return config_find_mount(config, name, type);
 }
 
-static void _handle_authentication_mount_generic(client_t *client, void *userdata, mount_type type, void (*callback)(client_t*, void*, auth_result))
+static void _handle_authentication_mount_generic(_Ptr<client_t> client, void* userdata, mount_type type, _Ptr<void (_Ptr<client_t> , void* , auth_result )> callback)
 {
-    ice_config_t *config;
-    mount_proxy *mountproxy;
-    auth_stack_t *stack = NULL;
+    _Ptr<ice_config_t> config = NULL;
+    _Ptr<mount_proxy> mountproxy = NULL;
+    _Ptr<auth_stack_t> stack =  NULL;
 
     config = config_get_config();
     mountproxy = __find_non_admin_mount(config, client->uri, type);
@@ -1433,7 +1433,7 @@ static void _handle_authentication_mount_generic(client_t *client, void *userdat
     }
 }
 
-static void _handle_authentication_mount_default(client_t *client, void *userdata, auth_result result)
+static void _handle_authentication_mount_default(_Ptr<client_t> client, void* userdata, auth_result result)
 {
     auth_stack_release(client->authstack);
     client->authstack = NULL;
@@ -1449,7 +1449,7 @@ static void _handle_authentication_mount_default(client_t *client, void *userdat
     _handle_authentication_mount_generic(client, userdata, MOUNT_TYPE_DEFAULT, _handle_authentication_global);
 }
 
-static void _handle_authentication_mount_normal(client_t *client, void *userdata, auth_result result)
+static void _handle_authentication_mount_normal(_Ptr<client_t> client, void* userdata, auth_result result)
 {
     auth_stack_release(client->authstack);
     client->authstack = NULL;
@@ -1463,10 +1463,10 @@ static void _handle_authentication_mount_normal(client_t *client, void *userdata
     _handle_authentication_mount_generic(client, userdata, MOUNT_TYPE_NORMAL, _handle_authentication_mount_default);
 }
 
-static void _handle_authentication_listen_socket(client_t *client)
+static void _handle_authentication_listen_socket(_Ptr<client_t> client)
 {
-    auth_stack_t *stack = NULL;
-    const listener_t *listener;
+    _Ptr<auth_stack_t> stack =  NULL;
+    _Ptr<const listener_t> listener = NULL;
 
     listener = listensocket_get_listener(client->con->listensocket_effective);
     if (listener) {
@@ -1484,18 +1484,18 @@ static void _handle_authentication_listen_socket(client_t *client)
     }
 }
 
-static void _handle_authentication(client_t *client)
+static void _handle_authentication(_Ptr<client_t> client)
 {
     fastevent_emit(FASTEVENT_TYPE_CLIENT_READY_FOR_AUTH, FASTEVENT_FLAG_MODIFICATION_ALLOWED, FASTEVENT_DATATYPE_CLIENT, client);
     _handle_authentication_listen_socket(client);
 }
 
-static void __prepare_shoutcast_admin_cgi_request(client_t *client)
+static void __prepare_shoutcast_admin_cgi_request(_Ptr<client_t> client)
 {
-    ice_config_t *config;
-    const char *sc_mount;
-    const char *pass = httpp_get_query_param(client->parser, "pass");
-    const listener_t *listener;
+    _Ptr<ice_config_t> config = NULL;
+    _Nt_array_ptr<const char> sc_mount = NULL;
+    _Nt_array_ptr<const char> pass =  httpp_get_query_param(client->parser, "pass");
+    _Ptr<const listener_t> listener = NULL;
 
     if (pass == NULL) {
         ICECAST_LOG_ERROR("missing pass parameter");
@@ -1526,9 +1526,9 @@ static void __prepare_shoutcast_admin_cgi_request(client_t *client)
 }
 
 /* Check if we need body of client */
-static int _need_body(client_queue_t *node)
+static int _need_body(client_queue_t *node : itype(_Ptr<client_queue_t> ) )
 {
-    client_t *client = node->client;
+    _Ptr<client_t> client =  node->client;
 
     if (node->tried_body)
         return 0;
@@ -1551,7 +1551,7 @@ static int _need_body(client_queue_t *node)
 }
 
 /* Updates client's admin_command */
-static int _update_admin_command(client_t *client)
+static int _update_admin_command(_Ptr<client_t> client)
 {
     if (strcmp(client->uri, "/admin.cgi") == 0) {
         client->admin_command = admin_get_command(client->uri + 1);
@@ -1573,14 +1573,14 @@ static int _update_admin_command(client_t *client)
  */
 static void _handle_connection(void)
 {
-    http_parser_t *parser;
+    _Ptr<http_parser_t> parser = NULL;
     const char *rawuri;
     client_queue_t *node;
 
     while (1) {
         node = _get_connection();
         if (node) {
-            client_t *client = node->client;
+            _Ptr<client_t> client =  node->client;
             int already_parsed = 0;
 
             /* Check for special shoutcast compatability processing */
@@ -1613,7 +1613,7 @@ static void _handle_connection(void)
                      * -> much faster.
                      */
                     client_slurp_result_t res;
-                    ice_config_t *config;
+                    _Ptr<ice_config_t> config = NULL;
                     time_t timeout;
                     size_t body_size_limit;
 
@@ -1714,7 +1714,7 @@ static void __on_sock_count(size_t count, void *userdata)
 }
 
 /* called when listening thread is not checking for incoming connections */
-void connection_setup_sockets (ice_config_t *config)
+void connection_setup_sockets(_Ptr<ice_config_t> config)
 {
     global_lock();
     refobject_unref(global.listensockets);
@@ -1747,7 +1747,7 @@ void connection_setup_sockets (ice_config_t *config)
 }
 
 
-void connection_close(connection_t *con)
+void connection_close(_Ptr<connection_t> con)
 {
     if (!con)
         return;
@@ -1766,7 +1766,7 @@ void connection_close(connection_t *con)
     free(con);
 }
 
-void connection_queue_client(client_t *client)
+void connection_queue_client(_Ptr<client_t> client)
 {
     client_queue_t *node = create_client_node(client);
     _add_connection(node);

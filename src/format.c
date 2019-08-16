@@ -48,10 +48,10 @@
 #include "stats.h"
 #define CATMODULE "format"
 
-static int format_prepare_headers (source_t *source, client_t *client);
+static int format_prepare_headers(_Ptr<source_t> source, _Ptr<client_t> client);
 
 
-format_type_t format_get_type (const char *contenttype)
+format_type_t format_get_type(_Nt_array_ptr<const char> contenttype)
 {
     if(strcmp(contenttype, "application/x-ogg") == 0)
         return FORMAT_TYPE_OGG; /* Backwards compatibility */
@@ -79,7 +79,7 @@ format_type_t format_get_type (const char *contenttype)
         return FORMAT_TYPE_GENERIC;
 }
 
-int format_get_plugin(format_type_t type, source_t *source)
+int format_get_plugin(format_type_t type, _Ptr<source_t> source)
 {
     int ret = -1;
 
@@ -104,9 +104,9 @@ int format_get_plugin(format_type_t type, source_t *source)
 /* clients need to be start from somewhere in the queue so we will look for
  * a refbuf which has been previously marked as a sync point.
  */
-static void find_client_start(source_t *source, client_t *client)
+static void find_client_start(_Ptr<source_t> source, _Ptr<client_t> client)
 {
-    refbuf_t *refbuf = source->burst_point;
+    _Ptr<refbuf_t> refbuf =  source->burst_point;
 
     /* we only want to attempt a burst at connection time, not midstream
      * however streams like theora may not have the most recent page marked as
@@ -140,9 +140,9 @@ static void find_client_start(source_t *source, client_t *client)
 }
 
 
-static int get_file_data(FILE *intro, client_t *client)
+static int get_file_data(_Ptr<FILE> intro, _Ptr<client_t> client)
 {
-    refbuf_t *refbuf = client->refbuf;
+    _Ptr<refbuf_t> refbuf =  client->refbuf;
     size_t bytes;
 
     if (intro == NULL || fseek (intro, client->intro_offset, SEEK_SET) < 0)
@@ -160,9 +160,9 @@ static int get_file_data(FILE *intro, client_t *client)
  * to right place in the queue at end of file else repeat file if queue
  * is not ready yet.
  */
-int format_check_file_buffer (source_t *source, client_t *client)
+int format_check_file_buffer(_Ptr<source_t> source, _Ptr<client_t> client)
 {
-    refbuf_t *refbuf = client->refbuf;
+    _Ptr<refbuf_t> refbuf =  client->refbuf;
 
     if (refbuf == NULL)
     {
@@ -205,9 +205,9 @@ int format_check_file_buffer (source_t *source, client_t *client)
 /* call this to verify that the HTTP data has been sent and if so setup
  * callbacks to the appropriate format functions
  */
-int format_check_http_buffer(source_t *source, client_t *client)
+int format_check_http_buffer(_Ptr<source_t> source, _Ptr<client_t> client)
 {
-    refbuf_t *refbuf = client->refbuf;
+    _Ptr<refbuf_t> refbuf =  client->refbuf;
 
     if (refbuf == NULL)
         return -1;
@@ -240,9 +240,9 @@ int format_check_http_buffer(source_t *source, client_t *client)
 }
 
 
-int format_generic_write_to_client(client_t *client)
+int format_generic_write_to_client(_Ptr<client_t> client)
 {
-    refbuf_t *refbuf = client->refbuf;
+    _Ptr<refbuf_t> refbuf =  client->refbuf;
     int ret;
     const char *buf = refbuf->data + client->pos;
     unsigned int len = refbuf->len - client->pos;
@@ -260,9 +260,9 @@ int format_generic_write_to_client(client_t *client)
  * the next buffer in the queue if there is no more left to be written from
  * the existing buffer.
  */
-int format_advance_queue(source_t *source, client_t *client)
+int format_advance_queue(_Ptr<source_t> source, _Ptr<client_t> client)
 {
-    refbuf_t *refbuf = client->refbuf;
+    _Ptr<refbuf_t> refbuf =  client->refbuf;
 
     if (refbuf == NULL)
         return -1;
@@ -288,7 +288,7 @@ int format_advance_queue(source_t *source, client_t *client)
  * calling functions will use a already freed client struct and
  * cause a segfault!
  */
-static inline ssize_t __print_var(char *str, size_t remaining, const char *format, const char *first, const http_var_t *var)
+static ssize_t __print_var(char *str, size_t remaining, _Nt_array_ptr<const char> format, const char *first : itype(_Ptr<const char> ) , const http_var_t *var : itype(_Ptr<const http_var_t> ) )
 {
     size_t i;
     ssize_t done = 0;
@@ -305,7 +305,7 @@ static inline ssize_t __print_var(char *str, size_t remaining, const char *forma
     return done;
 }
 
-static inline const char *__find_bitrate(const http_var_t *var)
+static const char * __find_bitrate(const http_var_t *var : itype(_Ptr<const http_var_t> ) )
 {
     size_t i;
     const char *ret;
@@ -319,13 +319,13 @@ static inline const char *__find_bitrate(const http_var_t *var)
     return NULL;
 }
 
-static int format_prepare_headers (source_t *source, client_t *client)
+static int format_prepare_headers(_Ptr<source_t> source, _Ptr<client_t> client)
 {
     size_t remaining;
     char *ptr;
     int bytes;
     int bitrate_filtered = 0;
-    avl_node *node;
+    _Ptr<avl_node> node = NULL;
 
     remaining = client->refbuf->len;
     ptr = client->refbuf->data;
@@ -396,8 +396,8 @@ static int format_prepare_headers (source_t *source, client_t *client)
             {
                 if (!strcasecmp(var->name, "ice-name"))
                 {
-                    ice_config_t *config;
-                    mount_proxy *mountinfo;
+                    _Ptr<ice_config_t> config = NULL;
+                    _Ptr<mount_proxy> mountinfo = NULL;
 
                     config = config_get_config();
                     mountinfo = config_find_mount (config, source->mount, MOUNT_TYPE_NORMAL);
@@ -461,7 +461,7 @@ static int format_prepare_headers (source_t *source, client_t *client)
     return 0;
 }
 
-void format_set_vorbiscomment(format_plugin_t *plugin, const char *tag, const char *value) {
+void format_set_vorbiscomment(_Ptr<format_plugin_t> plugin, const char *tag, const char *value) {
     if (vorbis_comment_query_count(&plugin->vc, tag) != 0) {
         /* delete key */
         /* as libvorbis hides away all the memory functions we need to copy

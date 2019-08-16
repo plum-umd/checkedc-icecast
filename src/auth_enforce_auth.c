@@ -20,9 +20,9 @@
 #include "logging.h"
 #define CATMODULE "auth_enforce_auth"
 
-static auth_result enforce_auth_auth(auth_client *auth_user)
+static auth_result enforce_auth_auth(_Ptr<auth_client> auth_user)
 {
-    client_t *client = auth_user->client;
+    _Ptr<client_t> client =  auth_user->client;
 
     if (client->password)
         return AUTH_NOMATCH;
@@ -30,7 +30,7 @@ static auth_result enforce_auth_auth(auth_client *auth_user)
     return AUTH_FAILED;
 }
 
-int  auth_get_enforce_auth_auth(auth_t *authenticator, config_options_t *options)
+int auth_get_enforce_auth_auth(_Ptr<auth_t> authenticator, config_options_t *options)
 {
     (void)options;
     authenticator->authenticate_client = enforce_auth_auth;

@@ -46,11 +46,11 @@ struct acl_tag {
     size_t max_connections_per_user;
 
     /* HTTP headers to send to clients using this role */
-    ice_config_http_header_t *http_headers;
+    _Ptr<ice_config_http_header_t> http_headers;
 };
 
 /* some string util functions */
-static inline void __skip_spaces(const char **str)
+static void __skip_spaces(_Ptr<const char*> str)
 {
  register const char * p;
 
@@ -58,10 +58,7 @@ static inline void __skip_spaces(const char **str)
  *str = p;
 }
 
-int acl_set_ANY_str(acl_t           *acl,
-                    acl_policy_t    policy,
-                    const char      *str,
-                    int (*callback)(acl_t *, acl_policy_t, const char *))
+int acl_set_ANY_str(acl_t *acl : itype(_Ptr<acl_t> ) , acl_policy_t policy, const char *str, _Ptr<int (_Ptr<acl_t> , acl_policy_t , const char* )> callback)
 {
     const char *end;
     size_t len;
@@ -118,11 +115,11 @@ acl_t *acl_new(void)
     return ret;
 }
 
-acl_t *acl_new_from_xml_node(xmlNodePtr node)
+acl_t * acl_new_from_xml_node(xmlNodePtr node)
 {
     acl_t * ret;
     char * tmp;
-    xmlAttrPtr prop;
+    _Ptr<xmlAttr> prop = NULL;
 
     if (!node)
         return NULL;
@@ -215,7 +212,7 @@ acl_t *acl_new_from_xml_node(xmlNodePtr node)
     return ret;
 }
 
-void acl_addref(acl_t * acl)
+void acl_addref(_Ptr<acl_t> acl)
 {
     if (!acl)
         return;
@@ -223,7 +220,7 @@ void acl_addref(acl_t * acl)
     acl->refcount++;
 }
 
-void acl_release(acl_t * acl)
+void acl_release(_Ptr<acl_t> acl)
 {
     if (!acl)
         return;
@@ -238,9 +235,7 @@ void acl_release(acl_t * acl)
 }
 
 /* HTTP Method specific functions */
-int acl_set_method_str__callback(acl_t          *acl,
-                                 acl_policy_t   policy,
-                                 const char     *str)
+int acl_set_method_str__callback(_Ptr<acl_t> acl, acl_policy_t policy, _Nt_array_ptr<const char> str)
 {
     httpp_request_type_e method;
     size_t i;
@@ -259,7 +254,7 @@ int acl_set_method_str__callback(acl_t          *acl,
     return 0;
 }
 
-acl_policy_t acl_test_method(acl_t * acl, httpp_request_type_e method)
+acl_policy_t acl_test_method(_Ptr<acl_t> acl, httpp_request_type_e method)
 {
     if (!acl || method < httpp_req_none || method > httpp_req_unknown)
         return ACL_POLICY_ERROR;
@@ -268,9 +263,7 @@ acl_policy_t acl_test_method(acl_t * acl, httpp_request_type_e method)
 }
 
 /* admin/ interface specific functions */
-int acl_set_admin_str__callbck(acl_t        *acl,
-                               acl_policy_t policy,
-                               const char   *str)
+int acl_set_admin_str__callbck(_Ptr<acl_t> acl, acl_policy_t policy, _Ptr<const char> str)
 {
     size_t read_i, write_i;
     admin_command_id_t command = admin_get_command(str);
@@ -299,7 +292,7 @@ int acl_set_admin_str__callbck(acl_t        *acl,
    return 0;
 }
 
-acl_policy_t acl_test_admin(acl_t *acl, admin_command_id_t command)
+acl_policy_t acl_test_admin(_Ptr<acl_t> acl, admin_command_id_t command)
 {
     size_t i;
 
@@ -314,7 +307,7 @@ acl_policy_t acl_test_admin(acl_t *acl, admin_command_id_t command)
 }
 
 /* web/ interface specific functions */
-int acl_set_web_policy(acl_t *acl, acl_policy_t policy)
+int acl_set_web_policy(acl_t *acl : itype(_Ptr<acl_t> ) , acl_policy_t policy)
 {
     if (!acl || (policy != ACL_POLICY_ALLOW && policy != ACL_POLICY_DENY))
         return -1;
@@ -324,7 +317,7 @@ int acl_set_web_policy(acl_t *acl, acl_policy_t policy)
     return 0;
 }
 
-acl_policy_t acl_test_web(acl_t *acl)
+acl_policy_t acl_test_web(_Ptr<acl_t> acl)
 {
     if (!acl)
         return ACL_POLICY_ERROR;
@@ -333,7 +326,7 @@ acl_policy_t acl_test_web(acl_t *acl)
 }
 
 /* mount specific functons */
-int acl_set_max_connection_duration(acl_t *acl, time_t duration)
+int acl_set_max_connection_duration(acl_t *acl : itype(_Ptr<acl_t> ) , time_t duration)
 {
     if (!acl)
         return -1;
@@ -343,7 +336,7 @@ int acl_set_max_connection_duration(acl_t *acl, time_t duration)
     return 0;
 }
 
-time_t acl_get_max_connection_duration(acl_t *acl)
+time_t acl_get_max_connection_duration(_Ptr<acl_t> acl)
 {
     if (!acl)
         return -1;
@@ -351,7 +344,7 @@ time_t acl_get_max_connection_duration(acl_t *acl)
     return acl->max_connection_duration;
 }
 
-int acl_set_max_connections_per_user(acl_t *acl, size_t limit)
+int acl_set_max_connections_per_user(acl_t *acl : itype(_Ptr<acl_t> ) , size_t limit)
 {
     if (!acl)
         return -1;
@@ -361,7 +354,7 @@ int acl_set_max_connections_per_user(acl_t *acl, size_t limit)
     return 0;
 }
 
-ssize_t acl_get_max_connections_per_user(acl_t *acl)
+ssize_t acl_get_max_connections_per_user(_Ptr<acl_t> acl)
 {
     if (!acl)
         return -1;
@@ -369,7 +362,7 @@ ssize_t acl_get_max_connections_per_user(acl_t *acl)
     return acl->max_connections_per_user;
 }
 
-const ice_config_http_header_t *acl_get_http_headers(acl_t * acl)
+_Ptr<const ice_config_http_header_t> acl_get_http_headers(_Ptr<acl_t> acl)
 {
     if (!acl)
         return NULL;

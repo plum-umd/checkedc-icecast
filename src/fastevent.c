@@ -30,9 +30,9 @@ typedef struct {
     refobject_base_t __base;
 
     fastevent_type_t type;
-    fastevent_cb_t cb;
-    fastevent_freecb_t freecb;
-    void *userdata;
+    _Ptr<void (_Ptr<const void> , fastevent_type_t , fastevent_flag_t , fastevent_datatype_t , struct __va_list_tag* )> cb;
+    _Ptr<void (void** )> freecb;
+    void* userdata;
 } fastevent_registration_t;
 
 struct eventrow {
@@ -44,7 +44,7 @@ struct eventrow {
 static struct eventrow fastevent_registrations[FASTEVENT_TYPE__END];
 static rwlock_t fastevent_lock;
 
-static inline struct eventrow * __get_row(fastevent_type_t type)
+static _Ptr<struct eventrow> __get_row(fastevent_type_t type)
 {
     size_t idx = type;
 
@@ -54,7 +54,7 @@ static inline struct eventrow * __get_row(fastevent_type_t type)
     return &(fastevent_registrations[idx]);
 }
 
-static int __add_to_row(struct eventrow * row, fastevent_registration_t *registration)
+static int __add_to_row(_Ptr<struct eventrow> row, fastevent_registration_t *registration)
 {
     fastevent_registration_t **n;
 
@@ -77,7 +77,7 @@ static int __add_to_row(struct eventrow * row, fastevent_registration_t *registr
     return 0;
 }
 
-static int __remove_from_row(struct eventrow * row, fastevent_registration_t *registration)
+static int __remove_from_row(_Ptr<struct eventrow> row, fastevent_registration_t *registration : itype(_Ptr<fastevent_registration_t> ) )
 {
     size_t i;
 
@@ -99,7 +99,7 @@ static int __remove_from_row(struct eventrow * row, fastevent_registration_t *re
 static void __unregister(refobject_t self, void **userdata)
 {
     fastevent_registration_t *registration = REFOBJECT_TO_TYPE(self, fastevent_registration_t *);
-    struct eventrow * row;
+    _Ptr<struct eventrow> row = NULL;
 
     (void)userdata;
 
@@ -147,9 +147,9 @@ REFOBJECT_DEFINE_PRIVATE_TYPE(fastevent_registration_t,
         REFOBJECT_DEFINE_TYPE_FREE(__unregister)
         );
 
-refobject_t fastevent_register(fastevent_type_t type, fastevent_cb_t cb, fastevent_freecb_t freecb, void *userdata)
+refobject_t fastevent_register(fastevent_type_t type, _Ptr<void (_Ptr<const void> , fastevent_type_t , fastevent_flag_t , fastevent_datatype_t , struct __va_list_tag* )> cb, _Ptr<void (void** )> freecb, void* userdata)
 {
-    struct eventrow * row;
+    _Ptr<struct eventrow> row = NULL;
     fastevent_registration_t *registration;
 
     if (cb == NULL)
@@ -187,7 +187,7 @@ refobject_t fastevent_register(fastevent_type_t type, fastevent_cb_t cb, fasteve
 
 void fastevent_emit(fastevent_type_t type, fastevent_flag_t flags, fastevent_datatype_t datatype, ...)
 {
-    struct eventrow * row;
+    _Ptr<struct eventrow> row = NULL;
     va_list ap, apx;
     size_t i;
 
