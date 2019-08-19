@@ -1,0 +1,95 @@
+make  all-recursive
+make[1]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+Making all in src
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Making all in common/avl
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+Making all in common/net
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net'
+Making all in common/thread
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/thread'
+  CC       libicethread_la-thread.lo
+thread.c:176:17: error: assigning to 'avl_tree *' (aka 'struct _avl_tree *') from incompatible type '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>')
+    _threadtree = avl_tree_new(_compare_threads, NULL);
+                ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+thread.c:182:20: error: cast source bounds are too narrow for '_Ptr<char>'
+    thread->file = strdup("main.c");
+                   ^~~~~~~~~~~~~~~~
+thread.c:182:20: note: source bounds are an empty range
+thread.c:182:20: note: target upper bound is above source upper bound
+thread.c:182:20: note: (expanded) required bounds are 'bounds((_Array_ptr<char>)strdup("main.c"), (_Array_ptr<char>)strdup("main.c") + 1)'
+thread.c:182:20: note: (expanded) inferred bounds are 'bounds(value of strdup("main.c"), value of strdup("main.c") + 0)'
+thread.c:185:20: error: cast source bounds are too narrow for '_Ptr<char>'
+    thread->name = strdup("Main Thread");
+                   ^~~~~~~~~~~~~~~~~~~~~
+thread.c:185:20: note: source bounds are an empty range
+thread.c:185:20: note: target upper bound is above source upper bound
+thread.c:185:20: note: (expanded) required bounds are 'bounds((_Array_ptr<char>)strdup("Main Thread"), (_Array_ptr<char>)strdup("Main Thread") + 1)'
+thread.c:185:20: note: (expanded) inferred bounds are 'bounds(value of strdup("Main Thread"), value of strdup("Main Thread") + 0)'
+thread.c:187:16: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    avl_insert(_threadtree, (void *)thread);
+               ^~~~~~~~~~~
+thread.c:204:23: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        avl_tree_free(_threadtree, _free_thread);
+                      ^~~~~~~~~~~
+thread.c:288:24: error: cast source bounds are too narrow for '_Ptr<char>'
+        thread->file = strdup(file);
+                       ^~~~~~~~~~~~
+thread.c:288:24: note: source bounds are an empty range
+thread.c:288:24: note: target upper bound is above source upper bound
+thread.c:288:24: note: (expanded) required bounds are 'bounds((_Array_ptr<char>)strdup(file), (_Array_ptr<char>)strdup(file) + 1)'
+thread.c:288:24: note: (expanded) inferred bounds are 'bounds(value of strdup(file), value of strdup(file) + 0)'
+thread.c:294:24: error: cast source bounds are too narrow for '_Ptr<char>'
+        thread->name = strdup(name);
+                       ^~~~~~~~~~~~
+thread.c:294:24: note: source bounds are an empty range
+thread.c:294:24: note: target upper bound is above source upper bound
+thread.c:294:24: note: (expanded) required bounds are 'bounds((_Array_ptr<char>)strdup(name), (_Array_ptr<char>)strdup(name) + 1)'
+thread.c:294:24: note: (expanded) inferred bounds are 'bounds(value of strdup(name), value of strdup(name) + 0)'
+thread.c:605:20: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        avl_delete(_threadtree, th, _free_thread);
+                   ^~~~~~~~~~~
+thread.c:656:16: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    avl_insert(_threadtree, (void *)thread);
+               ^~~~~~~~~~~
+thread.c:674:21: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        avl_delete (_threadtree, thread, _free_thread);
+                    ^~~~~~~~~~~
+thread.c:707:29: error: passing '_Ptr<avl_node>' (aka '_Ptr<struct avl_node_tag>') to parameter of incompatible type 'avl_node *' (aka 'struct avl_node_tag *')
+        node = avl_get_next(node);
+                            ^~~~
+./../avl/avl.h:136:35: note: passing argument to parameter 'node' here
+avl_node * avl_get_next(avl_node *node);
+                                  ^
+thread.c:697:12: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    node = avl_get_first(_threadtree);
+           ^~~~~~~~~~~~~~~~~~~~~~~~~~
+thread.c:697:26: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    node = avl_get_first(_threadtree);
+                         ^~~~~~~~~~~
+thread.c:726:16: error: cast source bounds are too narrow for '_Ptr<char>'
+    th->name = strdup(name);
+               ^~~~~~~~~~~~
+thread.c:726:16: note: source bounds are an empty range
+thread.c:726:16: note: target upper bound is above source upper bound
+thread.c:726:16: note: (expanded) required bounds are 'bounds((_Array_ptr<char>)strdup(name), (_Array_ptr<char>)strdup(name) + 1)'
+thread.c:726:16: note: (expanded) inferred bounds are 'bounds(value of strdup(name), value of strdup(name) + 0)'
+thread.c:756:16: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    avl_delete(_threadtree, thread, _free_thread);
+               ^~~~~~~~~~~
+15 errors generated.
+Makefile:422: recipe for target 'libicethread_la-thread.lo' failed
+make[3]: *** [libicethread_la-thread.lo] Error 1
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/thread'
+Makefile:1754: recipe for target 'all-recursive' failed
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Makefile:490: recipe for target 'all-recursive' failed
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+Makefile:401: recipe for target 'all' failed
+make: *** [all] Error 2
