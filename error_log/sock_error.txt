@@ -1,0 +1,35 @@
+make  all-recursive
+make[1]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+Making all in src
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Making all in common/avl
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+Making all in common/net
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net'
+  CC       libicenet_la-sock.lo
+sock.c:113:30: error: passing '_Ptr<char>' to parameter of incompatible type 'char *'
+    if (resolver_getip(temp, buff, len))
+                             ^~~~
+./resolver.h:52:47: note: passing argument to parameter 'buff' here
+char * resolver_getip(const char *name, char *buff, int len);
+                                              ^
+sock.c:396:32: error: passing '_Ptr<const char>' to parameter of incompatible type 'const char *'
+    rc = sock_write_fmt (sock, fmt, ap);
+                               ^~~
+./sock.h:133:42: note: passing argument to parameter 'fmt' here
+int sock_write_fmt(int sock, const char *fmt, va_list ap);
+                                         ^
+2 errors generated.
+Makefile:423: recipe for target 'libicenet_la-sock.lo' failed
+make[3]: *** [libicenet_la-sock.lo] Error 1
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net'
+Makefile:1754: recipe for target 'all-recursive' failed
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Makefile:490: recipe for target 'all-recursive' failed
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+Makefile:401: recipe for target 'all' failed
+make: *** [all] Error 2
