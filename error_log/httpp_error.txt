@@ -1,0 +1,281 @@
+make  all-recursive
+make[1]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+Making all in src
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Making all in common/avl
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+Making all in common/net
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net'
+Making all in common/thread
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/thread'
+make[3]: Nothing to be done for 'all'.
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/thread'
+Making all in common/httpp
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/httpp'
+  CC       libicehttpp_la-httpp.lo
+In file included from httpp.c:42:
+./httpp.h:142:50: error: expected ')'
+void httpp_free_any_key(char **keys : itype(char*_Ptr<char> ) );
+                                                 ^
+./httpp.h:142:44: note: to match this '('
+void httpp_free_any_key(char **keys : itype(char*_Ptr<char> ) );
+                                           ^
+./httpp.h:142:45: error: type must be a checked type
+void httpp_free_any_key(char **keys : itype(char*_Ptr<char> ) );
+                                            ^
+./httpp.h:142:45: error: mismatch between interface type 'char *' and declared type 'char **'
+httpp.c:143:65: error: subscript of '_Ptr<_Ptr<char>>'
+            httpp_setvar(parser, list->var.name, list->var.value[i]);
+                                                 ~~~~~~~~~~~~~~~^~
+httpp.c:232:18: warning: cannot prove argument meets declared bounds for 2nd parameter [-Wcheck-bounds-decls-unchecked-scope]
+    memcpy(data, http_data, len);
+                 ^~~~~~~~~
+httpp.c:232:18: note: (expanded) expected argument bounds are 'bounds((_Array_ptr<char>)http_data, (_Array_ptr<char>)http_data + len)'
+httpp.c:232:18: note: (expanded) inferred bounds are 'bounds((_Array_ptr<const char>)http_data, (_Array_ptr<const char>)http_data + 1)'
+    memcpy(data, http_data, len);
+                 ^~~~~~~~~
+httpp.c:350:12: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    return (char *)decoded;
+           ^~~~~~~~~~~~~~~
+httpp.c:379:40: error: passing '_Ptr<char>' to parameter of incompatible type 'char *'
+    _httpp_set_param_nocopy(tree, key, value, 0);
+                                       ^~~~~
+httpp.c:58:76: note: passing argument to parameter 'value' here
+static void _httpp_set_param_nocopy(_Ptr<avl_tree> tree, char *name, char *value, int replace);
+                                                                           ^
+httpp.c:541:45: error: passing '_Ptr<char>' to parameter of incompatible type 'const char *'
+        httpp_setvar(parser, HTTPP_VAR_URI, parser->uri);
+                                            ^~~~~~~~~~~
+./httpp.h:131:114: note: passing argument to parameter 'value' here
+void httpp_setvar(_Ptr<http_parser_t> parser, const char *name : itype(_Nt_array_ptr<const char> ) , const char *value : itype(_Nt_array_ptr<const char> ) );
+                                                                                                                 ^
+httpp.c:424:18: warning: cannot prove argument meets declared bounds for 2nd parameter [-Wcheck-bounds-decls-unchecked-scope]
+    memcpy(data, http_data, len);
+                 ^~~~~~~~~
+httpp.c:424:18: note: (expanded) expected argument bounds are 'bounds((_Array_ptr<char>)http_data, (_Array_ptr<char>)http_data + len)'
+httpp.c:424:18: note: (expanded) inferred bounds are 'bounds((_Array_ptr<const char>)http_data, (_Array_ptr<const char>)http_data + 1)'
+    memcpy(data, http_data, len);
+                 ^~~~~~~~~
+httpp.c:477:23: error: cast source bounds are too narrow for '_Ptr<char>'
+        parser->uri = strdup(uri);
+                      ^~~~~~~~~~~
+httpp.c:477:23: note: source bounds are an empty range
+httpp.c:477:23: note: target upper bound is above source upper bound
+httpp.c:477:23: note: (expanded) required bounds are 'bounds((_Array_ptr<char>)strdup(uri), (_Array_ptr<char>)strdup(uri) + 1)'
+httpp.c:477:23: note: (expanded) inferred bounds are 'bounds(value of strdup(uri), value of strdup(uri) + 0)'
+httpp.c:556:16: error: struct variable 'var' containing a checked pointer must have an initializer
+    http_var_t var;
+               ^
+httpp.c:564:16: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+    avl_delete(parser->vars, (void *)&var, _free_vars);
+               ^~~~~~~~~~~~
+./../avl/avl.h:114:26: note: passing argument to parameter 'tree' here
+int avl_delete(avl_tree *tree, void *key, _Ptr<int (void* )> free_key_fun);
+                         ^
+httpp.c:562:16: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    var.name = (char*)name;
+               ^~~~~~~~~~~
+httpp.c:585:15: error: subscript of '_Ptr<_Ptr<char>>'
+    var->value[0] = strdup(value);
+    ~~~~~~~~~~^~
+httpp.c:588:20: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+        avl_insert(parser->vars, (void *)var);
+                   ^~~~~~~~~~~~
+./../avl/avl.h:112:26: note: passing argument to parameter 'ob' here
+int avl_insert(avl_tree *ob, void *key);
+                         ^
+httpp.c:590:20: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+        avl_delete(parser->vars, (void *)var, _free_vars);
+                   ^~~~~~~~~~~~
+./../avl/avl.h:114:26: note: passing argument to parameter 'tree' here
+int avl_delete(avl_tree *tree, void *key, _Ptr<int (void* )> free_key_fun);
+                         ^
+httpp.c:591:20: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+        avl_insert(parser->vars, (void *)var);
+                   ^~~~~~~~~~~~
+./../avl/avl.h:112:26: note: passing argument to parameter 'ob' here
+int avl_insert(avl_tree *ob, void *key);
+                         ^
+httpp.c:583:17: error: cast source bounds are too narrow for '_Ptr<char>'
+    var->name = strdup(name);
+                ^~~~~~~~~~~~
+httpp.c:583:17: note: source bounds are an empty range
+httpp.c:583:17: note: target upper bound is above source upper bound
+httpp.c:583:17: note: (expanded) required bounds are 'bounds((_Array_ptr<char>)strdup(name), (_Array_ptr<char>)strdup(name) + 1)'
+httpp.c:583:17: note: (expanded) inferred bounds are 'bounds(value of strdup(name), value of strdup(name) + 0)'
+httpp.c:597:16: error: struct variable 'var' containing a checked pointer must have an initializer
+    http_var_t var;
+               ^
+httpp.c:611:28: error: subscript of '_Ptr<_Ptr<char>>'
+        return found->value[0];
+               ~~~~~~~~~~~~^~
+httpp.c:606:16: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    var.name = (char*)name;
+               ^~~~~~~~~~~
+httpp.c:651:16: error: assigning to '_Ptr<_Ptr<char>>' from incompatible type 'char **'
+    var->value = n;
+               ^ ~
+httpp.c:652:15: error: subscript of '_Ptr<_Ptr<char>>'
+    var->value[var->values++] = value;
+    ~~~~~~~~~~^~~~~~~~~~~~~~
+httpp.c:655:20: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+        avl_delete(tree, (void *)found, _free_vars);
+                   ^~~~
+./../avl/avl.h:114:26: note: passing argument to parameter 'tree' here
+int avl_delete(avl_tree *tree, void *key, _Ptr<int (void* )> free_key_fun);
+                         ^
+httpp.c:656:20: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+        avl_insert(tree, (void *)var);
+                   ^~~~
+./../avl/avl.h:112:26: note: passing argument to parameter 'ob' here
+int avl_insert(avl_tree *ob, void *key);
+                         ^
+httpp.c:658:20: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+        avl_insert(tree, (void *)var);
+                   ^~~~
+./../avl/avl.h:112:26: note: passing argument to parameter 'ob' here
+int avl_insert(avl_tree *ob, void *key);
+                         ^
+httpp.c:635:21: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        var->name = name;
+                    ^~~~
+httpp.c:667:49: error: passing '_Ptr<char>' to parameter of incompatible type 'char *'
+    _httpp_set_param_nocopy(tree, strdup(name), url_unescape(value, strlen(value)), 1);
+                                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+httpp.c:617:76: note: passing argument to parameter 'value' here
+static void _httpp_set_param_nocopy(_Ptr<avl_tree> tree, char *name, char *value, int replace)
+                                                                           ^
+httpp.c:672:16: error: struct variable 'var' containing a checked pointer must have an initializer
+    http_var_t var;
+               ^
+httpp.c:678:16: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+    var.name = (char *)name;
+               ^~~~~~~~~~~~
+httpp.c:695:22: error: subscript of '_Ptr<_Ptr<char>>'
+    return res->value[0];
+           ~~~~~~~~~~^~
+httpp.c:705:48: error: passing '_Ptr<const char>' to parameter of incompatible type 'const char *'
+    return _httpp_get_param(parser->queryvars, name);
+                                               ^~~~
+httpp.c:685:71: note: passing argument to parameter 'name' here
+static const char * _httpp_get_param(_Ptr<avl_tree> tree, const char *name)
+                                                                      ^
+httpp.c:715:47: error: passing '_Ptr<const char>' to parameter of incompatible type 'const char *'
+    return _httpp_get_param(parser->postvars, name);
+                                              ^~~~
+httpp.c:685:71: note: passing argument to parameter 'name' here
+static const char * _httpp_get_param(_Ptr<avl_tree> tree, const char *name)
+                                                                      ^
+httpp.c:793:34: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+    for (avlnode = avl_get_first(tree); avlnode; avlnode = avl_get_next(avlnode)) {
+                                 ^~~~
+./../avl/avl.h:132:36: note: passing argument to parameter 'tree' here
+avl_node * avl_get_first(avl_tree *tree);
+                                   ^
+httpp.c:793:73: error: passing '_Ptr<avl_node>' (aka '_Ptr<struct avl_node_tag>') to parameter of incompatible type 'avl_node *' (aka 'struct avl_node_tag *')
+    for (avlnode = avl_get_first(tree); avlnode; avlnode = avl_get_next(avlnode)) {
+                                                                        ^~~~~~~
+./../avl/avl.h:136:35: note: passing argument to parameter 'node' here
+avl_node * avl_get_next(avl_node *node);
+                                  ^
+httpp.c:797:26: error: subscript of '_Ptr<char>'
+            if (var->name[0] != '_' || var->name[1] != '_') {
+                ~~~~~~~~~^~
+httpp.c:797:49: error: subscript of '_Ptr<char>'
+            if (var->name[0] != '_' || var->name[1] != '_') {
+                                       ~~~~~~~~~^~
+httpp.c:801:26: error: subscript of '_Ptr<char>'
+            if (var->name[0] == '_' && var->name[1] == '_') {
+                ~~~~~~~~~^~
+httpp.c:801:49: error: subscript of '_Ptr<char>'
+            if (var->name[0] == '_' && var->name[1] == '_') {
+                                       ~~~~~~~~~^~
+httpp.c:817:27: error: passing '_Ptr<char>' to parameter of incompatible type 'const char *'
+        ret[pos] = strdup(var->name);
+                          ^~~~~~~~~
+/home/hasantouma/building-checkedc-clang-plum/llvm.obj/lib/clang/8.0.0/include/string_checked.h:169:26: note: passing argument to parameter 's' here
+char *strdup(const char *s : itype(_Nt_array_ptr<const char>)) : itype(_Nt_array_ptr<char>);
+                         ^
+httpp.c:794:33: error: expression has unknown bounds, cast to ptr<T> expects source to have bounds
+        _Ptr<http_var_t> var =  avlnode->key;
+                                ^~~~~~~~~~~~
+httpp.c:829:50: error: expected ')'
+void httpp_free_any_key(char **keys : itype(char*_Ptr<char> ) )
+                                                 ^
+httpp.c:829:44: note: to match this '('
+void httpp_free_any_key(char **keys : itype(char*_Ptr<char> ) )
+                                           ^
+httpp.c:829:45: error: type must be a checked type
+void httpp_free_any_key(char **keys : itype(char*_Ptr<char> ) )
+                                            ^
+httpp.c:829:45: error: mismatch between interface type 'char *' and declared type 'char **'
+httpp.c:831:10: error: expected identifier or '('
+    char*_Ptr<char> p = NULL;
+         ^
+httpp.c:836:10: error: use of undeclared identifier 'p'
+    for (p = keys; *p; p++) {
+         ^
+httpp.c:836:21: error: use of undeclared identifier 'p'
+    for (p = keys; *p; p++) {
+                    ^
+httpp.c:836:24: error: use of undeclared identifier 'p'
+    for (p = keys; *p; p++) {
+                       ^
+httpp.c:837:15: error: use of undeclared identifier 'p'
+        free(*p);
+              ^
+httpp.c:844:58: error: passing '_Ptr<const char>' to parameter of incompatible type 'const char *'
+    const char *ret = _httpp_get_param(parser->postvars, name);
+                                                         ^~~~
+httpp.c:685:71: note: passing argument to parameter 'name' here
+static const char * _httpp_get_param(_Ptr<avl_tree> tree, const char *name)
+                                                                      ^
+httpp.c:849:48: error: passing '_Ptr<const char>' to parameter of incompatible type 'const char *'
+    return _httpp_get_param(parser->queryvars, name);
+                                               ^~~~
+httpp.c:685:71: note: passing argument to parameter 'name' here
+static const char * _httpp_get_param(_Ptr<avl_tree> tree, const char *name)
+                                                                      ^
+httpp.c:858:19: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+    avl_tree_free(parser->vars, _free_vars);
+                  ^~~~~~~~~~~~
+./../avl/avl.h:110:30: note: passing argument to parameter 'tree' here
+void avl_tree_free(avl_tree *tree, _Ptr<int (void* )> free_key_fun);
+                             ^
+httpp.c:859:19: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+    avl_tree_free(parser->queryvars, _free_vars);
+                  ^~~~~~~~~~~~~~~~~
+./../avl/avl.h:110:30: note: passing argument to parameter 'tree' here
+void avl_tree_free(avl_tree *tree, _Ptr<int (void* )> free_key_fun);
+                             ^
+httpp.c:860:19: error: passing '_Ptr<avl_tree>' (aka '_Ptr<struct _avl_tree>') to parameter of incompatible type 'avl_tree *' (aka 'struct _avl_tree *')
+    avl_tree_free(parser->postvars, _free_vars);
+                  ^~~~~~~~~~~~~~~~
+./../avl/avl.h:110:30: note: passing argument to parameter 'tree' here
+void avl_tree_free(avl_tree *tree, _Ptr<int (void* )> free_key_fun);
+                             ^
+httpp.c:905:19: error: passing '_Ptr<char>' to parameter of incompatible type 'const char *'
+    return strcmp(vara->name, varb->name);
+                  ^~~~~~~~~~
+/home/hasantouma/building-checkedc-clang-plum/llvm.obj/lib/clang/8.0.0/include/string_checked.h:122:24: note: passing argument to parameter 'src1' here
+int strcmp(const char *src1 : itype(_Nt_array_ptr<const char>),
+                       ^
+httpp.c:916:24: error: subscript of '_Ptr<_Ptr<char>>'
+        free(var->value[i]);
+             ~~~~~~~~~~^~
+2 warnings and 54 errors generated.
+Makefile:426: recipe for target 'libicehttpp_la-httpp.lo' failed
+make[3]: *** [libicehttpp_la-httpp.lo] Error 1
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/httpp'
+Makefile:1754: recipe for target 'all-recursive' failed
+make[2]: *** [all-recursive] Error 1
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Makefile:490: recipe for target 'all-recursive' failed
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+Makefile:401: recipe for target 'all' failed
+make: *** [all] Error 2
