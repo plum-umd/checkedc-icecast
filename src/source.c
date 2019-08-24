@@ -16,16 +16,16 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio_checked.h>
+#include <stdlib_checked.h>
+#include <string_checked.h>
 #include <sys/types.h>
 #include <ogg/ogg.h>
-#include <errno.h>
+#include <errno_checked.h>
 
 /* REVIEW: Are all those includes needed? */
 #ifndef _WIN32
-#include <unistd.h>
+#include <unistd_checked.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/wait.h>

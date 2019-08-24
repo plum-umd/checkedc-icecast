@@ -14,7 +14,7 @@
 #ifndef __SOURCE_H__
 #define __SOURCE_H__
 
-#include <stdio.h>
+#include <stdio_checked.h>
 
 #include "common/thread/thread.h"
 #include "common/httpp/httpp.h"

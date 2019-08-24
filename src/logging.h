@@ -25,7 +25,7 @@ extern int accesslog;
 extern int playlistlog;
 
 #ifdef _WIN32
-#include <string.h>
+#include <string_checked.h>
 #define __func__ strrchr (__FILE__, '\\') ? strrchr (__FILE__, '\\') + 1 : __FILE__
 #endif
 

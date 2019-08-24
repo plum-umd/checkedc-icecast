@@ -15,8 +15,8 @@
 #include <libxml/tree.h>
 
 /* for free() and strdup() */
-#include <stdlib.h>
-#include <string.h>
+#include <stdlib_checked.h>
+#include <string_checked.h>
 
 #include "playlist.h"
 

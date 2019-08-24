@@ -10,14 +10,14 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
-#include <time.h>
+#include <stdio_checked.h>
+#include <stdlib_checked.h>
+#include <errno_checked.h>
+#include <string_checked.h>
+#include <time_checked.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#include <unistd_checked.h>
 
 #include "common/avl/avl.h"
 

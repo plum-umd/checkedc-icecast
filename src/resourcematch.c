@@ -10,8 +10,8 @@
 #include <config.h>
 #endif
 
-#include <stdlib.h>
-#include <errno.h>
+#include <stdlib_checked.h>
+#include <errno_checked.h>
 
 #include "resourcematch.h"
 

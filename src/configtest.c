@@ -15,7 +15,7 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
+#include <stdio_checked.h>
 #include "cfgfile.h"
 
 void _dump_config(ice_config_t *config);

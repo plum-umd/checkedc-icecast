@@ -15,7 +15,7 @@
 #include <config.h>
 #endif
 
-#include <signal.h>
+#include <signal_checked.h>
 
 #include "common/thread/thread.h"
 #include "common/avl/avl.h"

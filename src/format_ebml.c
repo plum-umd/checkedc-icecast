@@ -22,9 +22,9 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <stdio_checked.h>
+#include <stdlib_checked.h>
+#include <string_checked.h>
 
 #include "refbuf.h"
 #include "source.h"

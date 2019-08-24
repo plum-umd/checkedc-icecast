@@ -17,10 +17,10 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
+#include <stdio_checked.h>
+#include <stdlib_checked.h>
+#include <errno_checked.h>
+#include <string_checked.h>
 #ifdef HAVE_POLL
 #include <poll.h>
 #endif

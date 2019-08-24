@@ -26,17 +26,17 @@
 #endif
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+#include <unistd_checked.h>
 #endif
 
 #ifdef TIME_WITH_SYS_TIME
 #  include <sys/time.h>
-#  include <time.h>
+#  include <time_checked.h>
 #else
 #  ifdef HAVE_SYS_TIME_H
 #    include <sys/time.h>
 #  else
-#    include <time.h>
+#    include <time_checked.h>
 #  endif
 #endif
 
@@ -51,7 +51,7 @@
 #  include <stdint.h>
 #endif
 #ifdef HAVE_INTTYPES_H
-#  include <inttypes.h>
+#  include <inttypes_checked.h>
 #endif
 
 #if defined(_WIN32) && !defined(HAVE_STDINT_H) && !defined(HAVE_INTTYPES_H)

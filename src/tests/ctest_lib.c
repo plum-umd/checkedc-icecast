@@ -10,7 +10,7 @@
 #include <config.h>
 #endif
 
-#include <stdio.h>
+#include <stdio_checked.h>
 #include <stdarg.h>
 
 #include "ctest_lib.h"

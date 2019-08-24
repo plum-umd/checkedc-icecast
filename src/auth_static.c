@@ -15,7 +15,7 @@
 #endif
 
 /* for strcmp() and strdup() */
-#include <string.h>
+#include <string_checked.h>
 
 #include "auth.h"
 #include "cfgfile.h"
