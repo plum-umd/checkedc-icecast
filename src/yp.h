@@ -31,10 +31,10 @@
 #define YP_ADD_ALL              -1
 
 #ifdef USE_YP
-void yp_add (const char *mount);
-void yp_remove (const char *mount);
-void yp_touch (const char *mount);
-void yp_recheck_config (ice_config_t *config);
+void yp_add(const char *mount);
+void yp_remove(const char *mount : itype(_Nt_array_ptr<const char> ) );
+void yp_touch(const char *mount : itype(_Nt_array_ptr<const char> ) );
+void yp_recheck_config(_Ptr<ice_config_t> config);
 void yp_initialize(void);
 void yp_shutdown(void);
 

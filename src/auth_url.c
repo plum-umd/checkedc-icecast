@@ -90,14 +90,14 @@
 #define DEFAULT_HEADER_NEW_ALTER_ARGUMENT   "x-icecast-auth-alter-argument"
 
 typedef struct {
-    char       *pass_headers; // headers passed from client to addurl.
-    char       *prefix_headers; // prefix for passed headers.
-    char       *addurl;
-    char       *removeurl;
-    char       *addaction;
-    char       *removeaction;
-    char       *username;
-    char       *password;
+    _Nt_array_ptr<char> pass_headers; // headers passed from client to addurl.
+    _Nt_array_ptr<char> prefix_headers; // prefix for passed headers.
+    _Nt_array_ptr<char> addurl;
+    _Nt_array_ptr<char> removeurl;
+    _Ptr<char> addaction;
+    _Ptr<char> removeaction;
+    _Nt_array_ptr<char> username;
+    _Nt_array_ptr<char> password;
 
     /* old style */
     char       *auth_header;
@@ -105,32 +105,32 @@ typedef struct {
     char       *timelimit_header;
     size_t      timelimit_header_len;
     /* new style */
-    char       *header_auth;
-    char       *header_timelimit;
-    char       *header_message;
-    char       *header_alter_action;
-    char       *header_alter_argument;
+    _Nt_array_ptr<char> header_auth;
+    _Nt_array_ptr<char> header_timelimit;
+    _Nt_array_ptr<char> header_message;
+    _Nt_array_ptr<char> header_alter_action;
+    _Nt_array_ptr<char> header_alter_argument;
 
-    char       *userpwd;
+    _Nt_array_ptr<char> userpwd;
     CURL       *handle;
-    char        errormsg[CURL_ERROR_SIZE];
+    _Nt_array_ptr<char> errormsg;
     auth_result result;
 } auth_url;
 
 typedef struct {
-    char *all_headers;
+    _Nt_array_ptr<char> all_headers;
     size_t all_headers_len;
-    http_parser_t *parser;
+    _Ptr<http_parser_t> parser;
 } auth_user_url_t;
 
-static inline const char * __str_or_default(const char *str, const char *def)
+static const char *__str_or_default(const char *str : itype(_Nt_array_ptr<const char> ) , _Nt_array_ptr<const char> def) : itype(_Nt_array_ptr<const char> ) 
 {
     if (str)
         return str;
     return def;
 }
 
-static void auth_url_clear(auth_t *self)
+static void auth_url_clear(_Ptr<auth_t> self)
 {
     auth_url *url;
 
@@ -157,9 +157,9 @@ static void auth_url_clear(auth_t *self)
     free(url);
 }
 
-static void auth_user_url_clear(auth_client *auth_user)
+static void auth_user_url_clear(_Ptr<auth_client> auth_user)
 {
-    auth_user_url_t *au_url = auth_user->authbackend_userdata;
+    _Ptr<auth_user_url_t> au_url =  auth_user->authbackend_userdata;
 
     if (!au_url)
         return;
@@ -172,12 +172,12 @@ static void auth_user_url_clear(auth_client *auth_user)
     auth_user->authbackend_userdata = NULL;
 }
 
-static void handle_returned_header__complete(auth_client *auth_user)
+static void handle_returned_header__complete(_Ptr<auth_client> auth_user)
 {
-    auth_user_url_t *au_url = auth_user->authbackend_userdata;
-    const char *tmp;
+    _Ptr<auth_user_url_t> au_url =  auth_user->authbackend_userdata;
+    _Nt_array_ptr<const char> tmp = NULL;
     const char *action;
-    const char *argument;
+    _Nt_array_ptr<const char> argument = NULL;
     auth_url *url = auth_user->client->auth->state;
 
     if (!au_url)
@@ -216,7 +216,7 @@ static void handle_returned_header__complete(auth_client *auth_user)
         tmp = httpp_getvar(au_url->parser, url->header_timelimit);
         if (tmp) {
             long long int ret;
-            char *endptr;
+            _Ptr<char> endptr = NULL;
 
             errno = 0;
             ret = strtoll(tmp, &endptr, 0);
@@ -251,15 +251,12 @@ static void handle_returned_header__complete(auth_client *auth_user)
     }
 }
 
-static size_t handle_returned_header(void      *ptr,
-                                     size_t    size,
-                                     size_t    nmemb,
-                                     void      *stream)
+static size_t handle_returned_header(void *ptr, size_t size, size_t nmemb, void* stream)
 {
     size_t len = size * nmemb;
-    auth_client *auth_user = stream;
-    client_t *client = auth_user->client;
-    auth_t *auth;
+    _Ptr<auth_client> auth_user =  stream;
+    _Ptr<client_t> client =  auth_user->client;
+    _Ptr<auth_t> auth = NULL;
     auth_url *url;
 
     if (!client)
@@ -273,8 +270,8 @@ static size_t handle_returned_header(void      *ptr,
     }
 
     if (auth_user->authbackend_userdata) {
-        auth_user_url_t *au_url = auth_user->authbackend_userdata;
-        char *n = realloc(au_url->all_headers, au_url->all_headers_len + len);
+        _Ptr<auth_user_url_t> au_url =  auth_user->authbackend_userdata;
+        _Nt_array_ptr<char> n =  realloc(au_url->all_headers, au_url->all_headers_len + len);
         if (n) {
             au_url->all_headers = n;
             memcpy(n + au_url->all_headers_len, ptr, len);
@@ -325,24 +322,27 @@ static size_t handle_returned_header(void      *ptr,
     return len;
 }
 
-static auth_result url_remove_client(auth_client *auth_user)
+static auth_result url_remove_client(_Ptr<auth_client> auth_user)
 {
-    client_t       *client      = auth_user->client;
-    auth_t         *auth        = client->auth;
+    _Ptr<client_t> client =  auth_user->client;
+    _Ptr<auth_t> auth =  client->auth;
     auth_url       *url         = auth->state;
     time_t          duration    = time(NULL) - client->con->con_time;
-    char           *username,
-                   *password,
-                   *mount,
-                   *server;
+   _Nt_array_ptr<char> username = NULL;
+_Nt_array_ptr<char> password = NULL;
+_Ptr<char> mount = NULL;
+_Ptr<char> server = NULL;
+ 
     const char     *mountreq;
-    ice_config_t   *config;
+    _Ptr<ice_config_t> config = NULL;
     int             port;
-    char           *userpwd     = NULL,
-                    post[4096];
+   _Nt_array_ptr<char> userpwd = ((void *)0);
+_Nt_array_ptr<char> post;
+ 
     const char     *agent;
-    char           *user_agent,
-                   *ipaddr;
+   _Nt_array_ptr<char> user_agent = NULL;
+_Ptr<char> ipaddr = NULL;
+ 
     int             ret;
 
     if (url->removeurl == NULL)
@@ -434,29 +434,34 @@ static auth_result url_remove_client(auth_client *auth_user)
 }
 
 
-static auth_result url_add_client(auth_client *auth_user)
+static auth_result url_add_client(_Ptr<auth_client> auth_user)
 {
-    client_t       *client      = auth_user->client;
-    auth_t         *auth        = client->auth;
+    _Ptr<client_t> client =  auth_user->client;
+    _Ptr<auth_t> auth =  client->auth;
     auth_url       *url         = auth->state;
     int             res         = 0,
                     port;
     const char     *agent;
-    char           *user_agent,
-                   *username,
-                   *password;
+   _Nt_array_ptr<char> user_agent = NULL;
+_Nt_array_ptr<char> username = NULL;
+_Nt_array_ptr<char> password = NULL;
+ 
     const char     *mountreq;
-    char           *mount,
-                   *ipaddr,
-                   *server;
-    ice_config_t   *config;
-    char           *userpwd    = NULL, post [4096];
+   _Ptr<char> mount = NULL;
+_Ptr<char> ipaddr = NULL;
+_Ptr<char> server = NULL;
+ 
+    _Ptr<ice_config_t> config = NULL;
+   _Nt_array_ptr<char> userpwd = ((void *)0);
+_Nt_array_ptr<char> post;
+ 
     ssize_t         post_offset;
-    char           *pass_headers,
-                   *cur_header,
-                   *next_header;
+   _Nt_array_ptr<char> pass_headers = NULL;
+_Nt_array_ptr<char> cur_header = NULL;
+_Nt_array_ptr<char> next_header = NULL;
+ 
     const char     *header_val;
-    char           *header_valesc;
+    _Ptr<char> header_valesc = NULL;
 
     if (url->addurl == NULL)
         return AUTH_OK;
@@ -596,24 +601,22 @@ static auth_result url_add_client(auth_client *auth_user)
     return url->result;
 }
 
-static auth_result auth_url_adduser(auth_t      *auth,
-                                    const char  *username,
-                                    const char  *password)
+static auth_result auth_url_adduser(auth_t *auth : itype(_Ptr<auth_t> ) , const char *username : itype(_Ptr<const char> ) , const char *password : itype(_Ptr<const char> ) )
 {
     return AUTH_FAILED;
 }
 
-static auth_result auth_url_deleteuser(auth_t *auth, const char *username)
+static auth_result auth_url_deleteuser(auth_t *auth : itype(_Ptr<auth_t> ) , const char *username : itype(_Ptr<const char> ) )
 {
     return AUTH_FAILED;
 }
 
-static auth_result auth_url_listuser(auth_t *auth, xmlNodePtr srcnode)
+static auth_result auth_url_listuser(auth_t *auth : itype(_Ptr<auth_t> ) , xmlNodePtr srcnode : itype(_Ptr<xmlNode> ) )
 {
     return AUTH_FAILED;
 }
 
-int auth_get_url_auth(auth_t *authenticator, config_options_t *options)
+int auth_get_url_auth(_Ptr<auth_t> authenticator, config_options_t *options)
 {
     auth_url    *url_info;
     const char  *addaction      = "listener_add";

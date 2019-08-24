@@ -49,16 +49,16 @@
  */
 #define ICY_METADATA_INTERVAL 16000
 
-static void format_mp3_free_plugin(format_plugin_t *self);
-static refbuf_t *mp3_get_filter_meta (source_t *source);
-static refbuf_t *mp3_get_no_meta (source_t *source);
+static void format_mp3_free_plugin(_Ptr<format_plugin_t> self);
+static _Ptr<refbuf_t> mp3_get_filter_meta(_Ptr<source_t> source);
+static _Ptr<refbuf_t> mp3_get_no_meta(_Ptr<source_t> source);
 
-static int  format_mp3_create_client_data (source_t *source, client_t *client);
-static void free_mp3_client_data (client_t *client);
-static int format_mp3_write_buf_to_client(client_t *client);
-static void write_mp3_to_file (source_t *source, refbuf_t *refbuf);
-static void mp3_set_tag (format_plugin_t *plugin, const char *tag, const char *in_value, const char *charset);
-static void format_mp3_apply_settings(client_t *client, format_plugin_t *format, mount_proxy *mount);
+static int format_mp3_create_client_data(source_t *source : itype(_Ptr<source_t> ) , client_t *client : itype(_Ptr<client_t> ) );
+static void free_mp3_client_data(client_t *client : itype(_Ptr<client_t> ) );
+static int format_mp3_write_buf_to_client(_Ptr<client_t> client);
+static void write_mp3_to_file(_Ptr<source_t> source, _Ptr<refbuf_t> refbuf);
+static void mp3_set_tag(_Ptr<format_plugin_t> plugin, _Nt_array_ptr<const char> tag, const char *in_value : itype(_Nt_array_ptr<const char> ) , const char *charset : itype(_Ptr<const char> ) );
+static void format_mp3_apply_settings(client_t *client : itype(_Ptr<client_t> ) , _Ptr<format_plugin_t> format, _Ptr<mount_proxy> mount);
 
 
 typedef struct {
@@ -66,15 +66,15 @@ typedef struct {
     int metadata_offset;
     unsigned int since_meta_block;
     int in_metadata;
-    refbuf_t *associated;
+    _Ptr<refbuf_t> associated;
 } mp3_client_data;
 
-int format_mp3_get_plugin(source_t *source)
+int format_mp3_get_plugin(_Ptr<struct source_tag> source)
 {
-    const char *metadata;
-    format_plugin_t *plugin;
-    mp3_state *state = calloc(1, sizeof(mp3_state));
-    refbuf_t *meta;
+    _Nt_array_ptr<const char> metadata = NULL;
+    _Ptr<format_plugin_t> plugin = NULL;
+    _Ptr<mp3_state> state =  calloc(1, sizeof(mp3_state));
+    _Ptr<refbuf_t> meta = NULL;
 
     plugin = (format_plugin_t *) calloc(1, sizeof(format_plugin_t));
 
@@ -122,9 +122,9 @@ int format_mp3_get_plugin(source_t *source)
 }
 
 
-static void mp3_set_tag (format_plugin_t *plugin, const char *tag, const char *in_value, const char *charset)
+static void mp3_set_tag(_Ptr<format_plugin_t> plugin, _Nt_array_ptr<const char> tag, const char *in_value : itype(_Nt_array_ptr<const char> ) , const char *charset : itype(_Ptr<const char> ) )
 {
-    mp3_state *source_mp3 = plugin->_state;
+    _Ptr<mp3_state> source_mp3 =  plugin->_state;
     char *value = NULL;
 
     /* protect against multiple updaters */
@@ -159,11 +159,13 @@ static void mp3_set_tag (format_plugin_t *plugin, const char *tag, const char *i
 }
 
 
-static void filter_shoutcast_metadata (source_t *source, char *metadata, unsigned int meta_len)
+static void filter_shoutcast_metadata(_Ptr<source_t> source, char *metadata : itype(_Nt_array_ptr<char> ) , unsigned int meta_len)
 {
     if (metadata)
     {
-        char *end, *p;
+       _Nt_array_ptr<char> end = NULL;
+char *p;
+ 
         int len;
 
         do
@@ -189,9 +191,9 @@ static void filter_shoutcast_metadata (source_t *source, char *metadata, unsigne
 }
 
 
-static void format_mp3_apply_settings (client_t *client, format_plugin_t *format, mount_proxy *mount)
+static void format_mp3_apply_settings(client_t *client : itype(_Ptr<client_t> ) , _Ptr<format_plugin_t> format, _Ptr<mount_proxy> mount)
 {
-    mp3_state *source_mp3 = format->_state;
+    _Ptr<mp3_state> source_mp3 =  format->_state;
 
     source_mp3->interval = -1;
     free (format->charset);
@@ -206,7 +208,7 @@ static void format_mp3_apply_settings (client_t *client, format_plugin_t *format
     }
     if (source_mp3->interval < 0)
     {
-        const char *metadata = httpp_getvar (client->parser, "icy-metaint");
+        _Nt_array_ptr<const char> metadata =  httpp_getvar (client->parser, "icy-metaint");
         source_mp3->interval = ICY_METADATA_INTERVAL;
         if (metadata)
         {
@@ -227,18 +229,18 @@ static void format_mp3_apply_settings (client_t *client, format_plugin_t *format
 /* called from the source thread when the metadata has been updated.
  * The artist title are checked and made ready for clients to send
  */
-static void mp3_set_title(source_t *source)
+static void mp3_set_title(_Ptr<source_t> source)
 {
-    const char streamtitle[] = "StreamTitle='";
-    const char streamurl[] = "StreamUrl='";
+    _Nt_array_ptr<const char> streamtitle =  "StreamTitle='";
+    _Nt_array_ptr<const char> streamurl =  "StreamUrl='";
     const char *url_artist = vorbis_comment_query(&source->format->vc, MP3_METADATA_ARTIST, 0);
     const char *url_title = vorbis_comment_query(&source->format->vc, MP3_METADATA_TITLE, 0);
     const char *url = vorbis_comment_query(&source->format->vc, MP3_METADATA_URL, 0);
     size_t size;
     unsigned char len_byte;
-    refbuf_t *p;
+    _Ptr<refbuf_t> p = NULL;
     unsigned int len = sizeof(streamtitle) + 2; /* the StreamTitle, quotes, ; and null */
-    mp3_state *source_mp3 = source->format->_state;
+    _Ptr<mp3_state> source_mp3 =  source->format->_state;
 
     /* make sure the url data does not disappear from under us */
     thread_mutex_lock (&source_mp3->url_lock);
@@ -252,7 +254,7 @@ static void mp3_set_title(source_t *source)
         len += 3;
     if (source_mp3->inline_url)
     {
-        char *end = strstr (source_mp3->inline_url, "';");
+        _Nt_array_ptr<char> end =  strstr (source_mp3->inline_url, "';");
         if (end)
             len += end - source_mp3->inline_url+2;
     }
@@ -274,7 +276,7 @@ static void mp3_set_title(source_t *source)
     p = refbuf_new (size);
     if (p)
     {
-        mp3_state *source_mp3 = source->format->_state;
+        _Ptr<mp3_state> source_mp3 =  source->format->_state;
         int r;
 
         memset (p->data, '\0', size);
@@ -292,7 +294,7 @@ static void mp3_set_title(source_t *source)
         {
             if (source_mp3->inline_url)
             {
-                char *end = strstr (source_mp3->inline_url, "';");
+                _Nt_array_ptr<char> end =  strstr (source_mp3->inline_url, "';");
                 ssize_t urllen = size;
                 if (end) urllen = end - source_mp3->inline_url + 2;
                 if ((ssize_t)(size-r) > urllen)
@@ -315,12 +317,12 @@ static void mp3_set_title(source_t *source)
  * which is 0 or greater.  Check the client in_metadata value afterwards
  * to see if all metadata has been sent
  */
-static int send_stream_metadata (client_t *client, refbuf_t *associated)
+static int send_stream_metadata(_Ptr<client_t> client, _Ptr<refbuf_t> associated)
 {
     int ret = 0;
     char *metadata;
     int meta_len;
-    mp3_client_data *client_mp3 = client->format_data;
+    _Ptr<mp3_client_data> client_mp3 =  client->format_data;
 
     /* If there is a change in metadata then send it else
      * send a single zero value byte in its place
@@ -367,11 +369,11 @@ static int send_stream_metadata (client_t *client, refbuf_t *associated)
 /* Handler for writing mp3 data to a client, taking into account whether
  * client has requested shoutcast style metadata updates
  */
-static int format_mp3_write_buf_to_client(client_t *client)
+static int format_mp3_write_buf_to_client(_Ptr<client_t> client)
 {
     int ret, written = 0;
-    mp3_client_data *client_mp3 = client->format_data;
-    refbuf_t *refbuf = client->refbuf;
+    _Ptr<mp3_client_data> client_mp3 =  client->format_data;
+    _Ptr<refbuf_t> refbuf =  client->refbuf;
     char *buf = refbuf->data + client->pos;
     unsigned int len = refbuf->len - client->pos;
 
@@ -380,7 +382,7 @@ static int format_mp3_write_buf_to_client(client_t *client)
         /* send any unwritten metadata to the client */
         if (client_mp3->in_metadata)
         {
-            refbuf_t *associated = refbuf->associated;
+            _Ptr<refbuf_t> associated =  refbuf->associated;
             ret = send_stream_metadata(client, associated);
 
             if (client_mp3->in_metadata)
@@ -443,10 +445,10 @@ static int format_mp3_write_buf_to_client(client_t *client)
     return written;
 }
 
-static void format_mp3_free_plugin(format_plugin_t *self)
+static void format_mp3_free_plugin(_Ptr<format_plugin_t> self)
 {
     /* free the plugin instance */
-    mp3_state *state = self->_state;
+    _Ptr<mp3_state> state =  self->_state;
 
     thread_mutex_destroy(&state->url_lock);
     free(self->charset);
@@ -463,13 +465,13 @@ static void format_mp3_free_plugin(format_plugin_t *self)
  * incoming streams come in small packets which could waste a lot of
  * bandwidth with many listeners due to headers and such like.
  */
-static int complete_read(source_t *source)
+static int complete_read(_Ptr<source_t> source)
 {
     ssize_t bytes;
-    format_plugin_t *format = source->format;
-    mp3_state *source_mp3 = format->_state;
+    _Ptr<format_plugin_t> format =  source->format;
+    _Ptr<mp3_state> source_mp3 =  format->_state;
     char *buf;
-    refbuf_t *refbuf;
+    _Ptr<refbuf_t> refbuf = NULL;
 
 #define REFBUF_SIZE 1400
 
@@ -510,10 +512,10 @@ static int complete_read(source_t *source)
 
 
 /* read an mp3 stream which does not have shoutcast style metadata */
-static refbuf_t *mp3_get_no_meta (source_t *source)
+static _Ptr<refbuf_t> mp3_get_no_meta(_Ptr<source_t> source)
 {
-    refbuf_t *refbuf;
-    mp3_state *source_mp3 = source->format->_state;
+    _Ptr<refbuf_t> refbuf = NULL;
+    _Ptr<mp3_state> source_mp3 =  source->format->_state;
 
     if (complete_read (source) == 0)
         return NULL;
@@ -537,11 +539,11 @@ static refbuf_t *mp3_get_no_meta (source_t *source)
  * metadata so that the mp3 data itself is store on the queue and the
  * metadata is is associated with it
  */
-static refbuf_t *mp3_get_filter_meta(source_t *source)
+static _Ptr<refbuf_t> mp3_get_filter_meta(_Ptr<source_t> source)
 {
-    refbuf_t *refbuf;
-    format_plugin_t *plugin = source->format;
-    mp3_state *source_mp3 = plugin->_state;
+    _Ptr<refbuf_t> refbuf = NULL;
+    _Ptr<format_plugin_t> plugin =  source->format;
+    _Ptr<mp3_state> source_mp3 =  plugin->_state;
     unsigned char *src;
     unsigned int bytes, mp3_block;
 
@@ -616,7 +618,7 @@ static refbuf_t *mp3_get_filter_meta(source_t *source)
         if (source_mp3->build_metadata_len > 1 &&
                 strcmp (source_mp3->build_metadata+1, source_mp3->metadata->data+1) != 0)
         {
-            refbuf_t *meta = refbuf_new (source_mp3->build_metadata_len);
+            _Ptr<refbuf_t> meta =  refbuf_new (source_mp3->build_metadata_len);
             memcpy (meta->data, source_mp3->build_metadata,
                     source_mp3->build_metadata_len);
 
@@ -655,16 +657,16 @@ static refbuf_t *mp3_get_filter_meta(source_t *source)
 }
 
 
-static int format_mp3_create_client_data(source_t *source, client_t *client)
+static int format_mp3_create_client_data(source_t *source : itype(_Ptr<source_t> ) , client_t *client : itype(_Ptr<client_t> ) )
 {
-    mp3_client_data *client_mp3 = calloc(1, sizeof(mp3_client_data));
-    mp3_state *source_mp3 = source->format->_state;
-    const char *metadata;
+    _Ptr<mp3_client_data> client_mp3 =  calloc(1, sizeof(mp3_client_data));
+    _Ptr<mp3_state> source_mp3 =  source->format->_state;
+    _Nt_array_ptr<const char> metadata = NULL;
     /* the +-2 is for overwriting the last set of \r\n */
     unsigned remaining = 4096 - client->refbuf->len + 2;
     char *ptr = client->refbuf->data + client->refbuf->len - 2;
     int bytes;
-    const char *useragent;
+    _Nt_array_ptr<const char> useragent = NULL;
 
     if (client_mp3 == NULL)
         return -1;
@@ -710,14 +712,14 @@ static int format_mp3_create_client_data(source_t *source, client_t *client)
 }
 
 
-static void free_mp3_client_data (client_t *client)
+static void free_mp3_client_data(client_t *client : itype(_Ptr<client_t> ) )
 {
     free (client->format_data);
     client->format_data = NULL;
 }
 
 
-static void write_mp3_to_file (source_t *source, refbuf_t *refbuf)
+static void write_mp3_to_file(_Ptr<source_t> source, _Ptr<refbuf_t> refbuf)
 {
     if (refbuf->len == 0)
         return;

@@ -64,16 +64,16 @@ struct _client_tag {
     operation_mode mode;
 
     /* the client's connection */
-    connection_t *con;
+    _Ptr<connection_t> con;
 
     /* Reuse this connection ... */
     reuse_t reuse;
 
     /* the client's http headers */
-    http_parser_t *parser;
+    _Ptr<http_parser_t> parser;
 
     /* Transfer Encoding if any */
-    httpp_encoding_t *encoding;
+    _Ptr<httpp_encoding_t> encoding;
 
     /* protocol client uses */
     protocol_t protocol;
@@ -93,7 +93,7 @@ struct _client_tag {
     admin_command_id_t admin_command;
 
     /* authentication instances we still need to go thru */
-    struct auth_stack_tag *authstack;
+    _Ptr<struct auth_stack_tag> authstack;
 
     /* Client username */
     char *username;
@@ -105,59 +105,59 @@ struct _client_tag {
     char *role;
 
     /* active ACL, set as soon as the client is authenticated */
-    acl_t *acl;
+    _Ptr<acl_t> acl;
 
     /* URI */
     char *uri;
 
     /* Handler module and function */
     module_t *handler_module;
-    char *handler_function;
+    _Nt_array_ptr<char> handler_function;
 
     /* is client getting intro data */
     long intro_offset;
 
     /* where in the queue the client is */
-    refbuf_t *refbuf;
+    _Ptr<refbuf_t> refbuf;
 
     /* position in first buffer */
     unsigned int pos;
 
     /* auth used for this client */
-    auth_t *auth;
+    _Ptr<auth_t> auth;
 
     /* Format-handler-specific data for this client */
-    void *format_data;
+    void* format_data;
 
     /* function to call to release format specific resources */
-    void (*free_client_data)(client_t *client);
+    _Ptr<void (_Ptr<client_t> )> free_client_data;
 
     /* write out data associated with client */
-    int (*write_to_client)(client_t *client);
+    _Ptr<int (_Ptr<client_t> )> write_to_client;
 
     /* function to check if refbuf needs updating */
-    int (*check_buffer)(source_t *source, client_t *client);
+    _Ptr<int (_Ptr<source_t> , _Ptr<client_t> )> check_buffer;
 };
 
-int client_create (client_t **c_ptr, connection_t *con, http_parser_t *parser);
-void client_complete(client_t *client);
-void client_destroy(client_t *client);
-void client_send_error_by_id(client_t *client, icecast_error_id_t id);
-void client_send_error_by_uuid(client_t *client, const char *uuid);
-void client_send_101(client_t *client, reuse_t reuse);
-void client_send_204(client_t *client);
-void client_send_426(client_t *client, reuse_t reuse);
-void client_send_redirect(client_t *client, const char *uuid, int status, const char *location);
-void client_send_reportxml(client_t *client, reportxml_t *report, document_domain_t domain, const char *xsl, admin_format_t admin_format_hint, int status, const char *location);
-reportxml_t *client_get_reportxml(const char *state_definition, const char *state_akindof, const char *state_text);
-admin_format_t client_get_admin_format_by_content_negotiation(client_t *client);
-int client_send_bytes (client_t *client, const void *buf, unsigned len);
-int client_read_bytes (client_t *client, void *buf, unsigned len);
-void client_set_queue (client_t *client, refbuf_t *refbuf);
-ssize_t client_body_read(client_t *client, void *buf, size_t len);
-int client_body_eof(client_t *client);
-client_slurp_result_t client_body_slurp(client_t *client, void *buf, size_t *len);
-client_slurp_result_t client_body_skip(client_t *client);
-ssize_t client_get_baseurl(client_t *client, listensocket_t *listensocket, char *buf, size_t len, const char *user, const char *pw, const char *prefix, const char *suffix0, const char *suffix1);
+int client_create(client_t **c_ptr : itype(_Ptr<_Ptr<client_t>> ) , _Ptr<connection_t> con, _Ptr<http_parser_t> parser);
+void client_complete(client_t *client : itype(_Ptr<client_t> ) );
+void client_destroy(client_t *client : itype(_Ptr<client_t> ) );
+void client_send_error_by_id(client_t *client : itype(_Ptr<client_t> ) , icecast_error_id_t id);
+void client_send_error_by_uuid(_Ptr<client_t> client, const char *uuid : itype(_Ptr<const char> ) );
+void client_send_101(_Ptr<client_t> client, reuse_t reuse);
+void client_send_204(_Ptr<client_t> client);
+void client_send_426(_Ptr<client_t> client, reuse_t reuse);
+void client_send_redirect(_Ptr<client_t> client, _Ptr<const char> uuid, int status, _Nt_array_ptr<const char> location);
+void client_send_reportxml(_Ptr<client_t> client, reportxml_t *report : itype(_Ptr<reportxml_t> ) , document_domain_t domain, _Nt_array_ptr<const char> xsl, admin_format_t admin_format_hint, int status, _Nt_array_ptr<const char> location);
+reportxml_t * client_get_reportxml(_Ptr<const char> state_definition, _Ptr<const char> state_akindof, _Nt_array_ptr<const char> state_text);
+admin_format_t client_get_admin_format_by_content_negotiation(client_t *client : itype(_Ptr<client_t> ) );
+int client_send_bytes(client_t *client : itype(_Ptr<client_t> ) , const void *buf : itype(_Nt_array_ptr<const void> ) , unsigned int len);
+int client_read_bytes(client_t *client : itype(_Ptr<client_t> ) , void *buf : itype(_Nt_array_ptr<void> ) , unsigned int len);
+void client_set_queue(client_t *client : itype(_Ptr<client_t> ) , _Ptr<refbuf_t> refbuf);
+ssize_t client_body_read(client_t *client : itype(_Ptr<client_t> ) , void *buf : itype(_Nt_array_ptr<void> ) , size_t len);
+int client_body_eof(client_t *client : itype(_Ptr<client_t> ) );
+client_slurp_result_t client_body_slurp(_Ptr<client_t> client, void* buf, _Ptr<size_t> len);
+client_slurp_result_t client_body_skip(_Ptr<client_t> client);
+ssize_t client_get_baseurl(client_t *client : itype(_Ptr<client_t> ) , listensocket_t *listensocket, char *buf : itype(_Nt_array_ptr<char> ) , size_t len, const char *user : itype(_Ptr<const char> ) , const char *pw : itype(_Ptr<const char> ) , _Nt_array_ptr<const char> prefix, const char *suffix0 : itype(_Nt_array_ptr<const char> ) , _Nt_array_ptr<const char> suffix1);
 
 #endif  /* __CLIENT_H__ */

@@ -9,6 +9,6 @@
 #ifndef __EVENT_URL_H__
 #define __EVENT_URL_H__
 
-int event_get_url(event_registration_t *er, config_options_t *options);
+int event_get_url(_Ptr<event_registration_t> er, config_options_t *options);
 
 #endif

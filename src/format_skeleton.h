@@ -16,6 +16,6 @@
 
 #include "format_ogg.h"
 
-ogg_codec_t *initial_skeleton_page (format_plugin_t *plugin, ogg_page *page);
+_Ptr<ogg_codec_t> initial_skeleton_page(_Ptr<format_plugin_t> plugin, ogg_page *page);
 
 #endif /* __FORMAT_SKELETON_H */

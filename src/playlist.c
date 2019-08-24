@@ -31,7 +31,7 @@ typedef struct playlist_track_tag playlist_track_t;
 struct playlist_tag {
     size_t refc;
     ssize_t max_tracks;
-    playlist_track_t *first;
+    _Ptr<playlist_track_t> first;
 };
 
 struct playlist_track_tag {
@@ -39,10 +39,10 @@ struct playlist_track_tag {
     char *creator;
     char *album;
     char *trackNum;
-    playlist_track_t *next;
+    _Ptr<playlist_track_t> next;
 };
 
-static void __free_track(playlist_track_t *track)
+static void __free_track(_Ptr<playlist_track_t> track)
 {
     if (track->title)
         free(track->title);
@@ -63,9 +63,9 @@ static char * __query_vc(vorbis_comment *vc, const char *key)
     return strdup(value);
 }
 
-playlist_t * playlist_new(ssize_t max_tracks)
+_Ptr<playlist_t> playlist_new(ssize_t max_tracks)
 {
-    playlist_t *playlist = calloc(1, sizeof(playlist_t));
+    _Ptr<playlist_t> playlist =  calloc(1, sizeof(playlist_t));
 
     if (!playlist)
        return NULL;
@@ -76,7 +76,7 @@ playlist_t * playlist_new(ssize_t max_tracks)
     return playlist;
 }
 
-int          playlist_ref(playlist_t *playlist)
+int playlist_ref(_Ptr<playlist_t> playlist)
 {
     if (!playlist)
         return -1;
@@ -84,9 +84,9 @@ int          playlist_ref(playlist_t *playlist)
     return 0;
 }
 
-int          playlist_release(playlist_t *playlist)
+int playlist_release(_Ptr<playlist_t> playlist)
 {
-    playlist_track_t *track;
+    _Ptr<playlist_track_t> track = NULL;
 
     if (!playlist)
         return -1;
@@ -103,7 +103,7 @@ int          playlist_release(playlist_t *playlist)
     return 0;
 }
 
-int          playlist_set_max_tracks(playlist_t *playlist, ssize_t max_tracks)
+int playlist_set_max_tracks(_Ptr<playlist_t> playlist, ssize_t max_tracks)
 {
     if (!playlist)
         return -1;
@@ -112,9 +112,11 @@ int          playlist_set_max_tracks(playlist_t *playlist, ssize_t max_tracks)
 }
 
 
-int          playlist_push_track(playlist_t *playlist, vorbis_comment *vc)
+int playlist_push_track(_Ptr<playlist_t> playlist, _Ptr<vorbis_comment> vc)
 {
-    playlist_track_t *track, **cur;
+   _Ptr<playlist_track_t> track = NULL;
+_Ptr<_Ptr<playlist_track_t>> cur = NULL;
+ 
     ssize_t num = 0;
 
     if (!playlist)
@@ -134,7 +136,7 @@ int          playlist_push_track(playlist_t *playlist, vorbis_comment *vc)
     num++; /* the extra track we just inserted */
 
     while (playlist->max_tracks > 0 && num > playlist->max_tracks) {
-        playlist_track_t *to_free = playlist->first;
+        _Ptr<playlist_track_t> to_free =  playlist->first;
         playlist->first = to_free->next;
         __free_track(to_free);
         num--;
@@ -155,10 +157,10 @@ int          playlist_push_track(playlist_t *playlist, vorbis_comment *vc)
     return 0;
 }
 
-xmlNodePtr   playlist_render_xspf(playlist_t *playlist)
+xmlNodePtr playlist_render_xspf(_Ptr<playlist_t> playlist)
 {
     xmlNodePtr rootnode, tracklist, tracknode;
-    playlist_track_t *track;
+    _Ptr<playlist_track_t> track = NULL;
 
     if (!playlist)
         return NULL;

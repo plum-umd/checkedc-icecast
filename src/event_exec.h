@@ -9,6 +9,6 @@
 #ifndef __EVENT_EXEC_H__
 #define __EVENT_EXEC_H__
 
-int event_get_exec(event_registration_t *er, config_options_t *options);
+int event_get_exec(_Ptr<event_registration_t> er, config_options_t *options);
 
 #endif

@@ -121,14 +121,14 @@ typedef struct refobject_base_tag refobject_base_t;
 #ifdef HAVE_TYPE_ATTRIBUTE_TRANSPARENT_UNION
 typedef union __attribute__ ((__transparent_union__)) {
     refobject_base_t *refobject_base;
-    buffer_t *buffer;
-    module_t *module;
-    module_container_t *module_container;
-    reportxml_t *reportxml;
-    reportxml_node_t *reportxml_node;
-    reportxml_database_t *reportxml_database;
-    listensocket_container_t *listensocket_container;
-    listensocket_t *listensocket;
+    _Ptr<buffer_t> buffer;
+    _Ptr<module_t> module;
+    _Ptr<module_container_t> module_container;
+    _Ptr<reportxml_t> reportxml;
+    _Ptr<reportxml_node_t> reportxml_node;
+    _Ptr<reportxml_database_t> reportxml_database;
+    _Ptr<listensocket_container_t> listensocket_container;
+    _Ptr<listensocket_t> listensocket;
 } refobject_t;
 #else
 typedef void * refobject_t;

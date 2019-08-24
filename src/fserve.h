@@ -22,22 +22,22 @@ typedef void (*fserve_callback_t)(client_t *, void *);
 
 typedef struct _fserve_t
 {
-    client_t *client;
+    _Ptr<client_t> client;
 
-    FILE *file;
+    _Ptr<FILE> file;
     int ready;
-    void (*callback)(client_t *, void *);
-    void *arg;
+    _Ptr<void (_Ptr<client_t> , void* )> callback;
+    void* arg;
     struct _fserve_t *next;
 } fserve_t;
 
 void fserve_initialize(void);
 void fserve_shutdown(void);
-int fserve_client_create(client_t *httpclient);
-int fserve_add_client (client_t *client, FILE *file);
-void fserve_add_client_callback (client_t *client, fserve_callback_t callback, void *arg);
-char *fserve_content_type (const char *path);
-void fserve_recheck_mime_types (ice_config_t *config);
+int fserve_client_create(_Ptr<client_t> httpclient);
+int fserve_add_client(client_t *client : itype(_Ptr<client_t> ) , FILE *file : itype(_Ptr<FILE> ) );
+void fserve_add_client_callback(client_t *client : itype(_Ptr<client_t> ) , _Ptr<void (_Ptr<client_t> , void* )> callback, void *arg : itype(_Ptr<void> ) );
+char *fserve_content_type(const char *path : itype(_Nt_array_ptr<const char> ) ) : itype(_Nt_array_ptr<char> ) ;
+void fserve_recheck_mime_types(_Ptr<ice_config_t> config);
 
 
 #endif

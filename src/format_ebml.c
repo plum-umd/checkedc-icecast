@@ -138,15 +138,15 @@ typedef struct ebml_st {
     bool flush_cluster;
 
     size_t position;
-    unsigned char *buffer;
+    _Array_ptr<unsigned char> buffer;
 
     size_t input_position;
-    unsigned char *input_buffer;
+    _Nt_array_ptr<unsigned char> input_buffer;
 
     size_t header_size;
     size_t header_position;
     size_t header_read_position;
-    unsigned char *header;
+    _Array_ptr<unsigned char> header;
 
     uint_least64_t keyframe_track_number;
     uint_least64_t parsing_track_number;
@@ -155,51 +155,42 @@ typedef struct ebml_st {
 
 typedef struct ebml_source_state_st {
 
-    ebml_t *ebml;
-    refbuf_t *header;
+    _Ptr<ebml_t> ebml;
+    _Ptr<refbuf_t> header;
     bool file_headers_written;
 
 } ebml_source_state_t;
 
 typedef struct ebml_client_data_st {
 
-    refbuf_t *header;
+    _Ptr<refbuf_t> header;
     size_t header_pos;
 
 } ebml_client_data_t;
 
-static void ebml_free_plugin(format_plugin_t *plugin);
-static refbuf_t *ebml_get_buffer(source_t *source);
-static int ebml_write_buf_to_client(client_t *client);
-static void ebml_write_buf_to_file(source_t *source, refbuf_t *refbuf);
-static int ebml_create_client_data(source_t *source, client_t *client);
-static void ebml_free_client_data(client_t *client);
+static void ebml_free_plugin(_Ptr<format_plugin_t> plugin);
+static _Ptr<refbuf_t> ebml_get_buffer(_Ptr<source_t> source);
+static int ebml_write_buf_to_client(_Ptr<client_t> client);
+static void ebml_write_buf_to_file(_Ptr<source_t> source, _Ptr<refbuf_t> refbuf);
+static int ebml_create_client_data(source_t *source : itype(_Ptr<source_t> ) , client_t *client : itype(_Ptr<client_t> ) );
+static void ebml_free_client_data(client_t *client : itype(_Ptr<client_t> ) );
 
-static ebml_t *ebml_create();
-static void ebml_destroy(ebml_t *ebml);
-static size_t ebml_read_space(ebml_t *ebml);
-static size_t ebml_read(ebml_t *ebml, char *buffer, size_t len, ebml_chunk_type *chunk_type);
-static unsigned char *ebml_get_write_buffer(ebml_t *ebml, size_t *bytes);
-static ssize_t ebml_wrote(ebml_t *ebml, size_t len);
-static ssize_t ebml_parse_tag(unsigned char      *buffer,
-                              unsigned char      *buffer_end,
-                              uint_least64_t *tag_id,
-                              uint_least64_t *payload_length);
-static ssize_t ebml_parse_var_int(unsigned char      *buffer,
-                                  unsigned char      *buffer_end,
-                                  uint_least64_t *out_value);
-static ssize_t ebml_parse_sized_int(unsigned char      *buffer,
-                                    unsigned char      *buffer_end,
-                                    size_t             len,
-                                    bool                is_signed,
-                                    uint_least64_t *out_value);
-static inline void ebml_check_track(ebml_t *ebml);
+static _Ptr<ebml_t> ebml_create(void);
+static void ebml_destroy(_Ptr<ebml_t> ebml);
+static size_t ebml_read_space(_Ptr<ebml_t> ebml);
+static size_t ebml_read(_Ptr<ebml_t> ebml, char *buffer : itype(_Ptr<char> ) , size_t len, _Ptr<ebml_chunk_type> chunk_type);
+static unsigned char *ebml_get_write_buffer(_Ptr<ebml_t> ebml, _Ptr<size_t> bytes) : itype(_Nt_array_ptr<unsigned char> ) ;
+static ssize_t ebml_wrote(_Ptr<ebml_t> ebml, size_t len);
+static ssize_t ebml_parse_tag(_Nt_array_ptr<unsigned char> buffer, _Nt_array_ptr<unsigned char> buffer_end, _Ptr<uint_least64_t> tag_id, _Ptr<uint_least64_t> payload_length);
+static ssize_t ebml_parse_var_int(_Array_ptr<unsigned char> buffer, _Ptr<unsigned char> buffer_end, _Ptr<uint_least64_t> out_value);
+static ssize_t ebml_parse_sized_int(_Array_ptr<unsigned char> buffer, _Ptr<unsigned char> buffer_end, size_t len, bool is_signed, _Ptr<uint_least64_t> out_value);
+static void ebml_check_track(_Ptr<ebml_t> ebml);
 
-int format_ebml_get_plugin(source_t *source)
+int format_ebml_get_plugin(_Ptr<source_t> source)
 {
 
-    ebml_source_state_t *ebml_source_state = calloc(1, sizeof(ebml_source_state_t));
-    format_plugin_t *plugin = calloc(1, sizeof(format_plugin_t));
+    _Ptr<ebml_source_state_t> ebml_source_state =  calloc(1, sizeof(ebml_source_state_t));
+    _Ptr<format_plugin_t> plugin =  calloc(1, sizeof(format_plugin_t));
 
     plugin->get_buffer = ebml_get_buffer;
     plugin->write_buf_to_client = ebml_write_buf_to_client;
@@ -220,10 +211,10 @@ int format_ebml_get_plugin(source_t *source)
     return 0;
 }
 
-static void ebml_free_plugin(format_plugin_t *plugin)
+static void ebml_free_plugin(_Ptr<format_plugin_t> plugin)
 {
 
-    ebml_source_state_t *ebml_source_state = plugin->_state;
+    _Ptr<ebml_source_state_t> ebml_source_state =  plugin->_state;
 
     refbuf_release(ebml_source_state->header);
     ebml_destroy(ebml_source_state->ebml);
@@ -234,10 +225,10 @@ static void ebml_free_plugin(format_plugin_t *plugin)
 
 /* Write to a client from the header buffer.
  */
-static int send_ebml_header(client_t *client)
+static int send_ebml_header(client_t *client : itype(_Ptr<client_t> ) )
 {
 
-    ebml_client_data_t *ebml_client_data = client->format_data;
+    _Ptr<ebml_client_data_t> ebml_client_data =  client->format_data;
     size_t len = EBML_SLICE_SIZE;
     int ret;
 
@@ -260,10 +251,10 @@ static int send_ebml_header(client_t *client)
 
 /* Initial write-to-client function.
  */
-static int ebml_write_buf_to_client (client_t *client)
+static int ebml_write_buf_to_client(_Ptr<client_t> client)
 {
 
-    ebml_client_data_t *ebml_client_data = client->format_data;
+    _Ptr<ebml_client_data_t> ebml_client_data =  client->format_data;
 
     if (ebml_client_data->header_pos != ebml_client_data->header->len)
     {
@@ -281,16 +272,16 @@ static int ebml_write_buf_to_client (client_t *client)
 
 /* Return a refbuf to add to the queue.
  */
-static refbuf_t *ebml_get_buffer(source_t *source)
+static _Ptr<refbuf_t> ebml_get_buffer(_Ptr<source_t> source)
 {
 
-    ebml_source_state_t *ebml_source_state = source->format->_state;
-    format_plugin_t *format = source->format;
-    unsigned char *write_buffer = NULL;
+    _Ptr<ebml_source_state_t> ebml_source_state =  source->format->_state;
+    _Ptr<format_plugin_t> format =  source->format;
+    _Nt_array_ptr<unsigned char> write_buffer =  NULL;
     ssize_t read_bytes = 0;
     size_t write_bytes = 0;
     ebml_chunk_type chunk_type;
-    refbuf_t *refbuf;
+    _Ptr<refbuf_t> refbuf = NULL;
     ssize_t ret;
 
     while (1)
@@ -339,10 +330,10 @@ static refbuf_t *ebml_get_buffer(source_t *source)
 
 /* Initialize client state.
  */
-static int ebml_create_client_data(source_t *source, client_t *client)
+static int ebml_create_client_data(source_t *source : itype(_Ptr<source_t> ) , client_t *client : itype(_Ptr<client_t> ) )
 {
-    ebml_client_data_t *ebml_client_data;
-    ebml_source_state_t *ebml_source_state = source->format->_state;
+    _Ptr<ebml_client_data_t> ebml_client_data = NULL;
+    _Ptr<ebml_source_state_t> ebml_source_state =  source->format->_state;
 
     if (!ebml_source_state->header)
         return -1;
@@ -358,27 +349,27 @@ static int ebml_create_client_data(source_t *source, client_t *client)
     return 0;
 }
 
-static void ebml_free_client_data (client_t *client)
+static void ebml_free_client_data(client_t *client : itype(_Ptr<client_t> ) )
 {
 
-    ebml_client_data_t *ebml_client_data = client->format_data;
+    _Ptr<ebml_client_data_t> ebml_client_data =  client->format_data;
 
     refbuf_release (ebml_client_data->header);
     free (client->format_data);
     client->format_data = NULL;
 }
 
-static void ebml_write_buf_to_file_fail (source_t *source)
+static void ebml_write_buf_to_file_fail(_Ptr<source_t> source)
 {
     ICECAST_LOG_WARN("Write to dump file failed, disabling");
     fclose (source->dumpfile);
     source->dumpfile = NULL;
 }
 
-static void ebml_write_buf_to_file (source_t *source, refbuf_t *refbuf)
+static void ebml_write_buf_to_file(_Ptr<source_t> source, _Ptr<refbuf_t> refbuf)
 {
 
-    ebml_source_state_t *ebml_source_state = source->format->_state;
+    _Ptr<ebml_source_state_t> ebml_source_state =  source->format->_state;
 
     if ( ! ebml_source_state->file_headers_written)
     {
@@ -399,7 +390,7 @@ static void ebml_write_buf_to_file (source_t *source, refbuf_t *refbuf)
 
 /* internal ebml parsing */
 
-static void ebml_destroy(ebml_t *ebml)
+static void ebml_destroy(_Ptr<ebml_t> ebml)
 {
 
     free(ebml->header);
@@ -409,10 +400,10 @@ static void ebml_destroy(ebml_t *ebml)
 
 }
 
-static ebml_t *ebml_create()
+static _Ptr<ebml_t> ebml_create(void)
 {
 
-    ebml_t *ebml = calloc(1, sizeof(ebml_t));
+    _Ptr<ebml_t> ebml =  calloc(1, sizeof(ebml_t));
 
     ebml->output_state = EBML_STATE_READING_HEADER;
 
@@ -433,7 +424,7 @@ static ebml_t *ebml_create()
 /* Return the size of a buffer needed to store the next
  * chunk that ebml_read can yield.
  */
-static size_t ebml_read_space(ebml_t *ebml)
+static size_t ebml_read_space(_Ptr<ebml_t> ebml)
 {
 
     size_t read_space;
@@ -490,7 +481,7 @@ static size_t ebml_read_space(ebml_t *ebml)
  * chunk_type will be set to indicate if the chunk is the header,
  * the start of a cluster, or continuing the current cluster.
  */
-static size_t ebml_read(ebml_t *ebml, char *buffer, size_t len, ebml_chunk_type *chunk_type)
+static size_t ebml_read(_Ptr<ebml_t> ebml, char *buffer : itype(_Ptr<char> ) , size_t len, _Ptr<ebml_chunk_type> chunk_type)
 {
 
     size_t read_space;
@@ -588,7 +579,7 @@ static size_t ebml_read(ebml_t *ebml, char *buffer, size_t len, ebml_chunk_type 
  * Returns the start of the writable space;
  * Sets bytes to the amount of space available.
  */
-static unsigned char *ebml_get_write_buffer(ebml_t *ebml, size_t *bytes)
+static unsigned char *ebml_get_write_buffer(_Ptr<ebml_t> ebml, _Ptr<size_t> bytes) : itype(_Nt_array_ptr<unsigned char> ) 
 {
     *bytes = EBML_SLICE_SIZE - ebml->input_position;
     return ebml->input_buffer + ebml->input_position;
@@ -596,12 +587,12 @@ static unsigned char *ebml_get_write_buffer(ebml_t *ebml, size_t *bytes)
 
 /* Process data that has been written to the EBML parser's input buffer.
  */
-static ssize_t ebml_wrote(ebml_t *ebml, size_t len)
+static ssize_t ebml_wrote(_Ptr<ebml_t> ebml, size_t len)
 {
     bool processing = true;
     size_t cursor = 0;
     size_t to_copy;
-    unsigned char *end_of_buffer;
+    _Nt_array_ptr<unsigned char> end_of_buffer = NULL;
 
     ssize_t tag_length;
     ssize_t value_length;
@@ -838,7 +829,7 @@ static ssize_t ebml_wrote(ebml_t *ebml, size_t len)
 
 }
 
-static inline void ebml_check_track(ebml_t *ebml)
+static void ebml_check_track(_Ptr<ebml_t> ebml)
 {
     if (ebml->keyframe_track_number == EBML_UNKNOWN
         && ebml->parsing_track_is_video
@@ -861,10 +852,7 @@ static inline void ebml_check_track(ebml_t *ebml)
  * Returns -1 if the tag is corrupt.
  */
 
-static ssize_t ebml_parse_tag(unsigned char *buffer,
-                              unsigned char *buffer_end,
-                              uint_least64_t *tag_id,
-                              uint_least64_t *payload_length)
+static ssize_t ebml_parse_tag(_Nt_array_ptr<unsigned char> buffer, _Nt_array_ptr<unsigned char> buffer_end, _Ptr<uint_least64_t> tag_id, _Ptr<uint_least64_t> payload_length)
 {
     ssize_t type_length;
     ssize_t size_length;
@@ -895,9 +883,7 @@ static ssize_t ebml_parse_tag(unsigned char *buffer,
  * Else, returns the length of the number in bytes and writes the
  * value to *out_value.
  */
-static ssize_t ebml_parse_var_int(unsigned char *buffer,
-                                 unsigned char *buffer_end,
-                                 uint_least64_t *out_value)
+static ssize_t ebml_parse_var_int(_Array_ptr<unsigned char> buffer, _Ptr<unsigned char> buffer_end, _Ptr<uint_least64_t> out_value)
 {
     ssize_t size = 1;
     ssize_t i;
@@ -964,11 +950,7 @@ static ssize_t ebml_parse_var_int(unsigned char *buffer,
  * unsigned number can be safely cast to a signed number on systems using
  * two's complement arithmatic.
  */
-static ssize_t ebml_parse_sized_int(unsigned char       *buffer,
-                                    unsigned char       *buffer_end,
-                                    size_t              len,
-                                    bool                 is_signed,
-                                    uint_least64_t  *out_value)
+static ssize_t ebml_parse_sized_int(_Array_ptr<unsigned char> buffer, _Ptr<unsigned char> buffer_end, size_t len, bool is_signed, _Ptr<uint_least64_t> out_value)
 {
     uint_least64_t value;
     size_t i;

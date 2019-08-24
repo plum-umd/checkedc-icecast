@@ -64,17 +64,17 @@
 #undef CATMODULE
 #define CATMODULE "client"
 
-static inline void client_send_500(client_t *client, const char *message);
+static void client_send_500(client_t *client : itype(_Ptr<client_t> ) , _Nt_array_ptr<const char> message);
 
 /* create a client_t with the provided connection and parser details. Return
  * 0 on success, -1 if server limit has been reached.  In either case a
  * client_t is returned just in case a message needs to be returned. Should
  * be called with global lock held.
  */
-int client_create(client_t **c_ptr, connection_t *con, http_parser_t *parser)
+int client_create(client_t **c_ptr : itype(_Ptr<_Ptr<client_t>> ) , _Ptr<connection_t> con, _Ptr<http_parser_t> parser)
 {
-    ice_config_t    *config;
-    client_t        *client = (client_t *) calloc(1, sizeof(client_t));
+    _Ptr<ice_config_t> config = NULL;
+    _Ptr<client_t> client =  (client_t *) calloc(1, sizeof(client_t));
     int              ret    = -1;
 
     if (client == NULL)
@@ -115,7 +115,7 @@ int client_create(client_t **c_ptr, connection_t *con, http_parser_t *parser)
     return ret;
 }
 
-void client_complete(client_t *client)
+void client_complete(client_t *client : itype(_Ptr<client_t> ) )
 {
     const char *header;
     long long unsigned int scannumber;
@@ -167,8 +167,8 @@ void client_complete(client_t *client)
     ICECAST_LOG_DEBUG("Client %p has request_body_length=%zi", client, client->request_body_length);
 }
 
-static inline void client_reuseconnection(client_t *client) {
-    connection_t *con;
+static void client_reuseconnection(_Ptr<client_t> client) {
+    _Ptr<connection_t> con = NULL;
     reuse_t reuse;
 
     if (!client)
@@ -178,7 +178,7 @@ static inline void client_reuseconnection(client_t *client) {
     reuse = client->reuse;
 
     if (reuse == ICECAST_REUSE_UPGRADETLS) {
-        http_parser_t *parser = client->parser;
+        _Ptr<http_parser_t> parser =  client->parser;
 
         httpp_deletevar(parser, "upgrade");
         client->reuse = ICECAST_REUSE_CLOSE;
@@ -228,7 +228,7 @@ static inline void client_reuseconnection(client_t *client) {
     connection_queue(con);
 }
 
-void client_destroy(client_t *client)
+void client_destroy(client_t *client : itype(_Ptr<client_t> ) )
 {
     ICECAST_LOG_DEBUG("Called to destory client %p", client);
     if (client == NULL)
@@ -284,7 +284,7 @@ void client_destroy(client_t *client)
 }
 
 /* helper function for reading data from a client */
-static ssize_t __client_read_bytes_real(client_t *client, void *buf, size_t len)
+static ssize_t __client_read_bytes_real(_Ptr<client_t> client, void* buf, size_t len)
 {
     /* we have data to read from a refbuf first */
     if (client->refbuf->len < len)
@@ -298,10 +298,10 @@ static ssize_t __client_read_bytes_real(client_t *client, void *buf, size_t len)
     return len;
 }
 
-int client_read_bytes(client_t *client, void *buf, unsigned len)
+int client_read_bytes(client_t *client : itype(_Ptr<client_t> ) , void *buf : itype(_Nt_array_ptr<void> ) , unsigned int len)
 {
     ssize_t (*reader)(void*, void*, size_t) = (ssize_t(*)(void*,void*,size_t))__client_read_bytes_real;
-    void *userdata = client;
+    void* userdata =  client;
     int bytes;
 
     if (!(client->refbuf && client->refbuf->len)) {
@@ -323,11 +323,11 @@ int client_read_bytes(client_t *client, void *buf, unsigned len)
     return bytes;
 }
 
-static inline void _client_send_report(client_t *client, const char *uuid, const char *message, int http_status, const char *location)
+static void _client_send_report(_Ptr<client_t> client, const char *uuid : itype(_Ptr<const char> ) , _Nt_array_ptr<const char> message, int http_status, _Nt_array_ptr<const char> location)
 {
     reportxml_t *report;
     admin_format_t admin_format;
-    const char *xslt = NULL;
+    _Nt_array_ptr<const char> xslt =  NULL;
 
     admin_format = client_get_admin_format_by_content_negotiation(client);
 
@@ -353,7 +353,7 @@ static inline void _client_send_report(client_t *client, const char *uuid, const
     refobject_unref(report);
 }
 
-void client_send_error_by_error(client_t *client, const icecast_error_t *error)
+void client_send_error_by_error(_Ptr<client_t> client, _Ptr<const icecast_error_t> error)
 {
 
     if (!error) {
@@ -368,16 +368,16 @@ void client_send_error_by_error(client_t *client, const icecast_error_t *error)
 
     _client_send_report(client, error->uuid, error->message, error->http_status, NULL);
 }
-void client_send_error_by_uuid(client_t *client, const char *uuid)
+void client_send_error_by_uuid(_Ptr<client_t> client, const char *uuid : itype(_Ptr<const char> ) )
 {
     client_send_error_by_error(client, error_get_by_uuid(uuid));
 }
-void client_send_error_by_id(client_t *client, icecast_error_id_t id)
+void client_send_error_by_id(client_t *client : itype(_Ptr<client_t> ) , icecast_error_id_t id)
 {
     client_send_error_by_error(client, error_get_by_id(id));
 }
 
-void client_send_101(client_t *client, reuse_t reuse)
+void client_send_101(_Ptr<client_t> client, reuse_t reuse)
 {
     ssize_t ret;
 
@@ -407,7 +407,7 @@ void client_send_101(client_t *client, reuse_t reuse)
     fserve_add_client(client, NULL);
 }
 
-void client_send_204(client_t *client)
+void client_send_204(_Ptr<client_t> client)
 {
     source_t *source;
     ssize_t ret;
@@ -439,7 +439,7 @@ void client_send_204(client_t *client)
     fserve_add_client(client, NULL);
 }
 
-void client_send_426(client_t *client, reuse_t reuse)
+void client_send_426(_Ptr<client_t> client, reuse_t reuse)
 {
     ssize_t ret;
 
@@ -472,9 +472,9 @@ void client_send_426(client_t *client, reuse_t reuse)
 }
 
 /* this function is designed to work even if client is in bad state */
-static inline void client_send_500(client_t *client, const char *message)
+static void client_send_500(client_t *client : itype(_Ptr<client_t> ) , _Nt_array_ptr<const char> message)
 {
-    const char header[] = "HTTP/1.0 500 Internal Server Error\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n"
+    _Nt_array_ptr<const char> header =  "HTTP/1.0 500 Internal Server Error\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n"
                           "500 - Internal Server Error\n---------------------------\n";
     const ssize_t header_len = sizeof(header) - 1;
     ssize_t ret;
@@ -492,13 +492,13 @@ static inline void client_send_500(client_t *client, const char *message)
     client_destroy(client);
 }
 
-void client_send_redirect(client_t *client, const char *uuid, int status, const char *location)
+void client_send_redirect(_Ptr<client_t> client, _Ptr<const char> uuid, int status, _Nt_array_ptr<const char> location)
 {
     _client_send_report(client, uuid, "Redirecting", status, location);
 }
 
 /* this function sends a reportxml file to the client in the prefered format. */
-void client_send_reportxml(client_t *client, reportxml_t *report, document_domain_t domain, const char *xsl, admin_format_t admin_format_hint, int status, const char *location)
+void client_send_reportxml(_Ptr<client_t> client, reportxml_t *report : itype(_Ptr<reportxml_t> ) , document_domain_t domain, _Nt_array_ptr<const char> xsl, admin_format_t admin_format_hint, int status, _Nt_array_ptr<const char> location)
 {
     admin_format_t admin_format;
     xmlDocPtr doc;
@@ -619,10 +619,10 @@ void client_send_reportxml(client_t *client, reportxml_t *report, document_domai
         fastevent_emit(FASTEVENT_TYPE_CLIENT_SEND_RESPONSE, FASTEVENT_FLAG_MODIFICATION_ALLOWED, FASTEVENT_DATATYPE_CLIENT, client);
         fserve_add_client (client, NULL);
     } else {
-        char *fullpath_xslt_template;
+        _Nt_array_ptr<char> fullpath_xslt_template = NULL;
         const char *document_domain_path;
         ssize_t fullpath_xslt_template_len;
-        ice_config_t *config;
+        _Ptr<ice_config_t> config = NULL;
 
         config = config_get_config();
         switch (domain) {
@@ -653,7 +653,7 @@ void client_send_reportxml(client_t *client, reportxml_t *report, document_domai
     xmlFreeDoc(doc);
 }
 
-static void client_get_reportxml__add_basic_stats(reportxml_t *report)
+static void client_get_reportxml__add_basic_stats(reportxml_t *report : itype(_Ptr<reportxml_t> ) )
 {
     reportxml_node_t *rootnode, *extension;
     xmlNodePtr xmlroot;
@@ -678,12 +678,12 @@ static void client_get_reportxml__add_basic_stats(reportxml_t *report)
     xmlFreeNode(xmlroot);
 }
 
-reportxml_t *client_get_reportxml(const char *state_definition, const char *state_akindof, const char *state_text)
+reportxml_t * client_get_reportxml(_Ptr<const char> state_definition, _Ptr<const char> state_akindof, _Nt_array_ptr<const char> state_text)
 {
     reportxml_t *report = NULL;
 
     if (state_definition) {
-        ice_config_t *config;
+        _Ptr<ice_config_t> config = NULL;
 
         config = config_get_config();
         report = reportxml_database_build_report(config->reportxml_db, state_definition, -1);
@@ -719,7 +719,7 @@ reportxml_t *client_get_reportxml(const char *state_definition, const char *stat
     return report;
 }
 
-admin_format_t client_get_admin_format_by_content_negotiation(client_t *client)
+admin_format_t client_get_admin_format_by_content_negotiation(client_t *client : itype(_Ptr<client_t> ) )
 {
     const char *pref;
 
@@ -740,7 +740,7 @@ admin_format_t client_get_admin_format_by_content_negotiation(client_t *client)
 }
 
 /* helper function for sending the data to a client */
-int client_send_bytes(client_t *client, const void *buf, unsigned len)
+int client_send_bytes(client_t *client : itype(_Ptr<client_t> ) , const void *buf : itype(_Nt_array_ptr<const void> ) , unsigned int len)
 {
     int ret = connection_send_bytes(client->con, buf, len);
 
@@ -752,9 +752,9 @@ int client_send_bytes(client_t *client, const void *buf, unsigned len)
     return ret;
 }
 
-void client_set_queue(client_t *client, refbuf_t *refbuf)
+void client_set_queue(client_t *client : itype(_Ptr<client_t> ) , _Ptr<refbuf_t> refbuf)
 {
-    refbuf_t *to_release = client->refbuf;
+    _Ptr<refbuf_t> to_release =  client->refbuf;
 
     client->refbuf = refbuf;
     if (refbuf)
@@ -764,7 +764,7 @@ void client_set_queue(client_t *client, refbuf_t *refbuf)
         refbuf_release(to_release);
 }
 
-ssize_t client_body_read(client_t *client, void *buf, size_t len)
+ssize_t client_body_read(client_t *client : itype(_Ptr<client_t> ) , void *buf : itype(_Nt_array_ptr<void> ) , size_t len)
 {
     ssize_t ret;
 
@@ -790,7 +790,7 @@ ssize_t client_body_read(client_t *client, void *buf, size_t len)
 }
 
 /* we might un-static this if needed at some time in distant future. -- ph3-der-loewe, 2018-04-17 */
-static int client_eof(client_t *client)
+static int client_eof(_Ptr<client_t> client)
 {
     if (!client)
         return -1;
@@ -807,7 +807,7 @@ static int client_eof(client_t *client)
     return 0;
 }
 
-int client_body_eof(client_t *client)
+int client_body_eof(client_t *client : itype(_Ptr<client_t> ) )
 {
     int ret = -1;
 
@@ -829,7 +829,7 @@ int client_body_eof(client_t *client)
     return ret;
 }
 
-client_slurp_result_t client_body_slurp(client_t *client, void *buf, size_t *len)
+client_slurp_result_t client_body_slurp(_Ptr<client_t> client, void* buf, _Ptr<size_t> len)
 {
     if (!client || !buf || !len)
         return CLIENT_SLURP_ERROR;
@@ -886,9 +886,9 @@ client_slurp_result_t client_body_slurp(client_t *client, void *buf, size_t *len
     }
 }
 
-client_slurp_result_t client_body_skip(client_t *client)
+client_slurp_result_t client_body_skip(_Ptr<client_t> client)
 {
-    char buf[2048];
+    _Nt_array_ptr<char> buf;
     int ret;
 
     ICECAST_LOG_DEBUG("Slurping client %p", client);
@@ -939,12 +939,12 @@ client_slurp_result_t client_body_skip(client_t *client)
     }
 }
 
-ssize_t client_get_baseurl(client_t *client, listensocket_t *listensocket, char *buf, size_t len, const char *user, const char *pw, const char *prefix, const char *suffix0, const char *suffix1)
+ssize_t client_get_baseurl(client_t *client : itype(_Ptr<client_t> ) , listensocket_t *listensocket, char *buf : itype(_Nt_array_ptr<char> ) , size_t len, const char *user : itype(_Ptr<const char> ) , const char *pw : itype(_Ptr<const char> ) , _Nt_array_ptr<const char> prefix, const char *suffix0 : itype(_Nt_array_ptr<const char> ) , _Nt_array_ptr<const char> suffix1)
 {
-    const listener_t *listener = NULL;
-    const ice_config_t *config = NULL;
+    _Ptr<const listener_t> listener =  NULL;
+    _Ptr<const ice_config_t> config =  NULL;
     const char *host = NULL;
-    const char *proto = "http";
+    _Nt_array_ptr<const char> proto =  "http";
     int port = 0;
     ssize_t ret;
     tlsmode_t tlsmode = ICECAST_TLSMODE_AUTO;

@@ -19,19 +19,19 @@ typedef enum {
 
 typedef struct {
     char type;
-    char *raw;
+    _Ptr<char> raw;
     union {
-        const char *string;
+        _Ptr<const char> string;
         long long int lli;
     } result;
 } resourcematch_group_t;
 
 typedef struct {
     size_t groups;
-    resourcematch_group_t *group;
+    _Array_ptr<resourcematch_group_t> group;
 } resourcematch_extract_t;
 
-resourcematch_result_t resourcematch_match(const char *pattern, const char *string, resourcematch_extract_t **extract);
-void resourcematch_extract_free(resourcematch_extract_t *extract);
+resourcematch_result_t resourcematch_match(_Array_ptr<const char> pattern, _Array_ptr<const char> string, _Ptr<_Ptr<resourcematch_extract_t>> extract);
+void resourcematch_extract_free(_Ptr<resourcematch_extract_t> extract);
 
 #endif

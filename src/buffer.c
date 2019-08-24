@@ -21,7 +21,7 @@
 struct buffer_tag {
     refobject_base_t __base;
     /* Buffer itself */
-    void *buffer;
+    void* buffer;
     /* Length in bytes of buffer */
     size_t length;
     /* Amount of bytes in use of the buffer. This includes offset bytes */
@@ -30,7 +30,7 @@ struct buffer_tag {
     size_t offset;
 };
 
-static void __free(refobject_t self, void **userdata)
+static void __free(refobject_t self, void** userdata)
 {
     buffer_t *buffer = REFOBJECT_TO_TYPE(self, buffer_t*);
 
@@ -42,7 +42,7 @@ REFOBJECT_DEFINE_TYPE(buffer_t,
         REFOBJECT_DEFINE_TYPE_NEW_NOOP()
         );
 
-buffer_t *  buffer_new(ssize_t preallocation, void *userdata, const char *name, refobject_t associated)
+buffer_t * buffer_new(ssize_t preallocation, void* userdata, _Nt_array_ptr<const char> name, refobject_t associated)
 {
     buffer_t *buffer = refobject_new_ext(buffer_t, userdata, name, associated);
 
@@ -55,14 +55,14 @@ buffer_t *  buffer_new(ssize_t preallocation, void *userdata, const char *name, 
     return buffer;
 }
 
-buffer_t *  buffer_new_simple(void)
+_Ptr<buffer_t> buffer_new_simple(void)
 {
     return refobject_new(buffer_t);
 }
 
-void        buffer_preallocate(buffer_t *buffer, size_t request)
+void buffer_preallocate(buffer_t *buffer : itype(_Ptr<buffer_t> ) , size_t request)
 {
-    void *n;
+    void* n = NULL;
     size_t newlen;
 
     if (!buffer)
@@ -99,7 +99,7 @@ void        buffer_preallocate(buffer_t *buffer, size_t request)
     buffer->length = newlen;
 }
 
-int         buffer_get_data(buffer_t *buffer, const void **data, size_t *length)
+int buffer_get_data(_Ptr<buffer_t> buffer, _Ptr<_Array_ptr<const void>> data, _Ptr<size_t> length)
 {
     if (!buffer)
         return -1;
@@ -115,9 +115,9 @@ int         buffer_get_data(buffer_t *buffer, const void **data, size_t *length)
     return 0;
 }
 
-int         buffer_get_string(buffer_t *buffer, const char **string)
+int buffer_get_string(_Ptr<buffer_t> buffer, _Ptr<_Array_ptr<const char>> string)
 {
-    char *ret;
+    _Array_ptr<char> ret = NULL;
 
     if (!buffer || !string)
         return -1;
@@ -137,7 +137,7 @@ int         buffer_get_string(buffer_t *buffer, const char **string)
     return 0;
 }
 
-int         buffer_set_length(buffer_t *buffer, size_t length)
+int buffer_set_length(_Ptr<buffer_t> buffer, size_t length)
 {
     if (!buffer)
         return -1;
@@ -150,7 +150,7 @@ int         buffer_set_length(buffer_t *buffer, size_t length)
     return 0;
 }
 
-int         buffer_shift(buffer_t *buffer, size_t amount)
+int buffer_shift(_Ptr<buffer_t> buffer, size_t amount)
 {
     if (!buffer)
         return -1;
@@ -166,9 +166,9 @@ int         buffer_shift(buffer_t *buffer, size_t amount)
     return 0;
 }
 
-int         buffer_push_data(buffer_t *buffer, const void *data, size_t length)
+int buffer_push_data(_Ptr<buffer_t> buffer, _Ptr<const void> data, size_t length)
 {
-    void *buf;
+    void* buf = NULL;
     int ret;
 
     if (!buffer)
@@ -191,7 +191,7 @@ int         buffer_push_data(buffer_t *buffer, const void *data, size_t length)
     return ret;
 }
 
-int         buffer_push_string(buffer_t *buffer, const char *string)
+int buffer_push_string(_Ptr<buffer_t> buffer, _Nt_array_ptr<const char> string)
 {
     if (!buffer || !string)
         return -1;
@@ -200,7 +200,7 @@ int         buffer_push_string(buffer_t *buffer, const char *string)
 }
 
 
-int         buffer_push_printf(buffer_t *buffer, const char *format, ...)
+int buffer_push_printf(_Ptr<buffer_t> buffer, _Ptr<const char> format, ...)
 {
     int ret;
     va_list ap;
@@ -218,9 +218,9 @@ int         buffer_push_printf(buffer_t *buffer, const char *format, ...)
     return ret;
 }
 
-int         buffer_push_vprintf(buffer_t *buffer, const char *format, va_list ap)
+int buffer_push_vprintf(_Ptr<buffer_t> buffer, const char *format, va_list ap)
 {
-    void *buf;
+    void* buf = NULL;
     int ret;
     size_t length = 1024;
 
@@ -266,9 +266,9 @@ int         buffer_push_vprintf(buffer_t *buffer, const char *format, va_list ap
     return buffer_zerocopy_push_complete(buffer, ret);
 }
 
-int         buffer_push_buffer(buffer_t *buffer, buffer_t *source)
+int buffer_push_buffer(_Ptr<buffer_t> buffer, _Ptr<buffer_t> source)
 {
-    const void *data;
+    _Nt_array_ptr<const void> data = NULL;
     size_t length;
     int ret;
 
@@ -282,7 +282,7 @@ int         buffer_push_buffer(buffer_t *buffer, buffer_t *source)
     return buffer_push_data(buffer, data, length);
 }
 
-int         buffer_zerocopy_push_request(buffer_t *buffer, void **data, size_t request)
+int buffer_zerocopy_push_request(_Ptr<buffer_t> buffer, void** data, size_t request)
 {
     if (!buffer || !data)
         return -1;
@@ -297,7 +297,7 @@ int         buffer_zerocopy_push_request(buffer_t *buffer, void **data, size_t r
     return 0;
 }
 
-int         buffer_zerocopy_push_complete(buffer_t *buffer, size_t done)
+int buffer_zerocopy_push_complete(_Ptr<buffer_t> buffer, size_t done)
 {
     if (!buffer)
         return -1;

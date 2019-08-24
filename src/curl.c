@@ -25,7 +25,7 @@ static int my_getpass(void *client, char *prompt, char *buffer, int buflen) {
 }
 #endif
 
-static size_t handle_returned (void *ptr, size_t size, size_t nmemb, void *stream) {
+static size_t handle_returned(void *ptr, size_t size, size_t nmemb, void *stream) {
     (void)ptr, (void)stream;
     return size * nmemb;
 }
@@ -47,7 +47,7 @@ int   icecast_curl_shutdown(void)
     return 0;
 }
 
-CURL *icecast_curl_new(const char *url, char * errors)
+CURL * icecast_curl_new(_Ptr<const char> url, _Ptr<char> errors)
 {
     CURL *curl = curl_easy_init();
 

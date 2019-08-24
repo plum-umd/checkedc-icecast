@@ -55,11 +55,11 @@ struct connection_tag {
     /* I/O Callbacks. Should never be called directly.
      * Use connection_*_bytes() for I/O operations.
      */
-    int (*send)(connection_t *handle, const void *buf, size_t len);
-    int (*read)(connection_t *handle, void *buf, size_t len);
+    _Ptr<int (_Ptr<connection_t> , _Nt_array_ptr<const void> , size_t )> send;
+    _Ptr<int (_Ptr<connection_t> , void* , size_t )> read;
 
     /* Buffers for putback of data into the connection's read queue. */
-    void *readbuffer;
+    void* readbuffer;
     size_t readbufferlen;
 
     /* IP Address of the client as seen by the server */
@@ -68,19 +68,19 @@ struct connection_tag {
 
 void connection_initialize(void);
 void connection_shutdown(void);
-void connection_reread_config(ice_config_t *config);
+void connection_reread_config(_Ptr<ice_config_t> config);
 void connection_accept_loop(void);
-void connection_setup_sockets(ice_config_t *config);
-void connection_close(connection_t *con);
-connection_t *connection_create(sock_t sock, listensocket_t *listensocket_real, listensocket_t* listensocket_effective, char *ip);
-int connection_complete_source(source_t *source, int response);
-void connection_queue(connection_t *con);
-void connection_queue_client(client_t *client);
-void connection_uses_tls(connection_t *con);
+void connection_setup_sockets(_Ptr<ice_config_t> config);
+void connection_close(_Ptr<connection_t> con);
+_Ptr<connection_t> connection_create(int sock, listensocket_t *listensocket_real, listensocket_t *listensocket_effective, char *ip);
+int connection_complete_source(source_t *source : itype(_Ptr<source_t> ) , int response);
+void connection_queue(_Ptr<connection_t> con);
+void connection_queue_client(_Ptr<client_t> client);
+void connection_uses_tls(_Ptr<connection_t> con);
 
-ssize_t connection_send_bytes(connection_t *con, const void *buf, size_t len);
-ssize_t connection_read_bytes(connection_t *con, void *buf, size_t len);
-int connection_read_put_back(connection_t *con, const void *buf, size_t len);
+ssize_t connection_send_bytes(_Ptr<connection_t> con, _Nt_array_ptr<const void> buf, size_t len);
+ssize_t connection_read_bytes(_Ptr<connection_t> con, void* buf, size_t len);
+int connection_read_put_back(_Ptr<connection_t> con, const void *buf : itype(_Ptr<const void> ) , size_t len);
 
 extern rwlock_t _source_shutdown_rwlock;
 

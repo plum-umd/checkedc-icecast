@@ -118,7 +118,7 @@ static const signed char base64decode[256] = {
  *           0 if no activity occurs
  *         < 0 for error.
  */
-int util_timed_wait_for_fd(sock_t fd, int timeout)
+int util_timed_wait_for_fd(int fd, int timeout)
 {
 #ifdef HAVE_POLL
     struct pollfd ufds;
@@ -144,12 +144,12 @@ int util_timed_wait_for_fd(sock_t fd, int timeout)
 #endif
 }
 
-int util_read_header(sock_t sock, char *buff, unsigned long len, int entire)
+int util_read_header(int sock, _Array_ptr<char> buff, unsigned long len, int entire)
 {
     int read_bytes, ret;
     unsigned long pos;
     char c;
-    ice_config_t *config;
+    _Ptr<ice_config_t> config = NULL;
     int header_timeout;
 
     config = config_get_config();
@@ -190,8 +190,8 @@ int util_read_header(sock_t sock, char *buff, unsigned long len, int entire)
     return ret;
 }
 
-char *util_get_extension(const char *path) {
-    char *ext = strrchr(path, '.');
+_Nt_array_ptr<char> util_get_extension(const char *path : itype(_Nt_array_ptr<const char> ) ) {
+    _Nt_array_ptr<char> ext =  strrchr(path, '.');
 
     if(ext == NULL)
         return "";
@@ -199,8 +199,8 @@ char *util_get_extension(const char *path) {
         return ext+1;
 }
 
-int util_check_valid_extension(const char *uri) {
-    const char    *p2;
+int util_check_valid_extension(const char *uri : itype(_Nt_array_ptr<const char> ) ) {
+    _Nt_array_ptr<const char> p2 = NULL;
 
     if (!uri)
         return UNKNOWN_CONTENT;
@@ -231,7 +231,7 @@ static int hex(char c)
         return -1;
 }
 
-static int verify_path(char *path) {
+static int verify_path(char *path : itype(_Array_ptr<char> ) ) {
     int dir = 0, indotseq = 0;
 
     while(*path) {
@@ -259,8 +259,8 @@ static int verify_path(char *path) {
     return 1;
 }
 
-char *util_get_path_from_uri(char *uri) {
-    char *path = util_normalise_uri(uri);
+char * util_get_path_from_uri(_Nt_array_ptr<char> uri) {
+    _Nt_array_ptr<char> path =  util_normalise_uri(uri);
     char *fullpath;
 
     if(!path)
@@ -272,10 +272,10 @@ char *util_get_path_from_uri(char *uri) {
     }
 }
 
-char *util_get_path_from_normalised_uri(const char *uri) {
+char * util_get_path_from_normalised_uri(const char *uri : itype(_Nt_array_ptr<const char> ) ) {
     char *fullpath;
     char *webroot;
-    ice_config_t *config = config_get_config();
+    _Ptr<ice_config_t> config =  config_get_config();
 
     webroot = config->webroot_dir;
 
@@ -287,10 +287,10 @@ char *util_get_path_from_normalised_uri(const char *uri) {
     return fullpath;
 }
 
-char *util_url_escape (const char *src)
+char *util_url_escape(const char *src) : itype(_Nt_array_ptr<char> ) 
 {
     size_t len;
-    char *dst;
+    _Nt_array_ptr<char> dst = NULL;
     unsigned char *source = (unsigned char *)src;
     size_t i, j;
 
@@ -315,12 +315,12 @@ char *util_url_escape (const char *src)
     return dst;
 }
 
-char *util_url_unescape (const char *src)
+char *util_url_unescape(const char *src : itype(_Nt_array_ptr<const char> ) ) : itype(_Nt_array_ptr<char> ) 
 {
     int len = strlen(src);
-    char *decoded;
+    _Nt_array_ptr<char> decoded = NULL;
     int i;
-    char *dst;
+    _Nt_array_ptr<char> dst = NULL;
     int done = 0;
 
     decoded = calloc(1, len + 1);
@@ -368,8 +368,8 @@ char *util_url_unescape (const char *src)
  * escape from the webroot) or if it cannot be URI-decoded.
  * Caller should free the path.
  */
-char *util_normalise_uri(const char *uri) {
-    char *path;
+char *util_normalise_uri(const char *uri : itype(_Nt_array_ptr<const char> ) ) : itype(_Nt_array_ptr<char> )  {
+    _Nt_array_ptr<char> path = NULL;
 #ifdef _WIN32
     size_t len;
 #endif
@@ -400,9 +400,9 @@ char *util_normalise_uri(const char *uri) {
     }
 }
 
-char *util_bin_to_hex(unsigned char *data, int len)
+_Nt_array_ptr<char> util_bin_to_hex(_Array_ptr<unsigned char> data, int len)
 {
-    char *hex = malloc(len*2 + 1);
+    _Nt_array_ptr<char> hex =  malloc(len*2 + 1);
     int i;
 
     for (i = 0; i < len; i++) {
@@ -416,9 +416,9 @@ char *util_bin_to_hex(unsigned char *data, int len)
 }
 
 /* This isn't efficient, but it doesn't need to be */
-char *util_base64_encode(const char *data, size_t len) {
-    char *out = malloc(len*4/3 + 4);
-    char *result = out;
+_Nt_array_ptr<char> util_base64_encode(_Array_ptr<const char> data, size_t len) {
+    _Nt_array_ptr<char> out =  malloc(len*4/3 + 4);
+    _Nt_array_ptr<char> result =  out;
     size_t chunk;
 
     while(len > 0) {
@@ -450,12 +450,12 @@ char *util_base64_encode(const char *data, size_t len) {
     return result;
 }
 
-char *util_base64_decode(const char *data)
+_Nt_array_ptr<char> util_base64_decode(const char *data)
 {
     const unsigned char *input = (const unsigned char *)data;
     int len = strlen (data);
-    char *out = malloc(len*3/4 + 5);
-    char *result = out;
+    _Nt_array_ptr<char> out =  malloc(len*3/4 + 5);
+    _Nt_array_ptr<char> result =  out;
     signed char vals[4];
 
     while(len > 0) {
@@ -497,8 +497,8 @@ char *util_base64_decode(const char *data)
     return result;
 }
 
-util_hostcheck_type util_hostcheck(const char *hostname) {
-    const char * p;
+util_hostcheck_type util_hostcheck(const char *hostname : itype(_Nt_array_ptr<const char> ) ) {
+    _Nt_array_ptr<const char> p = NULL;
     size_t colon_count;
 
     if (!hostname)
@@ -570,7 +570,7 @@ int util_str_to_loglevel(const char *str) {
     return atoi(str);
 }
 
-int util_str_to_int(const char *str, const int default_value)
+int util_str_to_int(const char *str : itype(_Nt_array_ptr<const char> ) , const int default_value)
 {
     /* consider NULL and empty strings default */
     if (!str || !*str)
@@ -578,10 +578,10 @@ int util_str_to_int(const char *str, const int default_value)
     return atoi(str);
 }
 
-unsigned int util_str_to_unsigned_int(const char *str, const unsigned int default_value)
+unsigned int util_str_to_unsigned_int(const char *str : itype(_Nt_array_ptr<const char> ) , const unsigned int default_value)
 {
     long int val;
-    char *rem = NULL;
+    _Ptr<char> rem =  NULL;
 
     /* consider NULL and empty strings default */
     if (!str || !*str)
@@ -600,7 +600,7 @@ unsigned int util_str_to_unsigned_int(const char *str, const unsigned int defaul
 }
 
 /* TODO, FIXME: handle memory allocation errors better. */
-static inline void   _build_headers_loop(char **ret, size_t *len, const ice_config_http_header_t *header, int status, const char *allow, client_t *client) {
+static void _build_headers_loop(_Ptr<char*> ret, _Ptr<size_t> len, _Ptr<const ice_config_http_header_t> header, int status, const char *allow, _Ptr<client_t> client) {
     size_t headerlen;
     const char *name;
     const char *value;
@@ -678,10 +678,10 @@ static inline void   _build_headers_loop(char **ret, size_t *len, const ice_conf
     } while ((header = header->next));
     *ret = r;
 }
-static inline char * _build_headers(int status, const char *allow, ice_config_t *config, source_t *source, client_t *client) {
-    const ice_config_http_header_t *header;
-    mount_proxy *mountproxy = NULL;
-    char *ret = NULL;
+static _Ptr<char> _build_headers(int status, _Ptr<const char> allow, _Ptr<ice_config_t> config, _Ptr<source_t> source, _Ptr<client_t> client) {
+    _Ptr<const ice_config_http_header_t> header = NULL;
+    _Ptr<mount_proxy> mountproxy =  NULL;
+    _Ptr<char> ret =  NULL;
     size_t len = 1;
 
     if (source)
@@ -701,25 +701,20 @@ static inline char * _build_headers(int status, const char *allow, ice_config_t 
     return ret;
 }
 
-ssize_t util_http_build_header(char * out, size_t len, ssize_t offset,
-        int cache,
-        int status, const char * statusmsg,
-        const char * contenttype, const char * charset,
-        const char * datablock,
-        source_t * source, client_t * client) {
-    const char * http_version = "1.1";
-    ice_config_t *config;
+ssize_t util_http_build_header(char *out : itype(_Nt_array_ptr<char> ) , size_t len, ssize_t offset, int cache, int status, _Nt_array_ptr<const char> statusmsg, const char *contenttype : itype(_Ptr<const char> ) , const char *charset : itype(_Ptr<const char> ) , _Ptr<const char> datablock, source_t *source : itype(_Ptr<source_t> ) , client_t *client : itype(_Ptr<client_t> ) ) {
+    _Nt_array_ptr<const char> http_version =  "1.1";
+    _Ptr<ice_config_t> config = NULL;
     time_t now;
     struct tm result;
     struct tm *gmtime_result;
     char currenttime_buffer[80];
-    char status_buffer[80];
-    char contenttype_buffer[80];
+    _Nt_array_ptr<char> status_buffer;
+    _Nt_array_ptr<char> contenttype_buffer;
     ssize_t ret;
-    char * extra_headers;
-    const char *connection_header = "Close";
-    const char *upgrade_header = "";
-    const char *allow_header;
+    _Ptr<char> extra_headers = NULL;
+    _Nt_array_ptr<const char> connection_header =  "Close";
+    _Nt_array_ptr<const char> upgrade_header =  "";
+    _Nt_array_ptr<const char> allow_header = NULL;
 
     if (!out)
         return -1;
@@ -856,9 +851,9 @@ struct __args {
     int best_all;
 };
 
-static inline int __fill_arg(struct __args *arg, const char *str)
+static int __fill_arg(_Ptr<struct __args> arg, const char *str)
 {
-    char *delm;
+    _Nt_array_ptr<char> delm = NULL;
     size_t len;
 
     arg->comp = str;
@@ -883,7 +878,7 @@ static inline int __fill_arg(struct __args *arg, const char *str)
     return 0;
 }
 
-static inline void __free_args(struct __args *arg, size_t len)
+static void __free_args(_Array_ptr<struct __args> arg, size_t len)
 {
     size_t i;
 
@@ -892,7 +887,7 @@ static inline void __free_args(struct __args *arg, size_t len)
     }
 }
 
-static inline int __parse_q(const char *str)
+static int __parse_q(const char *str : itype(_Array_ptr<const char> ) )
 {
     int ret = 0;
     int mul = 1000;
@@ -912,7 +907,7 @@ static inline int __parse_q(const char *str)
     return ret;
 }
 
-static inline int __find_q_in_index(icecast_kva_t *kv, size_t idx)
+static int __find_q_in_index(_Ptr<icecast_kva_t> kv, size_t idx)
 {
     size_t i = kv->index[idx] + 1;
     size_t last;
@@ -932,10 +927,10 @@ static inline int __find_q_in_index(icecast_kva_t *kv, size_t idx)
     return 1000;
 }
 
-const char *util_http_select_best(const char *input, const char *first, ...)
+const char * util_http_select_best(const char *input : itype(_Nt_array_ptr<const char> ) , const char *first, ...)
 {
-    struct __args arg[__SELECT_BEST_MAX_ARGS];
-    icecast_kva_t *kv;
+    struct __args arg[8];
+    _Ptr<icecast_kva_t> kv = NULL;
     const char *p;
     size_t arglen = 1;
     size_t i, h;
@@ -1028,12 +1023,12 @@ const char *util_http_select_best(const char *input, const char *first, ...)
     return p;
 }
 
-static inline void __skip_space(char **p)
+static void __skip_space(_Ptr<_Array_ptr<char>> p)
 {
     for (; **p == ' '; (*p)++);
 }
 
-static inline int __is_token(const char p)
+static int __is_token(const char p)
 {
     return (p >= 'a' && p <= 'z') || (p >= 'A' && p <= 'Z') || (p >= '0' && p <= '9') ||
             p == '!' || p == '#'  ||  p == '$' || p == '%'  ||  p == '&' || p == '\'' ||
@@ -1050,7 +1045,7 @@ enum __tokenizer_result {
     __TOKENIZER_RESULT_EOS
 };
 
-static inline enum __tokenizer_result __tokenizer_res_from_char(const char p)
+static enum __tokenizer_result __tokenizer_res_from_char(const char p)
 {
     switch (p) {
         case 0:
@@ -1071,9 +1066,11 @@ static inline enum __tokenizer_result __tokenizer_res_from_char(const char p)
     }
 }
 
-static enum __tokenizer_result __tokenizer_str(char **out, char **in)
+static enum __tokenizer_result __tokenizer_str(_Ptr<_Ptr<char>> out, _Ptr<_Array_ptr<char>> in)
 {
-    char *p, *o;
+   _Array_ptr<char> p = NULL;
+_Array_ptr<char> o = NULL;
+ 
     char c;
 
     __skip_space(in);
@@ -1114,9 +1111,9 @@ static enum __tokenizer_result __tokenizer_str(char **out, char **in)
     }
 }
 
-static enum __tokenizer_result __tokenizer(char **out, char **in)
+static enum __tokenizer_result __tokenizer(char **out : itype(_Ptr<_Array_ptr<char>> ) , char **in : itype(_Ptr<_Array_ptr<char>> ) )
 {
-    char *p;
+    _Array_ptr<char> p = NULL;
     char c = 0;
 
     __skip_space(in);
@@ -1158,9 +1155,9 @@ static enum __tokenizer_result __tokenizer(char **out, char **in)
 #define HTTP_CN_INDEX_INCREMENT     8
 #define HTTP_CN_KV_INCREMENT        8
 
-static inline int __resize_array(void **also_ptr, void **array, size_t size, size_t *len, size_t revlen, size_t inc)
+static int __resize_array(void **also_ptr : itype(_Ptr<_Array_ptr<void>> ) , void **array : itype(_Ptr<_Array_ptr<void>> ) , size_t size, _Ptr<size_t> len, size_t revlen, size_t inc)
 {
-    void *n;
+    void* n = NULL;
 
     if (*len > revlen)
         return 0;
@@ -1178,9 +1175,9 @@ static inline int __resize_array(void **also_ptr, void **array, size_t size, siz
     return 0;
 }
 
-icecast_kva_t * util_parse_http_cn(const char *cnstr)
+_Ptr<icecast_kva_t> util_parse_http_cn(_Nt_array_ptr<const char> cnstr)
 {
-    icecast_kva_t *ret;
+    _Ptr<icecast_kva_t> ret = NULL;
     char *in;
     int eos = 0;
     size_t indexphylen = HTTP_CN_INDEX_INCREMENT;
@@ -1275,7 +1272,7 @@ icecast_kva_t * util_parse_http_cn(const char *cnstr)
     return ret;
 }
 
-void util_kva_free(icecast_kva_t *kva)
+void util_kva_free(_Ptr<icecast_kva_t> kva)
 {
     size_t i;
 
@@ -1288,14 +1285,14 @@ void util_kva_free(icecast_kva_t *kva)
     free(kva);
 }
 
-util_dict *util_dict_new(void)
+_Ptr<util_dict> util_dict_new(void)
 {
     return (util_dict *)calloc(1, sizeof(util_dict));
 }
 
-void util_dict_free(util_dict *dict)
+void util_dict_free(_Ptr<util_dict> dict)
 {
-    util_dict *next;
+    _Ptr<util_dict> next = NULL;
 
     while (dict) {
         next = dict->next;
@@ -1310,7 +1307,7 @@ void util_dict_free(util_dict *dict)
     }
 }
 
-const char *util_dict_get(util_dict *dict, const char *key)
+const char * util_dict_get(_Ptr<util_dict> dict, _Nt_array_ptr<const char> key)
 {
     while (dict) {
         if (dict->key && !strcmp(key, dict->key))
@@ -1320,9 +1317,9 @@ const char *util_dict_get(util_dict *dict, const char *key)
     return NULL;
 }
 
-int util_dict_set(util_dict *dict, const char *key, const char *val)
+int util_dict_set(_Ptr<util_dict> dict, _Nt_array_ptr<const char> key, const char *val : itype(_Nt_array_ptr<const char> ) )
 {
-    util_dict *prev;
+    _Ptr<util_dict> prev = NULL;
 
     if (!dict || !key) {
         ICECAST_LOG_ERROR("NULL values passed to util_dict_set()");
@@ -1370,10 +1367,10 @@ int util_dict_set(util_dict *dict, const char *key, const char *val)
 /* given a dictionary, URL-encode each val and stringify it in order as
    key=val&key=val... if val is set, or just key&key if val is NULL.
    TODO: Memory management needs overhaul. */
-char *util_dict_urlencode(util_dict *dict, char delim)
+char * util_dict_urlencode(_Ptr<util_dict> dict, char delim)
 {
     char *res, *tmp;
-    char *enc;
+    _Nt_array_ptr<char> enc = NULL;
     int start = 1;
 
     for (res = NULL; dict; dict = dict->next) {
@@ -1440,10 +1437,10 @@ struct tm *localtime_r (const time_t *timep, struct tm *result)
 /* helper function for converting a passed string in one character set to another
  * we use libxml2 for this
  */
-char *util_conv_string (const char *string, const char *in_charset, const char *out_charset)
+char *util_conv_string(const char *string, const char *in_charset, const char *out_charset) : itype(_Nt_array_ptr<char> ) 
 {
     xmlCharEncodingHandlerPtr in, out;
-    char *ret = NULL;
+    _Nt_array_ptr<char> ret =  NULL;
 
     if (string == NULL || in_charset == NULL || out_charset == NULL)
         return NULL;
@@ -1476,7 +1473,7 @@ char *util_conv_string (const char *string, const char *in_charset, const char *
 }
 
 
-int get_line(FILE *file, char *buf, size_t siz)
+int get_line(_Ptr<FILE> file, char *buf : itype(_Nt_array_ptr<char> ) , size_t siz)
 {
     if(fgets(buf, (int)siz, file)) {
         size_t len = strlen(buf);
@@ -1490,9 +1487,9 @@ int get_line(FILE *file, char *buf, size_t siz)
     return 0;
 }
 
-int util_replace_string(char **dst, const char *src)
+int util_replace_string(char **dst : itype(_Ptr<_Nt_array_ptr<char>> ) , const char *src : itype(_Nt_array_ptr<const char> ) )
 {
-    char *n;
+    _Nt_array_ptr<char> n = NULL;
 
     if (!dst)
         return -1;
@@ -1511,7 +1508,7 @@ int util_replace_string(char **dst, const char *src)
     return 0;
 }
 
-int util_strtolower(char *str)
+int util_strtolower(char *str : itype(_Array_ptr<char> ) )
 {
     if (!str)
         return -1;

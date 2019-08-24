@@ -37,13 +37,13 @@ struct event_tag {
     /* refernece counter */
     size_t refcount;
     /* reference to next element in chain */
-    event_t *next;
+    _Ptr<event_t> next;
 
     /* event_registration lists.
      * They are referenced here to avoid the need to access
      * config and global client list each time an event is emitted.
      */
-    event_registration_t *reglist[MAX_REGLISTS_PER_EVENT];
+    _Ptr<event_registration_t> reglist[8];
 
     /* trigger name */
     char *trigger;
@@ -63,7 +63,7 @@ struct event_registration_tag {
     /* refernece counter */
     size_t refcount;
     /* reference to next element in chain */
-    event_registration_t *next;
+    _Ptr<event_registration_t> next;
 
     /* protection */
     mutex_t lock;
@@ -78,10 +78,10 @@ struct event_registration_tag {
     void *state;
 
     /* emit events */
-    int (*emit)(void *state, event_t *event);
+    _Ptr<int (void* , _Ptr<event_t> )> emit;
 
     /* free backend state */
-    void (*free)(void *state);
+    _Ptr<void (void* )> free;
 };
 
 /* subsystem functions */
@@ -90,14 +90,14 @@ void event_shutdown(void);
 
 
 /* basic functions to work with event registrations */
-event_registration_t * event_new_from_xml_node(xmlNodePtr node);
+_Ptr<event_registration_t> event_new_from_xml_node(xmlNodePtr node);
 
-void event_registration_addref(event_registration_t *er);
-void event_registration_release(event_registration_t *er);
-void event_registration_push(event_registration_t **er, event_registration_t *tail);
+void event_registration_addref(_Ptr<event_registration_t> er);
+void event_registration_release(_Ptr<event_registration_t> er);
+void event_registration_push(_Ptr<_Ptr<event_registration_t>> er, _Ptr<event_registration_t> tail);
 
 /* event signaling */
-void event_emit_clientevent(const char *trigger, client_t *client, const char *uri);
+void event_emit_clientevent(_Nt_array_ptr<const char> trigger, client_t *client : itype(_Ptr<client_t> ) , const char *uri);
 #define event_emit_global(x) event_emit_clientevent((x), NULL, NULL)
 
 #endif

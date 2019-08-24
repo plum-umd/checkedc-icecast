@@ -47,7 +47,7 @@ typedef struct event_exec {
 } event_exec_t;
 
 /* OS independed code: */
-static inline size_t __argvtype2offset(event_exec_argvtype_t argvtype) {
+static size_t __argvtype2offset(event_exec_argvtype_t argvtype) {
     switch (argvtype) {
         case ARGVTYPE_NO_DEFAULTS:     return 1; break;
         case ARGVTYPE_ONLY_URI:        return 2; break;
@@ -58,7 +58,7 @@ static inline size_t __argvtype2offset(event_exec_argvtype_t argvtype) {
 }
 
 /* BEFORE RELEASE 2.5.0 DOCUMENT: Document names of possible values. */
-static inline event_exec_argvtype_t __str2argvtype(const char *str) {
+static event_exec_argvtype_t __str2argvtype(const char *str : itype(_Nt_array_ptr<const char> ) ) {
     if (!str)
         str = "(BAD VALUE)";
 
@@ -78,7 +78,7 @@ static inline event_exec_argvtype_t __str2argvtype(const char *str) {
     }
 }
 
-static inline char **__setup_argv(event_exec_t *self, event_t *event) {
+static char ** __setup_argv(_Ptr<event_exec_t> self, _Ptr<event_t> event) {
     self->argv[0] = self->executable;
 
     switch (self->argvtype) {
@@ -115,15 +115,15 @@ static inline char **__setup_argv(event_exec_t *self, event_t *event) {
  * We ignore most failtures as we can not handle them anyway.
  */
 #ifdef HAVE_SETENV
-static inline void __update_environ(const char *name, const char *value) {
+static void __update_environ(const char *name, const char *value) {
     if (!name || !value) return;
     setenv(name, value, 1);
 }
 #else
 #define __update_environ(x,y)
 #endif
-static inline void __setup_environ(ice_config_t *config, event_exec_t *self, event_t *event) {
-    mount_proxy *mountinfo;
+static void __setup_environ(_Ptr<ice_config_t> config, _Ptr<event_exec_t> self, _Ptr<event_t> event) {
+    _Ptr<mount_proxy> mountinfo = NULL;
     source_t *source;
     char buf[80];
 
@@ -165,7 +165,7 @@ static inline void __setup_environ(ice_config_t *config, event_exec_t *self, eve
     avl_tree_unlock(global.source_tree);
 }
 
-static inline void __setup_file_descriptors(ice_config_t *config) {
+static void __setup_file_descriptors(_Ptr<ice_config_t> config) {
     int i;
 
     /* close at least the first 1024 handles */
@@ -189,8 +189,8 @@ static inline void __setup_file_descriptors(ice_config_t *config) {
     }
 }
 
-static inline void __setup_empty_script_environment(event_exec_t *self, event_t *event) {
-    ice_config_t *config = config_get_config();
+static void __setup_empty_script_environment(_Ptr<event_exec_t> self, _Ptr<event_t> event) {
+    _Ptr<ice_config_t> config =  config_get_config();
 
     __setup_file_descriptors(config);
     __setup_environ(config, self, event);
@@ -198,7 +198,7 @@ static inline void __setup_empty_script_environment(event_exec_t *self, event_t 
     config_release_config();
 }
 
-static void _run_script (event_exec_t *self, event_t *event) {
+static void _run_script(_Ptr<event_exec_t> self, _Ptr<event_t> event) {
     pid_t pid, external_pid;
 
     /* do a fork twice so that the command has init as parent */
@@ -234,8 +234,8 @@ static void _run_script (event_exec_t *self, event_t *event) {
 }
 #endif
 
-static int event_exec_emit(void *state, event_t *event) {
-    event_exec_t *self = state;
+static int event_exec_emit(void *state : itype(_Ptr<void> ) , _Ptr<event_t> event) {
+    _Ptr<event_exec_t> self =  state;
 #ifdef _WIN32
     /* BEFORE RELEASE 2.5.0 DOCUMENT: Document this not working on win*. */
     ICECAST_LOG_ERROR("<event type=\"exec\" ...> not supported on Windows");
@@ -257,7 +257,7 @@ static void event_exec_free(void *state) {
     free(self);
 }
 
-int event_get_exec(event_registration_t *er, config_options_t *options) {
+int event_get_exec(_Ptr<event_registration_t> er, config_options_t *options) {
     event_exec_t *self = calloc(1, sizeof(event_exec_t));
     config_options_t *cur;
     size_t extra_argc = 0;

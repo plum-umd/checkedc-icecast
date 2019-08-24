@@ -148,22 +148,22 @@ struct refobject_type_tag {
     /* Total length of the objects to be created */
     size_t              type_length;
     /* Name of type */
-    const char *        type_name;
+    _Ptr<const char> type_name;
     /* Callback to be called on final free() */
-    refobject_free_t    type_freecb;
+    _Ptr<void (refobject_t , void** )> type_freecb;
     /* Callback to be callback by refobject_new() */
-    refobject_new_t     type_newcb;
+    _Ptr<int (refobject_t , _Ptr<const refobject_type_t> , struct __va_list_tag* )> type_newcb;
 };
 
 /* Only defined here as the size must be publically known.
  * DO NOT use any of the members in here directly!
  */
 struct refobject_base_tag {
-    const refobject_type_t* type;
+    _Ptr<const refobject_type_t> type;
     size_t refc;
     mutex_t lock;
-    void *userdata;
-    char *name;
+    void* userdata;
+    _Nt_array_ptr<char> name;
     refobject_t associated;
 };
 
@@ -180,26 +180,26 @@ REFOBJECT_FORWARD_TYPE(refobject_base_t);
  * If no freecb is given the userdata is freed (see refobject_free_t above).
  */
 #define         refobject_new__new(type, userdata, name, associated) REFOBJECT_TO_TYPE(refobject_new__real((refobject_type__ ## type), (userdata), (name), (associated)), type*)
-refobject_t     refobject_new__real(const refobject_type_t *type, void *userdata, const char *name, refobject_t associated);
+refobject_t refobject_new__real(const refobject_type_t *type : itype(_Ptr<const refobject_type_t> ) , void* userdata, _Nt_array_ptr<const char> name, refobject_t associated);
 #define         refobject_new(type, ...) REFOBJECT_TO_TYPE(refobject_new__simple((refobject_type__ ## type), NULL, NULL, REFOBJECT_NULL, ## __VA_ARGS__), type*)
 #define         refobject_new_ext(type, userdata, name, associated, ...) REFOBJECT_TO_TYPE(refobject_new__simple((refobject_type__ ## type), (userdata), (name), (associated), ## __VA_ARGS__), type*)
-refobject_t     refobject_new__simple(const refobject_type_t *type, void *userdata, const char *name, refobject_t associated, ...);
+refobject_t refobject_new__simple(const refobject_type_t *type : itype(_Ptr<const refobject_type_t> ) , void* userdata, _Nt_array_ptr<const char> name, refobject_t associated, ...);
 
 /* This increases the reference counter of the object */
-int             refobject_ref(refobject_t self);
+int refobject_ref(refobject_t self);
 /* This decreases the reference counter of the object.
  * If the object's reference counter reaches zero the object is freed.
  */
-int             refobject_unref(refobject_t self);
+int refobject_unref(refobject_t self);
 
 /* This gets and sets the userdata */
-void *          refobject_get_userdata(refobject_t self);
-int             refobject_set_userdata(refobject_t self, void *userdata);
+void* refobject_get_userdata(refobject_t self);
+int refobject_set_userdata(refobject_t self, void* userdata);
 
 /* This gets the object's name */
-const char *    refobject_get_name(refobject_t self);
+const char *refobject_get_name(refobject_t self) : itype(_Nt_array_ptr<const char> ) ;
 
 /* This gets the object's associated object. */
-refobject_t     refobject_get_associated(refobject_t self);
+refobject_t refobject_get_associated(refobject_t self);
 
 #endif

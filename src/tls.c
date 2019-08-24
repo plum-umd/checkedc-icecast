@@ -28,7 +28,7 @@
 #define CATMODULE "tls"
 
 /* Check for a specific implementation. Returns 0 if supported, 1 if unsupported and -1 on error. */
-int        tls_check_impl(const char *impl)
+int tls_check_impl(const char *impl)
 {
 #ifdef HAVE_OPENSSL
     if (!strcasecmp(impl, "openssl"))
@@ -51,7 +51,7 @@ struct tls_ctx_tag {
 struct tls_tag {
     size_t refc;
     SSL *ssl;
-    tls_ctx_t *ctx;
+    _Ptr<tls_ctx_t> ctx;
 };
 
 void       tls_initialize(void)
@@ -69,9 +69,9 @@ void       tls_shutdown(void)
 #endif
 }
 
-tls_ctx_t *tls_ctx_new(const char *cert_file, const char *key_file, const char *cipher_list)
+_Ptr<tls_ctx_t> tls_ctx_new(const char *cert_file, const char *key_file, const char *cipher_list)
 {
-    tls_ctx_t *ctx;
+    _Ptr<tls_ctx_t> ctx = NULL;
     long ssl_opts = 0;
 
     if (!cert_file || !key_file || !cipher_list)
@@ -127,7 +127,7 @@ tls_ctx_t *tls_ctx_new(const char *cert_file, const char *key_file, const char *
     return NULL;
 }
 
-void       tls_ctx_ref(tls_ctx_t *ctx)
+void tls_ctx_ref(_Ptr<tls_ctx_t> ctx)
 {
     if (!ctx)
         return;
@@ -135,7 +135,7 @@ void       tls_ctx_ref(tls_ctx_t *ctx)
     ctx->refc++;
 }
 
-void       tls_ctx_unref(tls_ctx_t *ctx)
+void tls_ctx_unref(_Ptr<tls_ctx_t> ctx)
 {
     if (!ctx)
         return;
@@ -151,9 +151,9 @@ void       tls_ctx_unref(tls_ctx_t *ctx)
     free(ctx);
 }
 
-tls_t     *tls_new(tls_ctx_t *ctx)
+tls_t *tls_new(_Ptr<tls_ctx_t> ctx) : itype(_Ptr<tls_t> ) 
 {
-    tls_t *tls;
+    _Ptr<tls_t> tls = NULL;
     SSL *ssl;
 
     if (!ctx)
@@ -177,14 +177,14 @@ tls_t     *tls_new(tls_ctx_t *ctx)
 
     return tls;
 }
-void       tls_ref(tls_t *tls)
+void tls_ref(_Ptr<tls_t> tls)
 {
     if (!tls)
         return;
     
     tls->refc++;
 }
-void       tls_unref(tls_t *tls)
+void tls_unref(tls_t *tls : itype(_Ptr<tls_t> ) )
 {
     if (!tls)
         return;
@@ -203,14 +203,14 @@ void       tls_unref(tls_t *tls)
     free(tls);
 }
 
-void       tls_set_incoming(tls_t *tls)
+void tls_set_incoming(tls_t *tls : itype(_Ptr<tls_t> ) )
 {
     if (!tls)
         return;
 
     SSL_set_accept_state(tls->ssl);
 }
-void       tls_set_socket(tls_t *tls, sock_t sock)
+void tls_set_socket(tls_t *tls : itype(_Ptr<tls_t> ) , int sock)
 {
     if (!tls)
         return;
@@ -218,7 +218,7 @@ void       tls_set_socket(tls_t *tls, sock_t sock)
     SSL_set_fd(tls->ssl, sock);
 }
 
-int        tls_want_io(tls_t *tls)
+int tls_want_io(tls_t *tls : itype(_Ptr<tls_t> ) )
 {
     int what;
 
@@ -239,7 +239,7 @@ int        tls_want_io(tls_t *tls)
     }
 }
 
-int        tls_got_shutdown(tls_t *tls)
+int tls_got_shutdown(tls_t *tls : itype(_Ptr<tls_t> ) )
 {
     if (!tls)
         return -1;
@@ -251,14 +251,14 @@ int        tls_got_shutdown(tls_t *tls)
     }
 }
 
-ssize_t    tls_read(tls_t *tls, void *buffer, size_t len)
+ssize_t tls_read(tls_t *tls : itype(_Ptr<tls_t> ) , void *buffer, size_t len)
 {
     if (!tls)
         return -1;
 
     return SSL_read(tls->ssl, buffer, len);
 }
-ssize_t    tls_write(tls_t *tls, const void *buffer, size_t len)
+ssize_t tls_write(tls_t *tls : itype(_Ptr<tls_t> ) , const void *buffer, size_t len)
 {
     if (!tls)
         return -1;

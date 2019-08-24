@@ -15,7 +15,7 @@
 
 #include "resourcematch.h"
 
-static size_t count_groups(const char *pattern)
+static size_t count_groups(_Array_ptr<const char> pattern)
 {
     size_t ret = 0;
 
@@ -40,10 +40,10 @@ static size_t count_groups(const char *pattern)
     return ret;
 }
 
-static resourcematch_extract_t * allocate_extract(const char *pattern)
+static _Ptr<resourcematch_extract_t> allocate_extract(_Array_ptr<const char> pattern)
 {
     size_t groups = count_groups(pattern);
-    resourcematch_extract_t *ret;
+    _Ptr<resourcematch_extract_t> ret = NULL;
 
     ret = calloc(1, sizeof(*ret));
     if (!ret)
@@ -55,10 +55,10 @@ static resourcematch_extract_t * allocate_extract(const char *pattern)
     return ret;
 }
 
-static void strip_common_prefix(const char **pattern, const char **string)
+static void strip_common_prefix(_Ptr<_Array_ptr<const char>> pattern, _Ptr<_Array_ptr<const char>> string)
 {
-    const char *p = *pattern;
-    const char *s = *string;
+    _Array_ptr<const char> p =  *pattern;
+    _Array_ptr<const char> s =  *string;
 
     for (; *p && *p != '%' && *p == *s; p++, s++);
 
@@ -66,7 +66,7 @@ static void strip_common_prefix(const char **pattern, const char **string)
     *string = s;
 }
 
-static inline void setup_group(resourcematch_extract_t *extract, size_t idx, char type)
+static void setup_group(_Ptr<resourcematch_extract_t> extract, size_t idx, char type)
 {
     if (!extract)
         return;
@@ -75,10 +75,10 @@ static inline void setup_group(resourcematch_extract_t *extract, size_t idx, cha
     extract->group[idx].raw = NULL;
 }
 
-static inline resourcematch_result_t match_lli(const char **string, resourcematch_extract_t *extract, size_t idx, int base)
+static resourcematch_result_t match_lli(_Ptr<_Nt_array_ptr<const char>> string, _Ptr<resourcematch_extract_t> extract, size_t idx, int base)
 {
     long long int ret;
-    char *endptr;
+    _Nt_array_ptr<char> endptr = NULL;
 
     errno = 0;
     ret = strtoll(*string, &endptr, base);
@@ -96,10 +96,10 @@ static inline resourcematch_result_t match_lli(const char **string, resourcematc
     return RESOURCEMATCH_MATCH;
 }
 
-resourcematch_result_t resourcematch_match(const char *pattern, const char *string, resourcematch_extract_t **extract)
+resourcematch_result_t resourcematch_match(_Array_ptr<const char> pattern, _Array_ptr<const char> string, _Ptr<_Ptr<resourcematch_extract_t>> extract)
 {
     resourcematch_result_t ret;
-    resourcematch_extract_t *matches = NULL;
+    _Ptr<resourcematch_extract_t> matches =  NULL;
     size_t idx = 0;
 
     if (!pattern || !string)
@@ -177,7 +177,7 @@ resourcematch_result_t resourcematch_match(const char *pattern, const char *stri
     }
 }
 
-void resourcematch_extract_free(resourcematch_extract_t *extract)
+void resourcematch_extract_free(_Ptr<resourcematch_extract_t> extract)
 {
     size_t i;
 

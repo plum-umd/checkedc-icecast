@@ -49,13 +49,13 @@ typedef struct ice_config_http_header_tag {
     int status;
 
     /* link to the next list element */
-    struct ice_config_http_header_tag *next;
+    _Ptr<struct ice_config_http_header_tag> next;
 } ice_config_http_header_t;
 
 typedef struct ice_config_dir_tag {
     char *host;
     int touch_interval;
-    struct ice_config_dir_tag *next;
+    _Ptr<struct ice_config_dir_tag> next;
 } ice_config_dir_t;
 
 struct _config_options {
@@ -111,15 +111,15 @@ typedef struct _mount_proxy {
     /* outgoing per-stream metadata interval */
     int mp3_meta_interval;
     /* additional HTTP headers */
-    ice_config_http_header_t *http_headers;
+    _Ptr<ice_config_http_header_t> http_headers;
 
     /* maximum history size of played songs */
     ssize_t max_history;
 
-    struct event_registration_tag *event;
+    _Ptr<struct event_registration_tag> event;
 
     char *cluster_password;
-    auth_stack_t *authstack;
+    _Ptr<auth_stack_t> authstack;
     unsigned int max_listener_duration;
 
     char *stream_name;
@@ -131,7 +131,7 @@ typedef struct _mount_proxy {
     char *subtype;
     int yp_public;
 
-    struct _mount_proxy *next;
+    _Ptr<struct _mount_proxy> next;
 } mount_proxy;
 
 #define ALIAS_FLAG_PREFIXMATCH          0x0001
@@ -147,7 +147,7 @@ typedef struct _resource {
     char *handler;
     operation_mode omode;
     unsigned int flags;
-    struct _resource *next;
+    _Ptr<struct _resource> next;
 } resource_t;
 
 typedef enum _listener_type_tag {
@@ -157,7 +157,7 @@ typedef enum _listener_type_tag {
 } listener_type_t;
 
 typedef struct _listener_t {
-    struct _listener_t *next;
+    _Ptr<struct _listener_t> next;
     char *id;
     char *on_behalf_of;
     listener_type_t type;
@@ -168,7 +168,7 @@ typedef struct _listener_t {
     int shoutcast_compat;
     char *shoutcast_mount;
     tlsmode_t tls;
-    auth_stack_t *authstack;
+    _Ptr<auth_stack_t> authstack;
 } listener_t;
 
 typedef struct _config_tls_context {
@@ -191,12 +191,12 @@ typedef struct {
     char *localmount;
     int on_demand;
     size_t upstreams;
-    relay_config_upstream_t *upstream;
+    _Array_ptr<relay_config_upstream_t> upstream;
     relay_config_upstream_t upstream_default;
 } relay_config_t;
 
 struct ice_config_tag {
-    char *config_filename;
+    _Nt_array_ptr<char> config_filename;
 
     char *location;
     char *admin;
@@ -215,19 +215,19 @@ struct ice_config_tag {
 
     char *shoutcast_mount;
     char *shoutcast_user;
-    auth_stack_t *authstack;
+    _Ptr<auth_stack_t> authstack;
 
-    struct event_registration_tag *event;
+    _Ptr<struct event_registration_tag> event;
 
     int touch_interval;
-    ice_config_dir_t *dir_list;
+    _Ptr<ice_config_dir_t> dir_list;
 
     char *hostname;
     int sane_hostname;
     int port;
     char *mimetypes_fn;
 
-    listener_t *listen_sock;
+    _Ptr<listener_t> listen_sock;
     unsigned int listen_sock_count;
 
     char *master_server;
@@ -236,15 +236,15 @@ struct ice_config_tag {
     char *master_username;
     char *master_password;
 
-    ice_config_http_header_t *http_headers;
+    _Ptr<ice_config_http_header_t> http_headers;
 
     /* is TLS supported by the server? */
     int tls_ok;
 
     size_t relay_length;
-    relay_config_t **relay;
+    _Array_ptr<_Ptr<relay_config_t>> relay;
 
-    mount_proxy *mounts;
+    _Ptr<mount_proxy> mounts;
 
     char *server_id;
     char *base_dir;
@@ -255,7 +255,7 @@ struct ice_config_tag {
     char *allowfile;
     char *webroot_dir;
     char *adminroot_dir;
-    resource_t *resources;
+    _Ptr<resource_t> resources;
     reportxml_database_t *reportxml_db;
 
     char *access_log;
@@ -271,9 +271,9 @@ struct ice_config_tag {
     int chuid;
     char *user;
     char *group;
-    char *yp_url[MAX_YP_DIRECTORIES];
-    int yp_url_timeout[MAX_YP_DIRECTORIES];
-    int yp_touch_interval[MAX_YP_DIRECTORIES];
+    char* yp_url[25];
+    int yp_url_timeout[25];
+    int yp_touch_interval[25];
     size_t num_yp_directories;
 };
 
@@ -288,32 +288,31 @@ void config_shutdown(void);
 operation_mode config_str_to_omode(const char *str);
 
 void config_reread_config(void);
-int config_parse_file(const char *filename, ice_config_t *configuration);
-int config_initial_parse_file(const char *filename);
-int config_parse_cmdline(int arg, char **argv);
-void config_set_config(ice_config_t *config);
-listener_t *config_clear_listener (listener_t *listener);
-void config_clear(ice_config_t *config);
-mount_proxy *config_find_mount(ice_config_t *config, const char *mount, mount_type type);
+int config_parse_file(const char *filename, _Ptr<ice_config_t> configuration);
+int config_initial_parse_file(_Nt_array_ptr<const char> filename);
+int config_parse_cmdline(int arg, _Ptr<_Ptr<char>> argv);
+void config_set_config(_Ptr<ice_config_t> config);
+_Ptr<listener_t> config_clear_listener(_Ptr<listener_t> listener);
+void config_clear(_Ptr<ice_config_t> c);
+_Ptr<mount_proxy> config_find_mount(_Ptr<ice_config_t> config, const char *mount, mount_type type);
 
-listener_t *config_copy_listener_one(const listener_t *listener);
+_Ptr<listener_t> config_copy_listener_one(_Ptr<const listener_t> listener);
 
-config_options_t *config_parse_options(xmlNodePtr node);
+config_options_t * config_parse_options(xmlNodePtr node);
 void config_clear_options(config_options_t *options);
 
-void config_parse_http_headers(xmlNodePtr                  node,
-                               ice_config_http_header_t  **http_headers);
-void config_clear_http_header(ice_config_http_header_t *header);
+void config_parse_http_headers(xmlNodePtr node, _Ptr<_Ptr<ice_config_http_header_t>> http_headers);
+void config_clear_http_header(_Ptr<ice_config_http_header_t> header);
 
 int config_rehash(void);
 
-ice_config_locks *config_locks(void);
+_Ptr<ice_config_locks> config_locks(void);
 
-ice_config_t *config_get_config(void);
-ice_config_t *config_grab_config(void);
+_Ptr<ice_config_t> config_get_config(void);
+_Ptr<ice_config_t> config_grab_config(void);
 void config_release_config(void);
 
 /* To be used ONLY in one-time startup code */
-ice_config_t *config_get_config_unlocked(void);
+_Ptr<ice_config_t> config_get_config_unlocked(void);
 
 #endif  /* __CFGFILE_H__ */

@@ -29,9 +29,9 @@ void ctest_fin(void)
     printf("1..%zu\n", ctest_g_test_num);
 }
 
-void ctest_test(const char *desc, int res)
+void ctest_test(_Ptr<const char> desc, int res)
 {
-    const char *prefix = NULL;
+    _Nt_array_ptr<const char> prefix =  NULL;
 
     if (ctest_bailed_out())
         return;
@@ -51,12 +51,12 @@ void ctest_test(const char *desc, int res)
     }
 }
 
-void ctest_diagnostic(const char *line)
+void ctest_diagnostic(_Ptr<const char> line)
 {
     printf("# %s\n", line);
 }
 
-void ctest_diagnostic_printf(const char *format, ...)
+void ctest_diagnostic_printf(_Nt_array_ptr<const char> format, ...)
 {
     va_list ap;
     va_start(ap, format);
@@ -68,7 +68,7 @@ void ctest_diagnostic_printf(const char *format, ...)
     va_end(ap);
 }
 
-void ctest_bail_out(const char *reason)
+void ctest_bail_out(_Ptr<const char> reason)
 {
     ctest_g_bailed_out = 1;
     if (reason) {

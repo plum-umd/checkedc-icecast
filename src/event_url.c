@@ -25,27 +25,27 @@ typedef struct event_url {
     char *action;
     char *userpwd;
     CURL *handle;
-    char errormsg[CURL_ERROR_SIZE];
+    _Ptr<char> errormsg;
 } event_url_t;
 
-static size_t handle_returned (void *ptr, size_t size, size_t nmemb, void *stream) {
+static size_t handle_returned(void *ptr, size_t size, size_t nmemb, void *stream) {
     (void)ptr, (void)stream;
     return size * nmemb;
 }
 
-static inline char *__escape(const char *src, const char *default_value) {
+static char * __escape(const char *src, _Nt_array_ptr<const char> default_value) {
     if (src)
         return util_url_escape(src);
 
     return strdup(default_value);
 }
 
-static int event_url_emit(void *state, event_t *event) {
-    event_url_t *self = state;
-    ice_config_t *config;
+static int event_url_emit(void *state : itype(_Ptr<void> ) , _Ptr<event_t> event) {
+    _Ptr<event_url_t> self =  state;
+    _Ptr<ice_config_t> config = NULL;
     char *action, *mount, *server, *role, *username, *ip, *agent;
     time_t duration;
-    char post[4096];
+    _Nt_array_ptr<char> post;
 
     action   = util_url_escape(self->action ? self->action : event->trigger);
     mount    = __escape(event->uri, "");
@@ -101,7 +101,7 @@ static void event_url_free(void *state) {
     free(self);
 }
 
-int event_get_url(event_registration_t *er, config_options_t *options) {
+int event_get_url(_Ptr<event_registration_t> er, config_options_t *options) {
     event_url_t *self = calloc(1, sizeof(event_url_t));
     const char *username = NULL;
     const char *password = NULL;

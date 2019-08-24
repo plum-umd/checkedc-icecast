@@ -35,25 +35,25 @@ struct matchfile_tag {
 
     time_t file_recheck;
     time_t file_mtime;
-    avl_tree *contents;
+    _Ptr<avl_tree> contents;
 };
 
-static int __func_free(void *x) {
+static int __func_free(void* x) {
     free(x);
     return 1;
 }
 
-static int __func_compare (void *arg, void *a, void *b) {
+static int __func_compare(void *arg, void* a, void* b) {
     (void)arg;
     return strcmp(b, a);
 }
 
-static void __func_recheck(matchfile_t *file) {
+static void __func_recheck(_Ptr<matchfile_t> file) {
     time_t now = time(NULL);
     struct stat file_stat;
-    FILE *input = NULL;
-    avl_tree *new_contents;
-    char line[MAX_LINE_LEN];
+    _Ptr<FILE> input =  NULL;
+    _Ptr<avl_tree> new_contents = NULL;
+    _Nt_array_ptr<char> line;
 
     if (now < file->file_recheck)
         return;
@@ -94,8 +94,8 @@ static void __func_recheck(matchfile_t *file) {
     file->contents = new_contents;
 }
 
-matchfile_t *matchfile_new(const char *filename) {
-    matchfile_t *ret;
+_Ptr<matchfile_t> matchfile_new(const char *filename : itype(_Nt_array_ptr<const char> ) ) {
+    _Ptr<matchfile_t> ret = NULL;
 
     if (!filename)
         return NULL;
@@ -120,7 +120,7 @@ matchfile_t *matchfile_new(const char *filename) {
     return ret;
 }
 
-int          matchfile_addref(matchfile_t *file) {
+int matchfile_addref(_Ptr<matchfile_t> file) {
     if (!file)
         return -1;
 
@@ -129,7 +129,7 @@ int          matchfile_addref(matchfile_t *file) {
     return 0;
 }
 
-int          matchfile_release(matchfile_t *file) {
+int matchfile_release(_Ptr<matchfile_t> file) {
     if (!file)
         return -1;
 
@@ -147,8 +147,8 @@ int          matchfile_release(matchfile_t *file) {
 }
 
 /* we are not const char *key because of avl_get_by_key()... */
-int          matchfile_match(matchfile_t *file, const char *key) {
-    void *result;
+int matchfile_match(_Ptr<matchfile_t> file, const char *key) {
+    void* result = NULL;
 
     if (!file)
         return -1;
@@ -162,7 +162,7 @@ int          matchfile_match(matchfile_t *file, const char *key) {
     return avl_get_by_key(file->contents, (void*)key, &result) == 0 ? 1 : 0;
 }
 
-int          matchfile_match_allow_deny(matchfile_t *allow, matchfile_t *deny, const char *key) {
+int matchfile_match_allow_deny(_Ptr<matchfile_t> allow, _Ptr<matchfile_t> deny, const char *key : itype(_Ptr<const char> ) ) {
     if (!allow && !deny)
         return 1;
 

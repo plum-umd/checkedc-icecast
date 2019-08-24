@@ -40,42 +40,42 @@ typedef struct _format_plugin_tag
     format_type_t type;
 
     /* we need to know the mount to report statistics */
-    char *mount;
+    _Ptr<char> mount;
 
     const char  *contenttype;
-    char        *charset;
+    _Nt_array_ptr<char> charset;
     uint64_t    read_bytes;
     uint64_t    sent_bytes;
 
-    refbuf_t *(*get_buffer)(source_t *);
-    int (*write_buf_to_client)(client_t *client);
-    void (*write_buf_to_file)(source_t *source, refbuf_t *refbuf);
-    int (*create_client_data)(source_t *source, client_t *client);
-    void (*set_tag)(struct _format_plugin_tag *plugin, const char *tag, const char *value, const char *charset);
-    void (*free_plugin)(struct _format_plugin_tag *self);
-    void (*apply_settings)(client_t *client, struct _format_plugin_tag *format, mount_proxy *mount);
+    _Ptr<_Ptr<refbuf_t> (_Ptr<source_t> )> get_buffer;
+    _Ptr<int (_Ptr<client_t> )> write_buf_to_client;
+    _Ptr<void (_Ptr<source_t> , _Ptr<refbuf_t> )> write_buf_to_file;
+    _Ptr<int (_Ptr<source_t> , _Ptr<client_t> )> create_client_data;
+    _Ptr<void (_Ptr<struct _format_plugin_tag> , _Nt_array_ptr<const char> , _Nt_array_ptr<const char> , _Ptr<const char> )> set_tag;
+    _Ptr<void (_Ptr<struct _format_plugin_tag> )> free_plugin;
+    _Ptr<void (_Ptr<client_t> , _Ptr<struct _format_plugin_tag> , _Ptr<mount_proxy> )> apply_settings;
 
     /* meta data */
     vorbis_comment vc;
 
     /* for internal state management */
-    void *_state;
+    void* _state;
 } format_plugin_t;
 
-format_type_t format_get_type(const char *contenttype);
+format_type_t format_get_type(const char *contenttype : itype(_Nt_array_ptr<const char> ) );
 char *format_get_mimetype(format_type_t type);
-int format_get_plugin(format_type_t type, source_t *source);
+int format_get_plugin(format_type_t type, source_t *source : itype(_Ptr<source_t> ) );
 
-int format_generic_write_to_client (client_t *client);
-int format_advance_queue (source_t *source, client_t *client);
-int format_check_http_buffer (source_t *source, client_t *client);
-int format_check_file_buffer (source_t *source, client_t *client);
+int format_generic_write_to_client(client_t *client : itype(_Ptr<client_t> ) );
+int format_advance_queue(_Ptr<source_t> source, client_t *client : itype(_Ptr<client_t> ) );
+int format_check_http_buffer(_Ptr<source_t> source, client_t *client : itype(_Ptr<client_t> ) );
+int format_check_file_buffer(_Ptr<source_t> source, client_t *client : itype(_Ptr<client_t> ) );
 
 
 void format_send_general_headers(format_plugin_t *format, 
         source_t *source, client_t *client);
 
-void format_set_vorbiscomment(format_plugin_t *plugin, const char *tag, const char *value);
+void format_set_vorbiscomment(_Ptr<format_plugin_t> plugin, const char *tag, const char *value);
 
 #endif  /* __FORMAT_H__ */
 

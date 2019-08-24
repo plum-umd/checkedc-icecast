@@ -11,6 +11,6 @@
 
 #include "cfgfile.h"
 
-void main_config_reload(ice_config_t *config);
+void main_config_reload(_Ptr<ice_config_t> config);
 
 #endif

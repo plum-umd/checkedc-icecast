@@ -42,9 +42,9 @@ typedef struct _kate_codec_tag
 } kate_codec_t;
 
 
-static void kate_codec_free (ogg_state_t *ogg_info, ogg_codec_t *codec)
+static void kate_codec_free(_Ptr<ogg_state_t> ogg_info, _Ptr<ogg_codec_t> codec)
 {
-    kate_codec_t *kate = codec->specific;
+    _Ptr<kate_codec_t> kate =  codec->specific;
 
     ICECAST_LOG_DEBUG("freeing kate codec");
     /* TODO: should i replace with something or just remove
@@ -62,12 +62,12 @@ static void kate_codec_free (ogg_state_t *ogg_info, ogg_codec_t *codec)
 /* kate pages are not rebuilt, so here we just for headers and then
  * pass them straight through to the the queue
  */
-static refbuf_t *process_kate_page (ogg_state_t *ogg_info, ogg_codec_t *codec, ogg_page *page, format_plugin_t *plugin)
+static _Ptr<refbuf_t> process_kate_page(_Ptr<ogg_state_t> ogg_info, _Ptr<ogg_codec_t> codec, ogg_page *page, _Ptr<format_plugin_t> plugin)
 {
-    kate_codec_t *kate = codec->specific;
+    _Ptr<kate_codec_t> kate =  codec->specific;
     ogg_packet packet;
     int header_page = 0;
-    refbuf_t *refbuf = NULL;
+    _Ptr<refbuf_t> refbuf =  NULL;
     ogg_int64_t granulepos;
 
     if (ogg_stream_pagein (&codec->os, page) < 0)
@@ -136,13 +136,13 @@ static refbuf_t *process_kate_page (ogg_state_t *ogg_info, ogg_codec_t *codec, o
 /* Check if specified BOS page is the start of a kate stream and
  * if so, create a codec structure for handling it
  */
-ogg_codec_t *initial_kate_page(format_plugin_t *plugin, ogg_page *page)
+_Ptr<ogg_codec_t> initial_kate_page(_Ptr<format_plugin_t> plugin, ogg_page *page)
 {
-    ogg_state_t *ogg_info = plugin->_state;
-    ogg_codec_t *codec = calloc(1, sizeof(ogg_codec_t));
+    _Ptr<ogg_state_t> ogg_info =  plugin->_state;
+    _Ptr<ogg_codec_t> codec =  calloc(1, sizeof(ogg_codec_t));
     ogg_packet packet;
 
-    kate_codec_t *kate_codec = calloc(1, sizeof(kate_codec_t));
+    _Ptr<kate_codec_t> kate_codec =  calloc(1, sizeof(kate_codec_t));
 
     ogg_stream_init(&codec->os, ogg_page_serialno(page));
     ogg_stream_pagein(&codec->os, page);

@@ -40,10 +40,10 @@
 #define snprintf _snprintf
 #endif
 
-static auth_result htpasswd_adduser (auth_t *auth, const char *username, const char *password);
-static auth_result htpasswd_deleteuser(auth_t *auth, const char *username);
-static auth_result htpasswd_userlist(auth_t *auth, xmlNodePtr srcnode);
-static int _free_user (void *key);
+static auth_result htpasswd_adduser(auth_t *auth : itype(_Ptr<auth_t> ) , const char *username, const char *password);
+static auth_result htpasswd_deleteuser(auth_t *auth : itype(_Ptr<auth_t> ) , const char *username : itype(_Nt_array_ptr<const char> ) );
+static auth_result htpasswd_userlist(auth_t *auth : itype(_Ptr<auth_t> ) , xmlNodePtr srcnode);
+static int _free_user(void *key);
 
 typedef struct {
     char *name;
@@ -53,11 +53,11 @@ typedef struct {
 typedef struct {
     char *filename;
     rwlock_t file_rwlock;
-    avl_tree *users;
+    _Ptr<avl_tree> users;
     time_t mtime;
 } htpasswd_auth_state;
 
-static void htpasswd_clear(auth_t *self)
+static void htpasswd_clear(_Ptr<auth_t> self)
 {
     htpasswd_auth_state *state = self->state;
     free(state->filename);
@@ -69,9 +69,9 @@ static void htpasswd_clear(auth_t *self)
 
 
 /* md5 hash */
-static char *get_hash(const char *data, int len)
+static _Nt_array_ptr<char> get_hash(const char *data, int len)
 {
-    struct MD5Context context;
+    struct MD5Context context = {};
     unsigned char digest[16];
 
     MD5Init(&context);
@@ -105,10 +105,10 @@ static int _free_user(void *key)
 }
 
 
-static void htpasswd_recheckfile(htpasswd_auth_state *htpasswd)
+static void htpasswd_recheckfile(htpasswd_auth_state *htpasswd : itype(_Ptr<htpasswd_auth_state> ) )
 {
-    FILE *passwdfile;
-    avl_tree *new_users;
+    _Ptr<FILE> passwdfile = NULL;
+    _Ptr<avl_tree> new_users = NULL;
     int num = 0;
     struct stat file_stat;
     char *sep;
@@ -174,13 +174,13 @@ static void htpasswd_recheckfile(htpasswd_auth_state *htpasswd)
 }
 
 
-static auth_result htpasswd_auth (auth_client *auth_user)
+static auth_result htpasswd_auth(_Ptr<auth_client> auth_user)
 {
-    auth_t *auth = auth_user->client->auth;
+    _Ptr<auth_t> auth =  auth_user->client->auth;
     htpasswd_auth_state *htpasswd = auth->state;
-    client_t *client = auth_user->client;
+    _Ptr<client_t> client =  auth_user->client;
     htpasswd_user entry;
-    void *result;
+    void* result = NULL;
 
     if (!client->username || !client->password)
         return AUTH_NOMATCH;
@@ -199,8 +199,8 @@ static auth_result htpasswd_auth (auth_client *auth_user)
     thread_rwlock_rlock (&htpasswd->file_rwlock);
     entry.name = client->username;
     if (avl_get_by_key (htpasswd->users, &entry, &result) == 0) {
-        htpasswd_user *found = result;
-        char *hashed_pw;
+        _Ptr<htpasswd_user> found =  result;
+        _Nt_array_ptr<char> hashed_pw = NULL;
 
         thread_rwlock_unlock (&htpasswd->file_rwlock);
         hashed_pw = get_hash (client->password, strlen (client->password));
@@ -217,7 +217,7 @@ static auth_result htpasswd_auth (auth_client *auth_user)
     return AUTH_NOMATCH;
 }
 
-int  auth_get_htpasswd_auth (auth_t *authenticator, config_options_t *options)
+int auth_get_htpasswd_auth(_Ptr<auth_t> authenticator, config_options_t *options)
 {
     htpasswd_auth_state *state;
 
@@ -254,13 +254,13 @@ int  auth_get_htpasswd_auth (auth_t *authenticator, config_options_t *options)
 }
 
 
-static auth_result htpasswd_adduser (auth_t *auth, const char *username, const char *password)
+static auth_result htpasswd_adduser(auth_t *auth : itype(_Ptr<auth_t> ) , const char *username, const char *password)
 {
-    FILE *passwdfile;
-    char *hashed_password = NULL;
+    _Ptr<FILE> passwdfile = NULL;
+    _Nt_array_ptr<char> hashed_password =  NULL;
     htpasswd_auth_state *state = auth->state;
     htpasswd_user entry;
-    void *result;
+    void* result = NULL;
 
     if (state->filename == NULL) {
         ICECAST_LOG_ERROR("No filename given in options for authenticator.");
@@ -304,13 +304,13 @@ static auth_result htpasswd_adduser (auth_t *auth, const char *username, const c
 }
 
 
-static auth_result htpasswd_deleteuser(auth_t *auth, const char *username)
+static auth_result htpasswd_deleteuser(auth_t *auth : itype(_Ptr<auth_t> ) , const char *username : itype(_Nt_array_ptr<const char> ) )
 {
-    FILE *passwdfile;
-    FILE *tmp_passwdfile;
+    _Ptr<FILE> passwdfile = NULL;
+    _Ptr<FILE> tmp_passwdfile = NULL;
     htpasswd_auth_state *state;
-    char line[MAX_LINE_LEN];
-    char *sep;
+    _Nt_array_ptr<char> line;
+    _Nt_array_ptr<char> sep = NULL;
     char *tmpfile = NULL;
     int tmpfile_len = 0;
     struct stat file_info;
@@ -401,7 +401,7 @@ static auth_result htpasswd_deleteuser(auth_t *auth, const char *username)
 }
 
 
-static auth_result htpasswd_userlist(auth_t *auth, xmlNodePtr srcnode)
+static auth_result htpasswd_userlist(auth_t *auth : itype(_Ptr<auth_t> ) , xmlNodePtr srcnode)
 {
     htpasswd_auth_state *state;
     xmlNodePtr newnode;

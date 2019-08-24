@@ -86,12 +86,12 @@ typedef enum {
 
 typedef struct auth_client_tag auth_client;
 struct auth_client_tag {
-    client_t     *client;
-    auth_result (*process)(auth_t *auth, auth_client *auth_user);
-    void        (*on_no_match)(client_t *client, void (*on_result)(client_t *client, void *userdata, auth_result result), void *userdata);
-    void        (*on_result)(client_t *client, void *userdata, auth_result result);
-    void         *userdata;
-    void         *authbackend_userdata;
+    _Ptr<client_t> client;
+    _Ptr<auth_result (_Ptr<auth_t> , _Ptr<auth_client> )> process;
+    _Ptr<void (_Ptr<client_t> , _Ptr<void (_Ptr<client_t> , void* , auth_result )> , void* )> on_no_match;
+    _Ptr<void (_Ptr<client_t> , void* , auth_result )> on_result;
+    void* userdata;
+    void* authbackend_userdata;
     auth_alter_t  alter_client_action;
     char         *alter_client_arg;
     auth_client  *next;
@@ -106,26 +106,23 @@ struct auth_tag
     /* URL for any kind of UI used to configure this or NULL. */
     char *management_url;
 
-    char *mount;
+    _Nt_array_ptr<char> mount;
 
     /* filters */
-    auth_matchtype_t filter_method[httpp_req_unknown+1];
+    auth_matchtype_t filter_method[13];
     auth_matchtype_t filter_web_policy;
     auth_matchtype_t filter_admin_policy;
-    struct {
-        auth_matchtype_t type;
-        admin_command_id_t command;
-    } filter_admin[MAX_ADMIN_COMMANDS];
+    struct (anonymous struct at /home/hasantouma/plum-umd-icecast/checkedc-icecast/src/auth.h:115:5) filter_admin[32];
 
     struct {
         auth_matchtype_t type;
-        char *origin;
+        _Nt_array_ptr<char> origin;
     } *filter_origin;
     size_t filter_origin_len;
     auth_matchtype_t filter_origin_policy;
 
     /* permissions */
-    auth_matchtype_t permission_alter[AUTH_ALTER_SEND_ERROR+1];
+    auth_matchtype_t permission_alter[7];
 
     /* whether authenticate_client() and release_client() will return immediate.
      * Setting this will result in no thread being started for this.
@@ -133,11 +130,11 @@ struct auth_tag
     int immediate;
 
     /* Authenticate using the given username and password */
-    auth_result (*authenticate_client)(auth_client *aclient);
-    auth_result (*release_client)(auth_client *auth_user);
+    _Ptr<auth_result (_Ptr<auth_client> )> authenticate_client;
+    _Ptr<auth_result (_Ptr<auth_client> )> release_client;
 
     /* auth state-specific free call */
-    void (*free)(auth_t *self);
+    _Ptr<void (_Ptr<auth_t> )> free;
 
     auth_result (*adduser)(auth_t *auth, const char *username, const char *password);
     auth_result (*deleteuser)(auth_t *auth, const char *username);
@@ -155,23 +152,23 @@ struct auth_tag
 
     void *state;
     char *type;
-    char *unique_tag;
+    _Ptr<char> unique_tag;
 
     /* acl to set on succsessful auth */
-    acl_t *acl;
+    _Ptr<acl_t> acl;
     /* role name for later matching, may be NULL if no role name was given in config */
     char  *role;
 
     /* HTTP headers to send to clients using this role */
-    ice_config_http_header_t *http_headers;
+    _Ptr<ice_config_http_header_t> http_headers;
 };
 
 /* prototypes for auths that do not need own header file */
-int auth_get_anonymous_auth(auth_t *auth, config_options_t *options);
-int auth_get_static_auth(auth_t *auth, config_options_t *options);
-int auth_get_url_auth(auth_t *authenticator, config_options_t *options);
-int auth_get_htpasswd_auth(auth_t *auth, config_options_t *options);
-int auth_get_enforce_auth_auth(auth_t *auth, config_options_t *options);
+int auth_get_anonymous_auth(_Ptr<auth_t> authenticator, config_options_t *options);
+int auth_get_static_auth(_Ptr<auth_t> authenticator, config_options_t *options);
+int auth_get_url_auth(_Ptr<auth_t> authenticator, config_options_t *options);
+int auth_get_htpasswd_auth(_Ptr<auth_t> authenticator, config_options_t *options);
+int auth_get_enforce_auth_auth(_Ptr<auth_t> authenticator, config_options_t *options);
 
 /* prototypes for auth.c */
 void auth_initialise(void);
@@ -179,29 +176,24 @@ void auth_shutdown(void);
 
 auth_result auth_str2result(const char *str);
 
-auth_t  *auth_get_authenticator(xmlNodePtr node);
-void    auth_release(auth_t *authenticator);
-void    auth_addref(auth_t *authenticator);
+auth_t *auth_get_authenticator(xmlNodePtr node) : itype(_Ptr<auth_t> ) ;
+void auth_release(auth_t *authenticator : itype(_Ptr<auth_t> ) );
+void auth_addref(auth_t *authenticator : itype(_Ptr<auth_t> ) );
 
-int auth_release_client(client_t *client);
+int auth_release_client(_Ptr<client_t> client);
 
-void auth_stack_add_client(auth_stack_t  *stack,
-                           client_t      *client,
-                           void         (*on_result)(client_t      *client,
-                                                     void          *userdata,
-                                                     auth_result   result),
-                           void          *userdata);
+void auth_stack_add_client(_Ptr<auth_stack_t> stack, _Ptr<client_t> client, _Ptr<void (_Ptr<client_t> , void* , auth_result )> on_result, void* userdata);
 
-int auth_alter_client(auth_t *auth, auth_client *auth_user, auth_alter_t action, const char *arg);
+int auth_alter_client(auth_t *auth : itype(_Ptr<auth_t> ) , _Ptr<auth_client> auth_user, auth_alter_t action, const char *arg : itype(_Nt_array_ptr<const char> ) );
 auth_alter_t auth_str2alter(const char *str);
 
-void          auth_stack_release(auth_stack_t *stack);
-void          auth_stack_addref(auth_stack_t *stack);
-int           auth_stack_next(auth_stack_t **stack); /* returns -1 on error, 0 on success, +1 if no next element is present */
-int           auth_stack_push(auth_stack_t **stack, auth_t *auth);
-int           auth_stack_append(auth_stack_t *stack, auth_stack_t *tail);
-auth_t       *auth_stack_get(auth_stack_t *stack);
-auth_t       *auth_stack_getbyid(auth_stack_t *stack, unsigned long id);
-acl_t        *auth_stack_get_anonymous_acl(auth_stack_t *stack, httpp_request_type_e method);
+void auth_stack_release(_Ptr<auth_stack_t> stack);
+void auth_stack_addref(_Ptr<auth_stack_t> stack);
+int auth_stack_next(_Ptr<_Ptr<auth_stack_t>> stack); /* returns -1 on error, 0 on success, +1 if no next element is present */
+int auth_stack_push(_Ptr<_Ptr<auth_stack_t>> stack, auth_t *auth : itype(_Ptr<auth_t> ) );
+int auth_stack_append(_Ptr<auth_stack_t> stack, _Ptr<auth_stack_t> tail);
+auth_t *auth_stack_get(_Ptr<auth_stack_t> stack) : itype(_Ptr<auth_t> ) ;
+auth_t *auth_stack_getbyid(_Ptr<auth_stack_t> stack, unsigned long id) : itype(_Ptr<auth_t> ) ;
+_Ptr<acl_t> auth_stack_get_anonymous_acl(_Ptr<auth_stack_t> stack, httpp_request_type_e method);
 
 #endif

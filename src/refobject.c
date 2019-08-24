@@ -29,13 +29,13 @@ REFOBJECT_DEFINE_TYPE(refobject_base_t,
         REFOBJECT_DEFINE_TYPE_NEW_NOOP()
         );
 
-static inline int check_type(const refobject_type_t *type)
+static int check_type(const refobject_type_t *type : itype(_Ptr<const refobject_type_t> ) )
 {
     return type->control_length == sizeof(refobject_type_t) && type->control_version == REFOBJECT_CONTROL_VERSION &&
         type->type_length >= sizeof(refobject_base_t);
 }
 
-refobject_t     refobject_new__real(const refobject_type_t *type, void *userdata, const char *name, refobject_t associated)
+refobject_t refobject_new__real(const refobject_type_t *type : itype(_Ptr<const refobject_type_t> ) , void* userdata, _Nt_array_ptr<const char> name, refobject_t associated)
 {
     refobject_base_t *ret = NULL;
 
@@ -72,9 +72,9 @@ refobject_t     refobject_new__real(const refobject_type_t *type, void *userdata
     return (refobject_t)ret;
 }
 
-refobject_t     refobject_new__simple(const refobject_type_t *type, void *userdata, const char *name, refobject_t associated, ...)
+refobject_t refobject_new__simple(const refobject_type_t *type : itype(_Ptr<const refobject_type_t> ) , void* userdata, _Nt_array_ptr<const char> name, refobject_t associated, ...)
 {
-    refobject_t ret;
+    refobject_t ret = {};
     int res;
     va_list ap;
 
@@ -100,7 +100,7 @@ refobject_t     refobject_new__simple(const refobject_type_t *type, void *userda
     return ret;
 }
 
-int             refobject_ref(refobject_t self)
+int refobject_ref(refobject_t self)
 {
     if (REFOBJECT_IS_NULL(self))
         return -1;
@@ -112,7 +112,7 @@ int             refobject_ref(refobject_t self)
     return 0;
 }
 
-int             refobject_unref(refobject_t self)
+int refobject_unref(refobject_t self)
 {
     register refobject_base_t *base = TO_BASE(self);
 
@@ -143,9 +143,9 @@ int             refobject_unref(refobject_t self)
     return 0;
 }
 
-void *          refobject_get_userdata(refobject_t self)
+void* refobject_get_userdata(refobject_t self)
 {
-    void *ret;
+    void* ret = NULL;
 
     if (REFOBJECT_IS_NULL(self))
         return NULL;
@@ -157,7 +157,7 @@ void *          refobject_get_userdata(refobject_t self)
     return ret;
 }
 
-int             refobject_set_userdata(refobject_t self, void *userdata)
+int refobject_set_userdata(refobject_t self, void* userdata)
 {
     if (REFOBJECT_IS_NULL(self))
         return -1;
@@ -169,9 +169,9 @@ int             refobject_set_userdata(refobject_t self, void *userdata)
     return 0;
 }
 
-const char *    refobject_get_name(refobject_t self)
+const char *refobject_get_name(refobject_t self) : itype(_Nt_array_ptr<const char> ) 
 {
-    const char *ret;
+    _Nt_array_ptr<const char> ret = NULL;
 
     if (REFOBJECT_IS_NULL(self))
         return NULL;
@@ -183,9 +183,9 @@ const char *    refobject_get_name(refobject_t self)
     return ret;
 }
 
-refobject_t     refobject_get_associated(refobject_t self)
+refobject_t refobject_get_associated(refobject_t self)
 {
-    refobject_t ret;
+    refobject_t ret = {};
 
     if (REFOBJECT_IS_NULL(self))
         return REFOBJECT_NULL;

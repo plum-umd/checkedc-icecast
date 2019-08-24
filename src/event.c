@@ -33,7 +33,7 @@ static int event_running = 0;
 static thread_type *event_thread = NULL;
 
 /* work with event_t* */
-static void event_addref(event_t *event) {
+static void event_addref(_Ptr<event_t> event) {
     if (!event)
         return;
     thread_mutex_lock(&event_lock);
@@ -41,9 +41,9 @@ static void event_addref(event_t *event) {
     thread_mutex_unlock(&event_lock);
 }
 
-static void event_release(event_t *event) {
+static void event_release(_Ptr<event_t> event) {
     size_t i;
-    event_t *to_free;
+    _Ptr<event_t> to_free = NULL;
 
     if (!event)
         return;
@@ -72,7 +72,7 @@ static void event_release(event_t *event) {
         event_release(to_free);
 }
 
-static void event_push(event_t **event, event_t *next) {
+static void event_push(_Ptr<_Ptr<event_t>> event, _Ptr<event_t> next) {
     size_t i = 0;
 
     if (!event || !next)
@@ -91,7 +91,7 @@ static void event_push(event_t **event, event_t *next) {
     *event = next;
 }
 
-static void event_push_reglist(event_t *event, event_registration_t *reglist) {
+static void event_push_reglist(_Ptr<event_t> event, _Ptr<event_registration_t> reglist) {
     size_t i;
 
     if (!event || !reglist)
@@ -107,8 +107,8 @@ static void event_push_reglist(event_t *event, event_registration_t *reglist) {
     ICECAST_LOG_ERROR("Can not push reglist %p into event %p. No space left on event.", reglist, event);
 }
 
-static event_t *event_new(const char *trigger) {
-    event_t *ret;
+static _Ptr<event_t> event_new(_Nt_array_ptr<const char> trigger) {
+    _Ptr<event_t> ret = NULL;
 
     if (!trigger)
         return NULL;
@@ -131,7 +131,7 @@ static event_t *event_new(const char *trigger) {
 }
 
 /* subsystem functions */
-static inline void _try_event(event_registration_t *er, event_t *event) {
+static void _try_event(_Ptr<event_registration_t> er, _Ptr<event_t> event) {
     /* er is already locked */
     if (strcmp(er->trigger, event->trigger) != 0)
         return;
@@ -140,7 +140,7 @@ static inline void _try_event(event_registration_t *er, event_t *event) {
         er->emit(er->state, event);
 }
 
-static inline void _try_registrations(event_registration_t *er, event_t *event) {
+static void _try_registrations(_Ptr<event_registration_t> er, _Ptr<event_t> event) {
     if (!er)
         return;
 
@@ -151,7 +151,7 @@ static inline void _try_registrations(event_registration_t *er, event_t *event) 
 
        /* go to next registration */
        if (er->next) {
-           event_registration_t *next = er->next;
+           _Ptr<event_registration_t> next =  er->next;
 
            thread_mutex_lock(&next->lock);
            thread_mutex_unlock(&er->lock);
@@ -163,13 +163,13 @@ static inline void _try_registrations(event_registration_t *er, event_t *event) 
     thread_mutex_unlock(&er->lock);
 }
 
-static void *event_run_thread (void *arg) {
+static void* event_run_thread(void *arg) {
     int running = 0;
 
     (void)arg;
 
     do {
-        event_t *event;
+        _Ptr<event_t> event = NULL;
         size_t i;
 
         thread_mutex_lock(&event_lock);
@@ -212,7 +212,7 @@ void event_initialise(void) {
 }
 
 void event_shutdown(void) {
-    event_t *event_queue_to_free = NULL;
+    _Ptr<event_t> event_queue_to_free =  NULL;
 
     /* stop thread */
     if (!event_running)
@@ -240,8 +240,8 @@ void event_shutdown(void) {
 
 
 /* basic functions to work with event registrations */
-event_registration_t * event_new_from_xml_node(xmlNodePtr node) {
-    event_registration_t *ret = calloc(1, sizeof(event_registration_t));
+_Ptr<event_registration_t> event_new_from_xml_node(xmlNodePtr node) {
+    _Ptr<event_registration_t> ret =  calloc(1, sizeof(event_registration_t));
     config_options_t *options;
     int rv;
 
@@ -284,7 +284,7 @@ event_registration_t * event_new_from_xml_node(xmlNodePtr node) {
     return ret;
 }
 
-void event_registration_addref(event_registration_t * er) {
+void event_registration_addref(_Ptr<event_registration_t> er) {
     if(!er)
         return;
     thread_mutex_lock(&er->lock);
@@ -292,7 +292,7 @@ void event_registration_addref(event_registration_t * er) {
     thread_mutex_unlock(&er->lock);
 }
 
-void event_registration_release(event_registration_t *er) {
+void event_registration_release(_Ptr<event_registration_t> er) {
     if(!er)
         return;
     thread_mutex_lock(&er->lock);
@@ -317,8 +317,10 @@ void event_registration_release(event_registration_t *er) {
     free(er);
 }
 
-void event_registration_push(event_registration_t **er, event_registration_t *tail) {
-    event_registration_t *next, *cur;
+void event_registration_push(_Ptr<_Ptr<event_registration_t>> er, _Ptr<event_registration_t> tail) {
+   _Ptr<event_registration_t> next = NULL;
+_Ptr<event_registration_t> cur = NULL;
+ 
 
     if (!er || !tail)
         return;
@@ -348,7 +350,7 @@ void event_registration_push(event_registration_t **er, event_registration_t *ta
 }
 
 /* event signaling */
-void event_emit(event_t *event) {
+void event_emit(_Ptr<event_t> event) {
     fastevent_emit(FASTEVENT_TYPE_SLOWEVENT, FASTEVENT_FLAG_NONE, FASTEVENT_DATATYPE_EVENT, event);
     event_addref(event);
     thread_mutex_lock(&event_lock);
@@ -359,10 +361,10 @@ void event_emit(event_t *event) {
 /* this function needs to extract all the info from the client, source and mount object
  * as after return the pointers become invalid.
  */
-void event_emit_clientevent(const char *trigger, client_t *client, const char *uri) {
-    event_t *event = event_new(trigger);
-    ice_config_t *config;
-    mount_proxy *mount;
+void event_emit_clientevent(_Nt_array_ptr<const char> trigger, client_t *client : itype(_Ptr<client_t> ) , const char *uri) {
+    _Ptr<event_t> event =  event_new(trigger);
+    _Ptr<ice_config_t> config = NULL;
+    _Ptr<mount_proxy> mount = NULL;
 
     if (!event) {
         ICECAST_LOG_ERROR("Can not create event.");
@@ -397,7 +399,7 @@ void event_emit_clientevent(const char *trigger, client_t *client, const char *u
 #endif
 
     if (client) {
-        const char *tmp;
+        _Nt_array_ptr<const char> tmp = NULL;
         event->connection_id = client->con->id;
         event->connection_time = client->con->con_time;
         event->client_admin_command = client->admin_command;

@@ -23,10 +23,10 @@
 struct module_tag {
     refobject_base_t __base;
     mutex_t lock;
-    const module_client_handler_t *client_handlers;
+    _Array_ptr<const module_client_handler_t> client_handlers;
     size_t client_handlers_len;
-    module_setup_handler_t freecb;
-    void *userdata;
+    _Ptr<int (module_t* , void** )> freecb;
+    void* userdata;
     char *management_link_url;
     char *management_link_title;
 };
@@ -35,22 +35,22 @@ struct module_tag {
 struct module_container_tag {
     refobject_base_t __base;
     mutex_t lock;
-    avl_tree *module;
+    _Ptr<avl_tree> module;
 };
 
-static int compare_refobject_t_name(void *arg, void *a, void *b)
+static int compare_refobject_t_name(void* arg, void* a, void* b)
 {
     return strcmp(refobject_get_name(a), refobject_get_name(b));
 }
 
-static void __module_container_free(refobject_t self, void **userdata)
+static void __module_container_free(refobject_t self, void** userdata)
 {
     module_container_t *cont = REFOBJECT_TO_TYPE(self, module_container_t *);
     thread_mutex_destroy(&(cont->lock));
     avl_tree_free(cont->module, (avl_free_key_fun_type)refobject_unref);
 }
 
-int __module_container_new(refobject_t self, const refobject_type_t *type, va_list ap)
+int __module_container_new(refobject_t self, _Ptr<const refobject_type_t> type, va_list ap)
 {
     module_container_t *ret = REFOBJECT_TO_TYPE(self, module_container_t*);
 
@@ -66,7 +66,7 @@ REFOBJECT_DEFINE_TYPE(module_container_t,
         REFOBJECT_DEFINE_TYPE_NEW(__module_container_new)
         );
 
-int                     module_container_add_module(module_container_t *self, module_t *module)
+int module_container_add_module(_Ptr<module_container_t> self, module_t *module)
 {
     if (!self)
         return -1;
@@ -81,7 +81,7 @@ int                     module_container_add_module(module_container_t *self, mo
     return 0;
 }
 
-int                     module_container_delete_module(module_container_t *self, const char *name)
+int module_container_delete_module(_Ptr<module_container_t> self, _Nt_array_ptr<const char> name)
 {
     module_t *module;
 
@@ -101,7 +101,7 @@ int                     module_container_delete_module(module_container_t *self,
     return 0;
 }
 
-module_t *              module_container_get_module(module_container_t *self, const char *name)
+module_t * module_container_get_module(module_container_t *self : itype(_Ptr<module_container_t> ) , const char *name : itype(_Nt_array_ptr<const char> ) )
 {
     refobject_base_t *search;
     module_t *ret;
@@ -123,7 +123,7 @@ module_t *              module_container_get_module(module_container_t *self, co
     return ret;
 }
 
-xmlNodePtr                      module_container_get_modulelist_as_xml(module_container_t *self)
+xmlNodePtr module_container_get_modulelist_as_xml(module_container_t *self : itype(_Ptr<module_container_t> ) )
 {
     xmlNodePtr root;
     avl_node *avlnode;
@@ -154,7 +154,7 @@ xmlNodePtr                      module_container_get_modulelist_as_xml(module_co
     return root;
 }
 
-static void __module_free(refobject_t self, void **userdata)
+static void __module_free(refobject_t self, void** userdata)
 {
     module_t *mod = REFOBJECT_TO_TYPE(self, module_t *);
 
@@ -174,7 +174,7 @@ REFOBJECT_DEFINE_TYPE(module_t,
         REFOBJECT_DEFINE_TYPE_FREE(__module_free)
         );
 
-module_t *              module_new(const char *name, module_setup_handler_t newcb, module_setup_handler_t freecb, void *userdata)
+module_t * module_new(_Nt_array_ptr<const char> name, _Ptr<int (module_t* , void** )> newcb, _Ptr<int (_Ptr<module_t> , void** )> freecb, void* userdata)
 {
     module_t *ret = refobject_new__new(module_t, NULL, name, NULL);
 
@@ -196,7 +196,7 @@ module_t *              module_new(const char *name, module_setup_handler_t newc
     return ret;
 }
 
-int                             module_add_link(module_t *self, const char *type, const char *url, const char *title)
+int module_add_link(_Ptr<module_t> self, _Nt_array_ptr<const char> type, _Nt_array_ptr<const char> url, _Nt_array_ptr<const char> title)
 {
     char *n_url = NULL;
     char *n_title = NULL;
@@ -232,7 +232,7 @@ int                             module_add_link(module_t *self, const char *type
     return 0;
 }
 
-const module_client_handler_t * module_get_client_handler(module_t *self, const char *name)
+_Ptr<const module_client_handler_t> module_get_client_handler(module_t *self : itype(_Ptr<module_t> ) , _Nt_array_ptr<const char> name)
 {
     size_t i;
 
@@ -251,7 +251,7 @@ const module_client_handler_t * module_get_client_handler(module_t *self, const 
     return NULL;
 }
 
-int                             module_add_client_handler(module_t *self, const module_client_handler_t *handlers, size_t len)
+int module_add_client_handler(_Ptr<module_t> self, _Array_ptr<const module_client_handler_t> handlers, size_t len)
 {
     if (!self)
         return -1;

@@ -26,7 +26,7 @@ static auth_result anonymous_auth(auth_client *auth_user)
     return AUTH_OK;
 }
 
-int  auth_get_anonymous_auth(auth_t *authenticator, config_options_t *options)
+int auth_get_anonymous_auth(_Ptr<auth_t> authenticator, config_options_t *options)
 {
     (void)options;
     authenticator->authenticate_client = anonymous_auth;

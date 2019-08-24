@@ -31,7 +31,7 @@
 #include "logging.h"
 
 
-static void midi_codec_free (ogg_state_t *ogg_info, ogg_codec_t *codec)
+static void midi_codec_free(_Ptr<ogg_state_t> ogg_info, _Ptr<ogg_codec_t> codec)
 {
     ICECAST_LOG_DEBUG("freeing MIDI codec");
     ogg_stream_clear (&codec->os);
@@ -40,9 +40,9 @@ static void midi_codec_free (ogg_state_t *ogg_info, ogg_codec_t *codec)
 
 
 /* Here, we just verify the page is ok and then add it to the queue */
-static refbuf_t *process_midi_page (ogg_state_t *ogg_info, ogg_codec_t *codec, ogg_page *page, format_plugin_t *plugin)
+static _Ptr<refbuf_t> process_midi_page(_Ptr<ogg_state_t> ogg_info, _Ptr<ogg_codec_t> codec, ogg_page *page, _Ptr<format_plugin_t> plugin)
 {
-    refbuf_t * refbuf;
+    _Ptr<refbuf_t> refbuf = NULL;
 
     if (ogg_stream_pagein (&codec->os, page) < 0)
     {
@@ -56,10 +56,10 @@ static refbuf_t *process_midi_page (ogg_state_t *ogg_info, ogg_codec_t *codec, o
 
 /* Check for midi header in logical stream */
 
-ogg_codec_t *initial_midi_page (format_plugin_t *plugin, ogg_page *page)
+_Ptr<ogg_codec_t> initial_midi_page(_Ptr<format_plugin_t> plugin, ogg_page *page)
 {
-    ogg_state_t *ogg_info = plugin->_state;
-    ogg_codec_t *codec = calloc (1, sizeof (ogg_codec_t));
+    _Ptr<ogg_state_t> ogg_info =  plugin->_state;
+    _Ptr<ogg_codec_t> codec =  calloc (1, sizeof (ogg_codec_t));
     ogg_packet packet;
 
     ogg_stream_init (&codec->os, ogg_page_serialno (page));

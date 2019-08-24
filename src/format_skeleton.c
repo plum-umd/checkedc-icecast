@@ -32,7 +32,7 @@
 #include "logging.h"
 
 
-static void skeleton_codec_free (ogg_state_t *ogg_info, ogg_codec_t *codec)
+static void skeleton_codec_free(_Ptr<ogg_state_t> ogg_info, _Ptr<ogg_codec_t> codec)
 {
     ICECAST_LOG_DEBUG("freeing skeleton codec");
     ogg_stream_clear (&codec->os);
@@ -43,7 +43,7 @@ static void skeleton_codec_free (ogg_state_t *ogg_info, ogg_codec_t *codec)
 /* skeleton pages are not rebuilt, so here we just for headers and then
  * pass them straight through to the the queue
  */
-static refbuf_t *process_skeleton_page (ogg_state_t *ogg_info, ogg_codec_t *codec, ogg_page *page, format_plugin_t *plugin)
+static _Ptr<refbuf_t> process_skeleton_page(_Ptr<ogg_state_t> ogg_info, _Ptr<ogg_codec_t> codec, ogg_page *page, _Ptr<format_plugin_t> plugin)
 {
     ogg_packet packet;
 
@@ -67,10 +67,10 @@ static refbuf_t *process_skeleton_page (ogg_state_t *ogg_info, ogg_codec_t *code
 /* Check if specified BOS page is the start of a skeleton stream and
  * if so, create a codec structure for handling it
  */
-ogg_codec_t *initial_skeleton_page (format_plugin_t *plugin, ogg_page *page)
+_Ptr<ogg_codec_t> initial_skeleton_page(_Ptr<format_plugin_t> plugin, ogg_page *page)
 {
-    ogg_state_t *ogg_info = plugin->_state;
-    ogg_codec_t *codec = calloc (1, sizeof (ogg_codec_t));
+    _Ptr<ogg_state_t> ogg_info =  plugin->_state;
+    _Ptr<ogg_codec_t> codec =  calloc (1, sizeof (ogg_codec_t));
     ogg_packet packet;
 
     ogg_stream_init (&codec->os, ogg_page_serialno (page));

@@ -37,7 +37,7 @@ REFOBJECT_FORWARD_TYPE(buffer_t);
  *  userdata, name, associated
  *      See refobject_new().
  */
-buffer_t *  buffer_new(ssize_t preallocation, void *userdata, const char *name, refobject_t associated);
+buffer_t * buffer_new(ssize_t preallocation, void* userdata, _Nt_array_ptr<const char> name, refobject_t associated);
 
 /* Depreciated: This creates a new buffer with defaults.
  * Do NOT use this. Use refobject_new(buffer_t)
@@ -45,7 +45,7 @@ buffer_t *  buffer_new(ssize_t preallocation, void *userdata, const char *name, 
  * This is the same as:
  *  buffer_new(-1, NULL, NULL, REFOBJECT_NULL)
  */
-buffer_t *  buffer_new_simple(void);
+_Ptr<buffer_t> buffer_new_simple(void);
 
 /* This function preallocates space for later use.
  * Parameters:
@@ -58,7 +58,7 @@ buffer_t *  buffer_new_simple(void);
  *  internal reallocation calls happening to often. However it is not required to call
  *  this function before adding data to the buffer.
  */
-void        buffer_preallocate(buffer_t *buffer, size_t request);
+void buffer_preallocate(buffer_t *buffer : itype(_Ptr<buffer_t> ) , size_t request);
 
 /* Gets data and length of the buffer.
  * Parameters:
@@ -70,7 +70,7 @@ void        buffer_preallocate(buffer_t *buffer, size_t request);
  *      Pointer to the length of how many bytes are in the buffer. If NULL
  *      length is not returned.
  */
-int         buffer_get_data(buffer_t *buffer, const void **data, size_t *length);
+int buffer_get_data(_Ptr<buffer_t> buffer, _Ptr<_Array_ptr<const void>> data, _Ptr<size_t> length);
 
 /* Gets data as a string. The string is '\0'-terminated.
  * Parameters:
@@ -79,7 +79,7 @@ int         buffer_get_data(buffer_t *buffer, const void **data, size_t *length)
  *  string
  *      The string representing the data hold by the buffer.
  */
-int         buffer_get_string(buffer_t *buffer, const char **string);
+int buffer_get_string(_Ptr<buffer_t> buffer, _Ptr<_Array_ptr<const char>> string);
 
 /* Sets the length of the buffer.
  * Parameters:
@@ -93,7 +93,7 @@ int         buffer_get_string(buffer_t *buffer, const char **string);
  *
  *  Calling this with length set to 0 clears the buffer but does not deallocate it.
  */
-int         buffer_set_length(buffer_t *buffer, size_t length);
+int buffer_set_length(_Ptr<buffer_t> buffer, size_t length);
 
 /* Shifts data out of the buffer.
  * Parameters:
@@ -106,7 +106,7 @@ int         buffer_set_length(buffer_t *buffer, size_t length);
  *  must not be used to implement a kind of ring buffer as it will result in
  *  poor performance caused by massive reallocations and memory copies.
  */
-int         buffer_shift(buffer_t *buffer, size_t amount);
+int buffer_shift(_Ptr<buffer_t> buffer, size_t amount);
 
 /* This pushes data to the end of the buffer.
  * Parameters:
@@ -119,7 +119,7 @@ int         buffer_shift(buffer_t *buffer, size_t amount);
  * Notes:
  *  Consider using buffer_zerocopy_*().
  */
-int         buffer_push_data(buffer_t *buffer, const void *data, size_t length);
+int buffer_push_data(_Ptr<buffer_t> buffer, _Ptr<const void> data, size_t length);
 
 /* This pushes a string to the end of the buffer.
  * Parameters:
@@ -131,7 +131,7 @@ int         buffer_push_data(buffer_t *buffer, const void *data, size_t length);
  * Notes:
  *  Consider using buffer_zerocopy_*().
  */
-int         buffer_push_string(buffer_t *buffer, const char *string);
+int buffer_push_string(_Ptr<buffer_t> buffer, _Nt_array_ptr<const char> string);
 
 /* This pushes a formated string to the end of the buffer.
  * Parameters:
@@ -142,7 +142,7 @@ int         buffer_push_string(buffer_t *buffer, const char *string);
  *  ...
  *      The parameters according to the format string.
  */
-int         buffer_push_printf(buffer_t *buffer, const char *format, ...);
+int buffer_push_printf(_Ptr<buffer_t> buffer, _Ptr<const char> format, ...);
 
 /* This pushes a formated string to the end of the buffer using a va_list.
  * Parameters:
@@ -155,7 +155,7 @@ int         buffer_push_printf(buffer_t *buffer, const char *format, ...);
  * See also:
  *  vprintf(3).
  */
-int         buffer_push_vprintf(buffer_t *buffer, const char *format, va_list ap);
+int buffer_push_vprintf(_Ptr<buffer_t> buffer, const char *format, va_list ap);
 
 /* This pushes the content of another buffer to the end of the buffer.
  * Parameters:
@@ -164,7 +164,7 @@ int         buffer_push_vprintf(buffer_t *buffer, const char *format, va_list ap
  *  source
  *      The buffer which's content is to be copied.
  */
-int         buffer_push_buffer(buffer_t *buffer, buffer_t *source);
+int buffer_push_buffer(_Ptr<buffer_t> buffer, _Ptr<buffer_t> source);
 
 /* This requests for a memory buffer that can be pushed to without the need for copy.
  * Parameters:
@@ -178,7 +178,7 @@ int         buffer_push_buffer(buffer_t *buffer, buffer_t *source);
  *  This is the first step of the zero copy push. After the memory returned by data has been
  *  written (e.g. used in a call to read(2)) buffer_zerocopy_push_complete() must be called.
  */
-int         buffer_zerocopy_push_request(buffer_t *buffer, void **data, size_t request);
+int buffer_zerocopy_push_request(_Ptr<buffer_t> buffer, void** data, size_t request);
 
 /* This is the final step of a zero copy push.
  * Parameters:
@@ -188,6 +188,6 @@ int         buffer_zerocopy_push_request(buffer_t *buffer, void **data, size_t r
  *      Amount of data in bytes that has actually been written into the memory area.
  *      May be zero to what has been requested with request.
  */
-int         buffer_zerocopy_push_complete(buffer_t *buffer, size_t done);
+int buffer_zerocopy_push_complete(_Ptr<buffer_t> buffer, size_t done);
 
 #endif

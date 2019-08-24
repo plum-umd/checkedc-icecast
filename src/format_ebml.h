@@ -19,6 +19,6 @@
 
 #include "format.h"
 
-int format_ebml_get_plugin (source_t *source);
+int format_ebml_get_plugin(_Ptr<source_t> source);
 
 #endif  /* __FORMAT_EBML_H__ */

@@ -39,9 +39,9 @@ void refbuf_shutdown(void)
 {
 }
 
-refbuf_t *refbuf_new (unsigned int size)
+_Ptr<refbuf_t> refbuf_new(unsigned int size)
 {
-    refbuf_t *refbuf;
+    _Ptr<refbuf_t> refbuf = NULL;
 
     refbuf = (refbuf_t *)malloc(sizeof(refbuf_t));
     if (refbuf == NULL)
@@ -62,18 +62,18 @@ refbuf_t *refbuf_new (unsigned int size)
     return refbuf;
 }
 
-void refbuf_addref(refbuf_t *self)
+void refbuf_addref(_Ptr<refbuf_t> self)
 {
     self->_count++;
 }
 
-static void refbuf_release_associated (refbuf_t *ref)
+static void refbuf_release_associated(_Ptr<refbuf_t> ref)
 {
     if (ref == NULL)
         return;
     while (ref)
     {
-        refbuf_t *to_go = ref;
+        _Ptr<refbuf_t> to_go =  ref;
         ref = to_go->next;
         if ( to_go->_count == 1 )
             to_go->next = NULL;
@@ -81,7 +81,7 @@ static void refbuf_release_associated (refbuf_t *ref)
     }
 }
 
-void refbuf_release(refbuf_t *self)
+void refbuf_release(_Ptr<refbuf_t> self)
 {
     if (self == NULL)
         return;

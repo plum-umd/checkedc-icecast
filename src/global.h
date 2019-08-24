@@ -35,11 +35,11 @@ typedef struct ice_global_tag
     int clients;
     int schedule_config_reread;
 
-    avl_tree *source_tree;
+    _Ptr<avl_tree> source_tree;
     /* for locally defined relays */
-    relay_t *relays;
+    _Ptr<relay_t> relays;
     /* relays retrieved from master */
-    relay_t *master_relays;
+    _Ptr<relay_t> master_relays;
 
     module_container_t *modulecontainer;
 
