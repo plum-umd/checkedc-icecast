@@ -1,0 +1,183 @@
+make  all-recursive
+make[1]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+Making all in src
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Making all in common/avl
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+  CC       libiceavl_la-avl.lo
+Makefile:421: recipe for target 'libiceavl_la-avl.lo' failed
+  CCLD     libiceavl.la
+Makefile:386: recipe for target 'libiceavl.la' failed
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/avl'
+Making all in common/net
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net'
+  CC       libicenet_la-sock.lo
+Makefile:423: recipe for target 'libicenet_la-sock.lo' failed
+  CC       libicenet_la-resolver.lo
+  CCLD     libicenet.la
+Makefile:387: recipe for target 'libicenet.la' failed
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/net'
+Making all in common/thread
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/thread'
+  CC       libicethread_la-thread.lo
+Makefile:422: recipe for target 'libicethread_la-thread.lo' failed
+  CCLD     libicethread.la
+Makefile:387: recipe for target 'libicethread.la' failed
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/thread'
+Making all in common/httpp
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/httpp'
+  CC       libicehttpp_la-httpp.lo
+Makefile:426: recipe for target 'libicehttpp_la-httpp.lo' failed
+  CC       libicehttpp_la-encoding.lo
+Makefile:433: recipe for target 'libicehttpp_la-encoding.lo' failed
+  CCLD     libicehttpp.la
+Makefile:390: recipe for target 'libicehttpp.la' failed
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/httpp'
+Making all in common/log
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/log'
+  CC       log.lo
+Makefile:409: recipe for target 'log.lo' failed
+  CCLD     libicelog.la
+Makefile:382: recipe for target 'libicelog.la' failed
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/log'
+Making all in common/timing
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/timing'
+  CC       libicetiming_la-timing.lo
+  CCLD     libicetiming.la
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src/common/timing'
+make[3]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+  CC       tests/ctest_lib.lo
+  CCLD     libice_ctest.la
+  CC       icecast-main.o
+Makefile:1013: recipe for target 'icecast-main.o' failed
+  CC       icecast-cfgfile.o
+Makefile:1027: recipe for target 'icecast-cfgfile.o' failed
+  CC       icecast-logging.o
+Makefile:1041: recipe for target 'icecast-logging.o' failed
+  CC       icecast-sighandler.o
+Makefile:1055: recipe for target 'icecast-sighandler.o' failed
+  CC       icecast-connection.o
+Makefile:1069: recipe for target 'icecast-connection.o' failed
+  CC       icecast-global.o
+Makefile:1083: recipe for target 'icecast-global.o' failed
+  CC       icecast-util.o
+Makefile:1097: recipe for target 'icecast-util.o' failed
+  CC       icecast-errors.o
+  CC       icecast-slave.o
+Makefile:1125: recipe for target 'icecast-slave.o' failed
+  CC       icecast-source.o
+Makefile:1139: recipe for target 'icecast-source.o' failed
+  CC       icecast-stats.o
+Makefile:1153: recipe for target 'icecast-stats.o' failed
+  CC       icecast-refbuf.o
+Makefile:1167: recipe for target 'icecast-refbuf.o' failed
+  CC       icecast-client.o
+Makefile:1181: recipe for target 'icecast-client.o' failed
+  CC       icecast-playlist.o
+Makefile:1195: recipe for target 'icecast-playlist.o' failed
+  CC       icecast-xslt.o
+Makefile:1209: recipe for target 'icecast-xslt.o' failed
+  CC       icecast-fserve.o
+Makefile:1223: recipe for target 'icecast-fserve.o' failed
+  CC       icecast-admin.o
+Makefile:1237: recipe for target 'icecast-admin.o' failed
+  CC       icecast-resourcematch.o
+Makefile:1251: recipe for target 'icecast-resourcematch.o' failed
+  CC       icecast-md5.o
+Makefile:1265: recipe for target 'icecast-md5.o' failed
+  CC       icecast-matchfile.o
+Makefile:1279: recipe for target 'icecast-matchfile.o' failed
+  CC       icecast-tls.o
+Makefile:1293: recipe for target 'icecast-tls.o' failed
+  CC       icecast-refobject.o
+Makefile:1307: recipe for target 'icecast-refobject.o' failed
+  CC       icecast-buffer.o
+Makefile:1321: recipe for target 'icecast-buffer.o' failed
+  CC       icecast-module.o
+Makefile:1335: recipe for target 'icecast-module.o' failed
+  CC       icecast-reportxml.o
+Makefile:1349: recipe for target 'icecast-reportxml.o' failed
+  CC       icecast-listensocket.o
+Makefile:1363: recipe for target 'icecast-listensocket.o' failed
+  CC       icecast-fastevent.o
+Makefile:1377: recipe for target 'icecast-fastevent.o' failed
+  CC       icecast-format.o
+Makefile:1391: recipe for target 'icecast-format.o' failed
+  CC       icecast-format_ogg.o
+Makefile:1405: recipe for target 'icecast-format_ogg.o' failed
+  CC       icecast-format_mp3.o
+Makefile:1419: recipe for target 'icecast-format_mp3.o' failed
+  CC       icecast-format_midi.o
+Makefile:1433: recipe for target 'icecast-format_midi.o' failed
+  CC       icecast-format_flac.o
+Makefile:1447: recipe for target 'icecast-format_flac.o' failed
+  CC       icecast-format_ebml.o
+Makefile:1461: recipe for target 'icecast-format_ebml.o' failed
+  CC       icecast-format_kate.o
+Makefile:1475: recipe for target 'icecast-format_kate.o' failed
+  CC       icecast-format_skeleton.o
+Makefile:1489: recipe for target 'icecast-format_skeleton.o' failed
+  CC       icecast-format_opus.o
+Makefile:1503: recipe for target 'icecast-format_opus.o' failed
+  CC       icecast-event.o
+Makefile:1517: recipe for target 'icecast-event.o' failed
+  CC       icecast-event_log.o
+Makefile:1531: recipe for target 'icecast-event_log.o' failed
+  CC       icecast-event_exec.o
+Makefile:1545: recipe for target 'icecast-event_exec.o' failed
+  CC       icecast-acl.o
+Makefile:1559: recipe for target 'icecast-acl.o' failed
+  CC       icecast-auth.o
+Makefile:1573: recipe for target 'icecast-auth.o' failed
+  CC       icecast-auth_htpasswd.o
+Makefile:1587: recipe for target 'icecast-auth_htpasswd.o' failed
+  CC       icecast-auth_anonymous.o
+Makefile:1601: recipe for target 'icecast-auth_anonymous.o' failed
+  CC       icecast-auth_static.o
+Makefile:1615: recipe for target 'icecast-auth_static.o' failed
+  CC       icecast-auth_enforce_auth.o
+Makefile:1629: recipe for target 'icecast-auth_enforce_auth.o' failed
+  CC       icecast-curl.o
+  CC       icecast-auth_url.o
+Makefile:1657: recipe for target 'icecast-auth_url.o' failed
+  CC       icecast-event_url.o
+Makefile:1671: recipe for target 'icecast-event_url.o' failed
+  CC       icecast-yp.o
+Makefile:1685: recipe for target 'icecast-yp.o' failed
+  CC       icecast-format_vorbis.o
+Makefile:1699: recipe for target 'icecast-format_vorbis.o' failed
+make[3]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Makefile:1754: recipe for target 'all-recursive' failed
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/src'
+Making all in conf
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/conf'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/conf'
+Making all in doc
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/doc'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/doc'
+Making all in web
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/web'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/web'
+Making all in admin
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/admin'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/admin'
+Making all in win32
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/win32'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/win32'
+Making all in examples
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/examples'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/examples'
+Making all in tests
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/tests'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast/tests'
+make[2]: Entering directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+make[2]: Nothing to be done for 'all-am'.
+make[2]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
+make[1]: Leaving directory '/home/hasantouma/plum-umd-icecast/checkedc-icecast'
